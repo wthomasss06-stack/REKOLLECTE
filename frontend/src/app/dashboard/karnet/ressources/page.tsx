@@ -1,16 +1,15 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 import ResourceBuilder from "@/components/karnet/ResourceBuilder";
 
 export default function KarnetRessourcesPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  // Arrivée depuis l'activation de KARN3T (voir paramètres/administration) :
-  // le builder propose alors "Terminé" / "Plus tard" pour renvoyer vers la vue
-  // d'ensemble une fois la configuration faite (ou sautée).
+  // Arrivée juste après l'activation de KARN3T (voir paramètres/administration) :
+  // le modal "Ajouter une ressource" se déclenche directement pour que Patron/
+  // Gérant configure tout de suite ou ferme le modal ("Annuler") pour plus tard.
   const onboarding = searchParams.get("onboarding") === "1";
 
-  return <ResourceBuilder onDone={onboarding ? () => router.push("/dashboard/karnet") : undefined} />;
+  return <ResourceBuilder autoOpenCreate={onboarding} />;
 }
