@@ -7,7 +7,7 @@ import Loader from "@/components/Loader";
 import { useDialog } from "@/components/ui/DialogProvider";
 import { useAuthContext } from "@/context/AuthContext";
 import { apiClient } from "@/lib/api";
-import type { AuditEvent, OrganizationCapabilities, UserProfile } from "@/types";
+import type { AuditEvent, OrganizationCapabilities, PaginatedResponse, UserProfile } from "@/types";
 
 const ACTION_LABELS: Record<string, string> = {
   "auth.login": "Connexion",
@@ -31,6 +31,9 @@ export default function AdministrationPage() {
   const router = useRouter();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [events, setEvents] = useState<AuditEvent[]>([]);
+  const [auditPage, setAuditPage] = useState(1);
+  const [hasMoreEvents, setHasMoreEvents] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -61,14 +64,32 @@ export default function AdministrationPage() {
   };
 
   useEffect(() => {
-    Promise.all([apiClient.get<UserProfile>("/auth/me/"), apiClient.get<AuditEvent[]>("/auth/audit/")])
+    Promise.all([apiClient.get<UserProfile>("/auth/me/"), apiClient.get<PaginatedResponse<AuditEvent>>("/auth/audit/")])
       .then(([me, audit]) => {
         setUser(me.data);
-        setEvents(audit.data);
+        setEvents(audit.data.results);
+        setHasMoreEvents(Boolean(audit.data.next));
       })
       .catch(() => setError("Impossible de charger le journal d’administration."))
       .finally(() => setLoading(false));
   }, []);
+
+  const loadMoreEvents = async () => {
+    if (!hasMoreEvents || loadingMore) return;
+    setLoadingMore(true);
+    try {
+      const nextPage = auditPage + 1;
+      // On redemande par numéro de page (comme le registre) plutôt que de
+      // suivre l'URL absolue `next` renvoyée par l'API : celle-ci pointe vers
+      // le domaine Render lui-même, hors du proxy Next.js same-origin.
+      const response = await apiClient.get<PaginatedResponse<AuditEvent>>("/auth/audit/", { params: { page: nextPage } });
+      setEvents((current) => [...current, ...response.data.results]);
+      setAuditPage(nextPage);
+      setHasMoreEvents(Boolean(response.data.next));
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   if (loading) return <Loader fullScreen={false} />;
   if (error || !user) return <p className="text-sm text-error-text">{error || "Accès refusé."}</p>;
@@ -130,6 +151,16 @@ export default function AdministrationPage() {
           })}
           {events.length === 0 && <p className="py-3 text-sm text-ink-soft">Aucun événement d’administration.</p>}
         </div>
+        {hasMoreEvents && (
+          <button
+            type="button"
+            onClick={loadMoreEvents}
+            disabled={loadingMore}
+            className="mt-4 w-full rounded-lg border border-border py-2 text-sm font-medium text-ink-soft hover:bg-canvas disabled:opacity-60"
+          >
+            {loadingMore ? "Chargement…" : "Charger plus"}
+          </button>
+        )}
       </section>
     </div>
   );

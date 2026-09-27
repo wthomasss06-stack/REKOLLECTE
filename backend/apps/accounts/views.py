@@ -1,6 +1,7 @@
 from django.db import transaction
 from django.utils import timezone
-from rest_framework import status, throttling
+from rest_framework import generics, status, throttling
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -229,9 +230,20 @@ class RevokeMemberView(APIView):
         return Response(UserSerializer(member).data)
 
 
-class AuditEventListView(APIView):
-    permission_classes = [IsAuthenticated, IsBoss]
+class AuditEventPagination(PageNumberPagination):
+    # Le journal d'audit grossit sans limite avec l'activité de l'établissement
+    # (connexions, révocations, activation KARN3T...) ; le `[:100]` d'origine
+    # cachait silencieusement tout ce qui précédait les 100 événements les plus
+    # récents, sans le signaler ni permettre de remonter dans l'historique.
+    page_size = 20
+    page_size_query_param = "page_size"
+    max_page_size = 50
 
-    def get(self, request):
-        events = AuditEvent.objects.filter(organization=request.user.organization).select_related("actor", "target_user")[:100]
-        return Response(AuditEventSerializer(events, many=True).data)
+
+class AuditEventListView(generics.ListAPIView):
+    serializer_class = AuditEventSerializer
+    permission_classes = [IsAuthenticated, IsBoss]
+    pagination_class = AuditEventPagination
+
+    def get_queryset(self):
+        return AuditEvent.objects.filter(organization=self.request.user.organization).select_related("actor", "target_user")

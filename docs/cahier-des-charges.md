@@ -310,12 +310,77 @@ action directe « Créer une réservation » qui préremplit le client.
 Voir `rapport-fusion-r3ns3ign3m3nt-karnet.md` pour le détail livraison par
 livraison, et `docs/phase-10-recette.md` pour la checklist de recette manuelle.
 
-### 16.8 Limite connue et documentée (pas un bug)
+### 16.8 Normalisation téléphone Côte d'Ivoire — corrigée
 
-La normalisation de téléphone actuelle ne rapproche pas un numéro local
-(`0701020304`) de sa forme internationale (`+2250701020304`) : ce sont deux
-identifiants distincts pour la détection de doublon client. Confirmé par un
-test automatisé (`test_sync_matches_same_client_with_dashes_or_country_code_variants`).
-À traiter avant une ouverture commerciale à grande échelle en Côte d'Ivoire
-(normalisation spécifique à l'indicatif +225), déjà noté comme tel dans le
-rapport de fusion.
+La limite documentée plus haut (un numéro local et sa forme internationale
+créaient deux fiches) est **corrigée** : `normalize_phone()` reconnaît
+désormais un numéro ivoirien local à 10 chiffres (`0701020304`) et sa forme
+internationale (`+225`/`00225` suivi des 10 chiffres) comme un seul et même
+numéro, quel que soit le format de saisie (espaces, tirets, indicatif).
+Vérifié par `test_sync_matches_same_client_with_dashes_or_country_code_variants`
+et `test_normalize_phone_leaves_non_ivorian_numbers_untouched` (les numéros
+hors Côte d'Ivoire ne sont pas réinterprétés).
+
+## 17. Correctif critique de production — session expirée non détectée — 27 septembre 2026
+
+Signalé en production (Render) : après un redéploiement, les utilisateurs déjà
+connectés se retrouvaient bloqués sur un dashboard affichant « Impossible de
+charger le registre » avec un badge « Hors ligne » trompeur, alors que le
+serveur répondait normalement (confirmé par les logs Render : chaque requête,
+y compris `/auth/me/` et `/auth/token/refresh/`, recevait un `401` cohérent et
+explicite — pas une panne réseau).
+
+### Cause räcine (deux bugs distincts, cumulatifs)
+
+1. **`AuthContext.restoreSession()` masquait une session réellement morte.**
+   Quand le rafraîchissement du token échouait **définitivement** (401/403
+   confirmé par le serveur — pas un incident réseau, déjà filtré en amont dans
+   `lib/authClient.ts`), le code affichait quand même l'utilisateur mis en
+   cache localement et le déclarait « authentifié ». Le garde de layout
+   (`if (!isAuthenticated) router.push("/")`) ne se déclenchait donc jamais,
+   et l'utilisateur restait sur un dashboard fantôme où chaque appel API
+   échouait en boucle avec 401, sans jamais proposer de se reconnecter.
+2. **`networkMonitor.ts` ciblait `http://localhost:8000` en production**,
+   au lieu de passer par le proxy Next.js same-origin (`/api/v1`) comme le
+   reste de l'application. Ce test de connectivité échouait donc à chaque
+   fois en production (hôte injoignable depuis le navigateur), faisant
+   afficher un badge « Hors ligne » en permanence — y compris quand l'API
+   répondait correctement — brouillant complètement le diagnostic du
+   problème réel (une session expirée, pas une coupure réseau).
+
+### Correctifs appliqués
+
+- `AuthContext.restoreSession()` efface désormais le cache local et déclare
+  l'utilisateur déconnecté sur un rejet définitif du refresh, au lieu de
+  masquer l'expiration — l'utilisateur est renvoyé proprement vers la
+  connexion au lieu de rester bloqué.
+- `networkMonitor.ts` utilise le même proxy same-origin (`/api/v1`) que le
+  reste de l'application pour son test de connectivité.
+- Journal d'audit (`/auth/audit/`) : l'ancien plafond fixe `[:100]` (sans
+  pagination, sans indication qu'il tronquait l'historique) est remplacé par
+  la même pagination serveur que le registre (`page`, `page_size`, `count`,
+  `next`, `previous`), avec un bouton « Charger plus » côté interface.
+
+### Point de vigilance qui reste à vérifier côté infrastructure (hors code)
+
+~~Le code ne peut pas exclure une autre cause possible...~~ **Confirmé** : la
+variable `SECRET_KEY` sur Render était littéralement égale au placeholder de
+`backend/.env.example` (`change-moi-en-production...`), jamais remplacée par
+une vraie valeur. C'est une faille de sécurité critique, pas seulement une
+cause d'instabilité de session : quiconque connaît ou devine ce placeholder
+(visible dans le dépôt) peut forger un JWT valide pour **n'importe quel
+compte, y compris Patron**, sur n'importe quel établissement.
+
+**Correctif appliqué en plus** : `core/settings.py` refuse désormais de
+démarrer en production (`DEBUG=False`) si `SECRET_KEY` correspond à une valeur
+de placeholder connue ou fait moins de 32 caractères — défense en profondeur
+pour qu'une erreur de configuration de ce type ne puisse plus jamais tourner
+silencieusement. Testé manuellement (placeholder rejeté, clé courte rejetée,
+clé aléatoire acceptée).
+
+**Action encore requise côté Render, à faire immédiatement :**
+1. Générer une vraie clé aléatoire (`python -c "import secrets; print(secrets.token_urlsafe(64))"`).
+2. La définir comme `SECRET_KEY` dans les variables d'environnement Render (jamais dans Git).
+3. Redéployer — tous les jetons existants seront invalidés d'un coup (attendu et voulu : tout le monde doit se reconnecter une fois).
+4. Vérifier au passage `PLATFORM_ADMIN_PASSWORD` sur Render : même risque si le placeholder `.env.example` y a aussi été copié tel quel.
+5. Rotation du secret Cloudinary (déjà notée plus haut) : à faire dans la même passe d'hygiène des secrets.

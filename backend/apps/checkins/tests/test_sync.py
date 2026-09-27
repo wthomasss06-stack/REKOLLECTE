@@ -90,7 +90,7 @@ def test_sync_creates_client_and_links_checkin_when_karnet_enabled(db, api_clien
     checkin = CheckIn.objects.get(idempotency_key=payload["idempotency_key"])
     assert checkin.client_id == client.id
     assert client.full_name == "Awa Kone"
-    assert client.phone == "+2250700000000"
+    assert client.phone == "0700000000"  # forme locale canonique (indicatif +225 normalisé)
     assert client.email == "awa@example.com"
 
 
@@ -124,8 +124,9 @@ def test_sync_reuses_existing_client_on_second_visit(db, api_client, organizatio
 
 
 def test_sync_matches_same_client_with_dashes_or_country_code_variants(db, api_client, organization, form_template):
-    """Recette phase 10 — un même numéro saisi avec des tirets ou un indicatif
-    international ne doit pas créer un doublon."""
+    """Recette phase 10 — un même numéro écrit avec des tirets ou un indicatif
+    international (+225/00225) ne doit pas créer un doublon (normalisation
+    spécifique à la Côte d'Ivoire, corrigée suite à la recette)."""
     from apps.karnet.models import Client
 
     organization.karnet_enabled = True
@@ -147,12 +148,25 @@ def test_sync_matches_same_client_with_dashes_or_country_code_variants(db, api_c
         {"checkins": [valid_checkin_payload(organization.qr_secure_token, responses={"nom": "Bakary Traore", "telephone": "+2250701020304"})]},
         format="json",
     )
+    third = api_client.post(
+        "/api/v1/checkins/sync/",
+        {"checkins": [valid_checkin_payload(organization.qr_secure_token, responses={"nom": "Bakary Traore", "telephone": "00 225 07 01 02 03 04"})]},
+        format="json",
+    )
 
-    # Les indicatifs differents (0701020304 vs +2250701020304) restent des
-    # identifiants distincts cote normalisation actuelle : documente le
-    # comportement reel plutot que de supposer une correspondance implicite.
-    assert second.data["processed"][0]["client_action"] == "created"
-    assert Client.objects.filter(organization=organization).count() == 2
+    assert second.data["processed"][0]["client_action"] == "matched"
+    assert third.data["processed"][0]["client_action"] == "matched"
+    assert Client.objects.filter(organization=organization).count() == 1
+
+
+def test_normalize_phone_leaves_non_ivorian_numbers_untouched():
+    """Un numéro hors Côte d'Ivoire (ex. France) ne doit pas être réinterprété
+    comme un numéro local — seul le format +225/00225 à 10 chiffres locaux est
+    reconnu."""
+    from apps.checkins.services import normalize_phone
+
+    assert normalize_phone("+33 6 12 34 56 78") == "+33612345678"
+    assert normalize_phone("06 12 34 56 78") == "0612345678"  # pas d'indicatif ivoirien détecté, inchangé
 
 
 def test_sync_matches_same_client_with_case_insensitive_email(db, api_client, organization, form_template):

@@ -180,6 +180,24 @@ if not DEBUG:
     if not CSRF_TRUSTED_ORIGINS or "*" in CSRF_TRUSTED_ORIGINS:
         raise RuntimeError("CSRF_TRUSTED_ORIGINS doit contenir des origines HTTPS explicites en production.")
 
+    # SECRET_KEY signe les JWT d'accès/refresh : une valeur par défaut ou un
+    # placeholder documenté (donc devinable par quiconque a vu le dépôt, y
+    # compris .env.example) permettrait de forger un jeton valide pour
+    # n'importe quel compte. On refuse de démarrer plutôt que de tourner
+    # silencieusement avec une clé connue ou trop courte.
+    _INSECURE_SECRET_KEYS = {
+        "dev-secret-key-change-me-32-bytes-minimum",
+        "change-moi-en-production-avec-une-cle-aleatoire-de-32-caracteres-minimum",
+    }
+    if SECRET_KEY in _INSECURE_SECRET_KEYS or "change-moi" in SECRET_KEY or "change-me" in SECRET_KEY:
+        raise RuntimeError(
+            "SECRET_KEY utilise encore une valeur de placeholder (.env.example). "
+            "Génère une clé aléatoire (ex. `python -c \"import secrets; print(secrets.token_urlsafe(64))\")` "
+            "et définis-la dans les variables d'environnement de l'hébergeur."
+        )
+    if len(SECRET_KEY) < 32:
+        raise RuntimeError("SECRET_KEY doit faire au moins 32 caractères en production.")
+
 X_FRAME_OPTIONS = "DENY"
 
 LOGGING = {

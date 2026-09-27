@@ -62,14 +62,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const cached = readSessionCache();
       const tokenValid = await restoreAccessSession();
       if (!tokenValid) {
-        // Un refresh expiré ne doit pas effacer immédiatement la dernière session
-        // connue : l’utilisateur reste dans son dashboard et peut se reconnecter
-        // explicitement si le serveur confirme réellement l’expiration.
-        if (cached?.user) {
-          setUser(cached.user);
-          setOrganization(cached.organization || null);
-          return true;
-        }
+        // `restoreAccessSession()` ne renvoie `false` que sur un rejet DÉFINITIF
+        // du refresh (401/403 confirmé par le serveur) — une panne réseau ou un
+        // cold start est déjà absorbé en amont et renvoie `true` dans ce cas
+        // (voir lib/authClient.ts, `result.transient`). Afficher malgré tout le
+        // cache local ici masquait une session réellement expirée : l'utilisateur
+        // restait sur un dashboard qui semblait connecté mais où chaque appel API
+        // échouait en boucle avec 401 (cause du "Impossible de charger le
+        // registre" sans issue). Une session dont le cookie est mort n'en est
+        // plus une : on efface le cache et on laisse le garde de layout renvoyer
+        // vers la connexion.
+        clearSessionCache();
+        setUser(null);
+        setOrganization(null);
         return false;
       }
       try {

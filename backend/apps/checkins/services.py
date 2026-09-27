@@ -92,14 +92,43 @@ def normalize_email(value: object) -> str:
 
 
 def normalize_phone(value: object) -> str:
-    """Conserve un format stable sans imposer un indicatif national."""
+    """Ramène un numéro à une forme stable pour la détection de doublon.
+
+    Spécifique à la Côte d'Ivoire : un numéro écrit localement (10 chiffres,
+    ex. `0701020304`) et le même numéro écrit avec l'indicatif international
+    (`+225`/`00225` suivi des 10 chiffres) sont ramenés à la **même** clé
+    locale à 10 chiffres — sinon deux saisies du même client créent deux
+    fiches distinctes (point technique identifié dans le rapport de fusion,
+    confirmé par `test_sync_matches_same_client_with_dashes_or_country_code_variants`).
+    Les numéros hors Côte d'Ivoire gardent le comportement d'origine (chiffres
+    bruts, `+` conservé si saisi ainsi) : on ne devine pas leur plan de
+    numérotation national."""
     raw = _as_text(value)
     if not raw:
         return ""
     digits = re.sub(r"\D", "", raw)
     if not digits:
         return ""
+
+    local_ci = _as_ivorian_local_number(digits)
+    if local_ci:
+        return local_ci
+
     return f"+{digits}" if raw.lstrip().startswith("+") else digits
+
+
+def _as_ivorian_local_number(digits: str) -> str | None:
+    """Renvoie la forme locale à 10 chiffres (ex. `0701020304`) si `digits`
+    correspond à un numéro ivoirien saisi localement ou avec son indicatif
+    international, sinon `None`."""
+    if len(digits) == 10 and digits[0] == "0":
+        return digits
+    for prefix in ("00225", "225"):
+        if digits.startswith(prefix) and len(digits) == len(prefix) + 10:
+            remainder = digits[len(prefix):]
+            if remainder[0] == "0":
+                return remainder
+    return None
 
 
 def _field_identity_role(field: dict) -> str | None:

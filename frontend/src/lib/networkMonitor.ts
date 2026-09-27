@@ -1,4 +1,15 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+// Même logique que lib/api.ts : en navigateur, passer par le proxy Next.js
+// same-origin (/api/v1) plutôt que par NEXT_PUBLIC_API_URL. Cette variable n'est
+// pas définie en production (voir next.config.js) — l'ancien fallback
+// `http://localhost:8000/api/v1` était donc appelé tel quel depuis le
+// navigateur en production, échouait à chaque fois (hôte injoignable), et
+// affichait "Hors ligne" en permanence même quand l'API répondait normalement
+// via le proxy. C'est ce qui explique un badge "Hors ligne" alors que le
+// registre, lui, se charge (ou échoue pour une tout autre raison, ex. session
+// expirée) en passant correctement par /api/v1.
+const API_URL = typeof window !== "undefined"
+  ? "/api/v1"
+  : (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1");
 
 export type NetworkStatus = { browserOnline: boolean; apiReachable: boolean; lastChecked: number };
 

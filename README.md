@@ -207,6 +207,7 @@ Toutes les routes API sont préfixées par `/api/v1`.
 | `GET` | `/checkins/stats/` | Membre | Volume, heures et motifs fréquents |
 | `GET` | `/checkins/export/` | Selon permission | Export CSV |
 | `POST` | `/org/me/regenerate-qr/` | Patron | Invalider l’ancien QR |
+| `GET` | `/auth/audit/?page=&page_size=` | Patron | Journal d’audit, paginé (`count`/`next`/`previous`) |
 | `GET` | `/health/` | Public | Vérifier la disponibilité backend |
 | `PATCH` | `/org/me/karnet/` | Patron | Activer/désactiver KARN3T et ses sous-capacités |
 | `GET/POST` | `/karnet/clients/` | Membre (KARN3T actif) | Lister/créer une fiche client |
@@ -438,3 +439,50 @@ fusionné dans le registre R3NS3IGN3M3NT. Cette mise à jour livre les phases 7 
 
 Validation : 65 tests backend passants, migration `karnet.0002` appliquée
 proprement, `manage.py check` sans erreur, `tsc --noEmit` sans erreur.
+
+## Mise à jour — correctif critique session/production, normalisation téléphone, pagination audit — 27 septembre 2026
+
+Suite à un signalement en production (Render) montrant un dashboard bloqué sur
+« Impossible de charger le registre » avec un badge « Hors ligne » trompeur :
+
+- **Bug corrigé** : `AuthContext.restoreSession()` affichait l’utilisateur mis
+  en cache comme « authentifié » même quand le rafraîchissement du token avait
+  été **définitivement rejeté** par le serveur (401/403 confirmé, pas une
+  panne réseau). Le garde de layout ne redirigeait donc jamais vers la
+  connexion, laissant l’utilisateur sur un dashboard où chaque appel API
+  échouait en boucle. Il efface désormais la session et déclare l’utilisateur
+  déconnecté dans ce cas précis.
+- **Bug corrigé** : `networkMonitor.ts` ciblait `http://localhost:8000` en
+  production au lieu du proxy Next.js same-origin (`/api/v1`), faisant
+  échouer son test de connectivité en permanence et afficher « Hors ligne »
+  même quand l’API répondait normalement — brouillant le diagnostic du vrai
+  problème (session expirée).
+- **Normalisation téléphone Côte d’Ivoire corrigée** : un numéro local
+  (`0701020304`) et sa forme internationale (`+225`/`00225` + 10 chiffres)
+  sont désormais reconnus comme le même numéro pour la détection de doublon
+  client — l’ancienne limitation documentée est résolue.
+- **Journal d’audit paginé** : `/auth/audit/` suit désormais le même contrat
+  de pagination que le registre (`page`, `page_size`, `count`, `next`,
+  `previous`) au lieu d’un plafond fixe de 100 événements sans indication de
+  troncature ; bouton « Charger plus » ajouté côté Administration.
+- **Point à vérifier côté infrastructure, hors code** : confirmer dans le
+  dashboard Render que `SECRET_KEY` est une valeur fixe et jamais régénérée
+  automatiquement entre deux déploiements — une rotation invaliderait d’un
+  coup tous les jetons émis avant, ce qui reproduirait la vague de 401
+  observée (voir `docs/cahier-des-charges.md`, section 17).
+
+Validation : 68 tests backend passants, `manage.py check` sans erreur,
+`tsc --noEmit` sans erreur.
+
+## Mise à jour — faille SECRET_KEY confirmée et corrigée — 27 septembre 2026
+
+Confirmé : `SECRET_KEY` sur Render était encore le placeholder de
+`backend/.env.example`, jamais remplacé. Faille de sécurité critique
+(forgeabilité de JWT pour n’importe quel compte), pas seulement une cause
+d’instabilité de session. `core/settings.py` refuse désormais de démarrer en
+production avec un `SECRET_KEY` de placeholder connu ou trop court (< 32
+caractères) — vérifié dans les trois cas (placeholder rejeté, clé courte
+rejetée, clé aléatoire acceptée). **Action encore requise côté Render** :
+générer une vraie clé, la définir dans les variables d’environnement,
+redéployer (tout le monde sera déconnecté une fois, c’est attendu), et
+vérifier `PLATFORM_ADMIN_PASSWORD` par la même occasion.
