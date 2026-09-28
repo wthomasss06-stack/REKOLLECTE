@@ -384,3 +384,31 @@ clé aléatoire acceptée).
 3. Redéployer — tous les jetons existants seront invalidés d'un coup (attendu et voulu : tout le monde doit se reconnecter une fois).
 4. Vérifier au passage `PLATFORM_ADMIN_PASSWORD` sur Render : même risque si le placeholder `.env.example` y a aussi été copié tel quel.
 5. Rotation du secret Cloudinary (déjà notée plus haut) : à faire dans la même passe d'hygiène des secrets.
+
+## 18. OCR pièce d'identité déplacé côté serveur — 27 septembre 2026
+
+**Problème** : le scan de CNI/passeport tournait entièrement dans le navigateur
+(`tesseract.js`, moteur WASM). Sur un téléphone d'entrée de gamme en 4G, le
+téléchargement du moteur + des données de langue puis l'inférence sur le CPU du
+visiteur dépassaient régulièrement le délai de 35 secondes — le visiteur
+retombait sur une saisie manuelle après une longue attente, sans champ prérempli.
+
+**Solution** : la lecture se fait désormais sur le serveur avec Tesseract natif
+(`pytesseract`), via `POST /api/v1/public/forms/<qr_token>/ocr/`.
+- Extraction ciblée CNI ivoirienne (Nom, Prénoms, numéro `CI…`, dates), avec
+  repli générique pour les autres documents.
+- Throttle dédié `ocr: 6/min` (chaque appel coûte du CPU, plus strict que les
+  60/min des autres endpoints publics).
+- L'image n'est jamais écrite sur disque ni en base : décodée en mémoire, jetée
+  avec la réponse (durée de conservation des documents encore à trancher).
+- Dégradation propre : si Tesseract est absent, `available: false` et le
+  formulaire retombe sur la saisie manuelle, jamais sur une erreur 500.
+- `tesseract.js` retiré des dépendances frontend.
+
+**Contrainte d'infrastructure importante** : le runtime Python natif de Render
+ne permet pas d'installer de paquet système (`apt-get`). Le binaire
+`tesseract-ocr` n'y est donc pas disponible. Un `backend/Dockerfile` est fourni
+(installe `tesseract-ocr` + `tesseract-ocr-fra`) ; **le service Render doit être
+basculé en runtime Docker** (Settings > Runtime > Docker) pour que l'OCR serveur
+fonctionne en production. Tant que ce n'est pas fait, l'endpoint répond
+`available: false` et le formulaire reste utilisable en saisie manuelle.

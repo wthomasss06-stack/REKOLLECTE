@@ -2,15 +2,24 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Camera, Check, IdentificationCard, Spinner, UploadSimple, X } from "@phosphor-icons/react";
-import { createWorker, PSM } from "tesseract.js";
+
+import { apiClient } from "@/lib/api";
 
 type ExtractKey = "last_name" | "first_names" | "document_number" | "birth_date" | "nationality" | "expiry_date";
 export type DocumentScanResult = { document_type: string; extracted: Partial<Record<ExtractKey, string>>; raw_text: string; image?: string; validated_at: string };
 
 const LABELS: Record<ExtractKey, string> = { last_name: "Nom", first_names: "Prénoms", document_number: "Numéro du document", birth_date: "Date de naissance", nationality: "Nationalité", expiry_date: "Date d’expiration" };
-const OCR_TIMEOUT_MS = 35_000;
+// La lecture tourne maintenant côté serveur (Tesseract natif, voir
+// apps/checkins/ocr_utils.py) au lieu de tesseract.js dans le navigateur : sur
+// un téléphone d'entrée de gamme en 4G, télécharger le moteur WASM + les
+// données de langue puis faire tourner l'inférence sur le CPU du visiteur
+// dépassait régulièrement 35 secondes (voir le rapport de fusion). L'aller-
+// retour réseau d'une photo compressée est nettement plus rapide et fiable.
+const OCR_TIMEOUT_MS = 15_000;
 
 function guessFields(text: string, keys: ExtractKey[]) {
+  // Repli générique si le serveur n'a rien pu extraire (document étranger,
+  // mise en page inhabituelle) — mêmes heuristiques qu'avant la migration.
   const lines = text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
   const dates = text.match(/\b\d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b/g) || [];
   const number = text.match(/\b(?:[A-Z]{1,4}[A-Z0-9-]{4,18}|\d{6,18})\b/g)?.[0] || "";
@@ -46,7 +55,7 @@ async function prepareOcrImage(source: string): Promise<string> {
   context.filter = "grayscale(1) contrast(1.25) brightness(1.05)";
   context.drawImage(image, 0, 0, canvas.width, canvas.height);
   context.filter = "none";
-  return canvas.toDataURL("image/jpeg", 0.88);
+  return canvas.toDataURL("image/jpeg", 0.85);
 }
 
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
@@ -56,7 +65,7 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
   });
 }
 
-export default function DocumentScanner({ documentType = "free", extractFields = ["last_name", "first_names", "document_number", "birth_date"], required = false, requiresAgentValidation = true, retainDocumentImage = false, onChange }: { documentType?: string; extractFields?: ExtractKey[]; required?: boolean; requiresAgentValidation?: boolean; retainDocumentImage?: boolean; onChange: (value: DocumentScanResult | null) => void }) {
+export default function DocumentScanner({ qrToken, documentType = "free", extractFields = ["last_name", "first_names", "document_number", "birth_date"], required = false, requiresAgentValidation = true, retainDocumentImage = false, onChange }: { qrToken: string; documentType?: string; extractFields?: ExtractKey[]; required?: boolean; requiresAgentValidation?: boolean; retainDocumentImage?: boolean; onChange: (value: DocumentScanResult | null) => void }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -94,28 +103,32 @@ export default function DocumentScanner({ documentType = "free", extractFields =
 
   const processImage = async (image: string) => {
     setCaptured(image); setBusy(true); setError("");
-    let worker: Awaited<ReturnType<typeof createWorker>> | null = null;
     try {
       const ocrImage = await withTimeout(prepareOcrImage(image), 8_000);
-      // Un délai strict évite qu’un téléchargement Tesseract ou un worker bloqué
-      // laisse l’écran "Lecture OCR" indéfiniment. La saisie manuelle reste possible.
-      worker = await withTimeout(createWorker("fra+eng"), OCR_TIMEOUT_MS);
-      await withTimeout(worker.setParameters({ tessedit_pageseg_mode: PSM.SINGLE_BLOCK, preserve_interword_spaces: "1" }), 5_000);
-      let result = await withTimeout(worker.recognize(ocrImage), OCR_TIMEOUT_MS);
-      if (result.data.text.trim().length < 12) {
-        await withTimeout(worker.setParameters({ tessedit_pageseg_mode: PSM.SPARSE_TEXT }), 5_000);
-        result = await withTimeout(worker.recognize(ocrImage), OCR_TIMEOUT_MS);
+      const response = await withTimeout(
+        apiClient.post<{ available: boolean; raw_text: string; extracted: Partial<Record<ExtractKey, string>> }>(
+          `/public/forms/${qrToken}/ocr/`,
+          { image: ocrImage, fields: extractFields }
+        ),
+        OCR_TIMEOUT_MS
+      );
+      const { available, raw_text, extracted } = response.data;
+      if (!available) {
+        // Tesseract indisponible côté serveur, ou image illisible : on ne
+        // bloque jamais le visiteur, la saisie manuelle reste toujours possible.
+        setRawText(""); setValues({});
+        setError("La lecture automatique n’est pas disponible pour l’instant. Renseigne les informations manuellement.");
+        return;
       }
-      const text = result.data.text.trim();
-      if (!text) throw new Error("ocr-empty-result");
-      setRawText(text); setValues(guessFields(text, extractFields));
+      setRawText(raw_text);
+      setValues(Object.keys(extracted).length > 0 ? extracted : guessFields(raw_text, extractFields));
+      if (!raw_text) setError("Aucun texte lisible sur cette photo. Améliore la lumière, cadre tout le document, ou saisis les informations manuellement.");
     } catch (scanError) {
       const message = scanError instanceof Error && scanError.message === "ocr-timeout"
-        ? "La lecture OCR a dépassé 35 secondes. Tu peux saisir les informations manuellement ou reprendre une photo plus nette."
-        : "La lecture OCR a échoué. Améliore la lumière, cadre tout le document, puis réessaie ou saisis les informations manuellement.";
+        ? "La lecture a mis trop de temps (connexion lente). Tu peux saisir les informations manuellement ou réessayer."
+        : "La lecture OCR a échoué. Vérifie ta connexion, améliore la lumière, puis réessaie ou saisis les informations manuellement.";
       setError(message);
     } finally {
-      if (worker) await Promise.race([worker.terminate(), new Promise<void>((resolve) => window.setTimeout(resolve, 2_000))]);
       setBusy(false);
     }
   };
@@ -146,7 +159,7 @@ export default function DocumentScanner({ documentType = "free", extractFields =
     <div className="flex items-start gap-3"><IdentificationCard size={24} className="mt-0.5 text-ink-soft" /><div className="min-w-0 flex-1"><p className="font-medium text-ink">Scanner une pièce d’identité</p><p className="text-xs text-ink-soft">CNI, passeport ou document — caméra arrière et OCR.</p></div></div>
     {!captured && !open && <div className="space-y-2"><button type="button" onClick={startCamera} className="flex w-full items-center justify-center gap-2 rounded-lg bg-cta px-4 py-3 text-sm font-semibold text-white"><Camera size={18} /> Ouvrir la caméra arrière</button><button type="button" onClick={() => fileRef.current?.click()} className="flex w-full items-center justify-center gap-2 rounded-lg border border-border px-4 py-3 text-sm font-medium text-ink"><UploadSimple size={18} /> Prendre une photo du document</button><input ref={fileRef} type="file" accept="image/*" capture="environment" onChange={(event) => { choosePhoto(event.target.files?.[0]); event.currentTarget.value = ""; }} className="sr-only" /></div>}
     {open && <div className="space-y-3"><video ref={videoRef} playsInline muted className="aspect-[4/3] w-full rounded-lg bg-black object-cover" /><div className="flex gap-2"><button type="button" onClick={capture} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-cta px-4 py-3 text-sm font-semibold text-white"><Camera size={18} /> Capturer</button><button type="button" onClick={() => { stopCamera(); setOpen(false); }} className="rounded-lg border border-border px-4 py-3 text-sm text-ink"><X size={18} /></button></div></div>}
-    {busy && <p className="flex items-center gap-2 text-sm text-ink-soft"><Spinner size={18} className="animate-spin" /> Lecture OCR en cours… (maximum 35 secondes)</p>}
+    {busy && <p className="flex items-center gap-2 text-sm text-ink-soft"><Spinner size={18} className="animate-spin" /> Lecture en cours…</p>}
     {captured && !busy && !validated && <div className="space-y-3"><img src={captured} alt="Photo du document" className="max-h-48 w-full rounded-lg border border-border object-contain" /><p className="text-xs text-ink-soft">Vérifie les informations extraites avant de valider. L’OCR peut faire des erreurs.</p>{extractFields.map((key) => <label key={key} className="block text-xs font-medium text-ink-soft">{LABELS[key]}<input value={values[key] || ""} onChange={(e) => setValues((prev) => ({ ...prev, [key]: e.target.value }))} required={required} className="mt-1 w-full rounded-lg border border-border bg-surface p-2.5 text-sm text-ink outline-none focus:border-ink" /></label>)}<div className="flex gap-2"><button type="button" onClick={validate} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-success-text px-4 py-3 text-sm font-semibold text-white"><Check size={18} /> {requiresAgentValidation ? "Valider les informations" : "Confirmer"}</button><button type="button" onClick={reset} className="rounded-lg border border-border px-4 py-3 text-sm text-ink">Reprendre</button></div></div>}
     {validated && <div className="flex items-center justify-between rounded-lg border border-success-text/30 bg-success-bg p-3 text-sm text-success-text"><span className="flex items-center gap-2"><Check size={18} /> Identité vérifiée</span><button type="button" onClick={reset} className="text-xs underline">Modifier</button></div>}
     {error && <p className="text-xs text-error-text">{error}</p>}

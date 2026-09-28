@@ -486,3 +486,16 @@ rejetée, clé aléatoire acceptée). **Action encore requise côté Render** :
 générer une vraie clé, la définir dans les variables d’environnement,
 redéployer (tout le monde sera déconnecté une fois, c’est attendu), et
 vérifier `PLATFORM_ADMIN_PASSWORD` par la même occasion.
+
+## Mise à jour — OCR pièce d’identité côté serveur — 27 septembre 2026
+
+Le scan de CNI/passeport ne tourne plus dans le navigateur (`tesseract.js`,
+souvent > 35 s sur téléphone d’entrée de gamme) mais sur le serveur
+(`pytesseract`, endpoint `POST /public/forms/<qr_token>/ocr/`, throttle
+`6/min`, image jamais conservée). Extraction ciblée CNI ivoirienne, repli sur la
+saisie manuelle si indisponible. Validé en local avec un vrai Tesseract : nom,
+prénoms, numéro et date de naissance extraits correctement d’une CNI
+synthétique. **Action requise** : basculer le service Render en runtime Docker
+(le runtime Python natif ne permet pas d’installer `tesseract-ocr`) — voir
+`backend/Dockerfile` et `docs/cahier-des-charges.md` section 18.
+73 tests backend passants, `tsc --noEmit` sans erreur.

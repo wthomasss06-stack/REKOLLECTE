@@ -19,11 +19,25 @@ const ALL_TABS = [
 export default function ParametresLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [role, setRole] = useState<UserProfile["role"] | null>(null);
+  const [failed, setFailed] = useState(false);
 
-  useEffect(() => {
-    apiClient.get<UserProfile>("/auth/me/").then((res) => setRole(res.data.role));
-  }, []);
+  const loadRole = () => {
+    setFailed(false);
+    apiClient
+      .get<UserProfile>("/auth/me/")
+      .then((res) => setRole(res.data.role))
+      .catch(() => setFailed(true)); // sans ça, un simple timeout bloquait toute la section Paramètres sur un loader infini
+  };
+  useEffect(loadRole, []);
 
+  if (failed) {
+    return (
+      <div className="space-y-3">
+        <p className="text-ink-soft">Impossible de charger les paramètres.</p>
+        <button onClick={loadRole} className="rounded-full bg-cta px-4 py-2.5 text-sm font-medium text-white">Réessayer</button>
+      </div>
+    );
+  }
   if (!role) return <Loader fullScreen={false} />;
 
   const tabs = ALL_TABS.filter((tab) => (role !== "STAFF" || tab.staffCanSee) && (!tab.bossOnly || role === "BOSS"));

@@ -116,6 +116,9 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "anon": "60/min",
         "user": "300/min",
+        # Chaque appel fait tourner Tesseract côté serveur (CPU) — throttle
+        # dédié, bien plus strict que les autres endpoints publics.
+        "ocr": "6/min",
     },
     "EXCEPTION_HANDLER": "apps.common.exceptions.standard_exception_handler",
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",

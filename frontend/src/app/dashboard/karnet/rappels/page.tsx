@@ -49,14 +49,18 @@ export default function KarnetRappelsPage() {
       knownDueIds.current = new Set(dueRes.data.map((r) => r.id));
       setDue(dueRes.data);
       setActive(activeRes.data.filter((r) => r.resource_unit === "heure"));
+    } catch {
+      // Un cold start ou une coupure passagère saute simplement ce cycle de
+      // sondage (toutes les 20s) : pas d'état d'erreur bruyant pour un rappel
+      // qui se resynchronisera de lui-même au prochain passage.
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    load(true);
-    const id = setInterval(() => load(false), POLL_MS);
+    void load(true);
+    const id = setInterval(() => void load(false), POLL_MS);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [soundOn]);
