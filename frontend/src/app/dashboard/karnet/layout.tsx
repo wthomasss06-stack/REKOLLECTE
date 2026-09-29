@@ -8,7 +8,7 @@ import Loader from "@/components/Loader";
 import { useAuthContext } from "@/context/AuthContext";
 
 const TABS = [
-  { href: "/dashboard/karnet", label: "Vue d’ensemble", exact: true },
+  { href: "/dashboard/karnet", label: "Karn3t", exact: true },
   { href: "/dashboard/karnet/ressources", label: "Ressources", exact: false },
   { href: "/dashboard/karnet/reservations", label: "Réservations", exact: false },
   { href: "/dashboard/karnet/paiements", label: "Paiements", exact: false },

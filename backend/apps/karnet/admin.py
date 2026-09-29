@@ -19,7 +19,7 @@ class ResourceAdmin(admin.ModelAdmin):
 
 @admin.register(Reservation)
 class ReservationAdmin(admin.ModelAdmin):
-    list_display = ("resource", "client", "organization", "status", "total_amount", "is_paid", "starts_at")
+    list_display = ("number", "resource", "client", "organization", "status", "total_amount", "is_paid", "starts_at")
     list_filter = ("organization", "status", "is_paid")
     date_hierarchy = "starts_at"
     search_fields = ("client__full_name", "resource__name")

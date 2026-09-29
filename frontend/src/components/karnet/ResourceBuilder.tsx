@@ -23,7 +23,6 @@ const BILLING_LABELS: Record<KarnetResourceBillingUnit, string> = {
   hour: "Par heure", session: "Par séance", day: "Par jour", night: "Par nuit", month: "Par mois", fixed: "Forfait fixe",
 };
 const inputClass = "w-full rounded-lg border border-border bg-canvas px-3 py-2.5 text-sm text-ink outline-none transition placeholder:text-ink-soft/70 focus:border-cta focus:ring-2 focus:ring-cta/10";
-const DEFAULT_PRESET = RESOURCE_PRESETS[0]!; // le catalogue est une constante non vide définie dans ce module
 
 type EditDraft = {
   name: string; code: string; category: KarnetResourceCategory; resource_type: string;
@@ -59,11 +58,13 @@ export default function ResourceBuilder({ autoOpenCreate = false }: Props) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const [createOpen, setCreateOpen] = useState(false);
-  const [newName, setNewName] = useState("");
-  const [newPrice, setNewPrice] = useState("");
   const [presetSearch, setPresetSearch] = useState("");
-  const [presetId, setPresetId] = useState(DEFAULT_PRESET.id);
-  const [creating, setCreating] = useState(false);
+  // Accordéon : une seule catégorie dépliée à la fois, repliée par défaut.
+  const [expandedCategory, setExpandedCategory] = useState<KarnetResourceCategory | null>(null);
+  // Id du modèle en cours de création : désactive juste sa carte le temps de
+  // l'appel, pas tout le modal (on garde la vue prête pour enchaîner un autre
+  // sous-type après avoir personnalisé le premier).
+  const [creatingPresetId, setCreatingPresetId] = useState<string | null>(null);
   const [createError, setCreateError] = useState("");
 
   const [editing, setEditing] = useState<KarnetResource | null>(null);
@@ -100,19 +101,20 @@ export default function ResourceBuilder({ autoOpenCreate = false }: Props) {
   }, [filteredPresets]);
 
   const openCreate = () => {
-    setNewName(""); setNewPrice(""); setPresetSearch(""); setPresetId(DEFAULT_PRESET.id);
+    setPresetSearch(""); setExpandedCategory(null);
     setCreateError(""); setCreateOpen(true);
   };
 
-  const submitCreate = async (event: React.FormEvent) => {
-    event.preventDefault();
-    const preset = RESOURCE_PRESETS.find((item) => item.id === presetId) ?? DEFAULT_PRESET;
-    if (!newName.trim()) return setCreateError("Donne un nom à cette ressource.");
-    if (!newPrice || Number(newPrice) <= 0) return setCreateError("Indique un prix de départ supérieur à 0.");
-    setCreating(true); setCreateError("");
+  // Un sous-type suffit à créer la ressource : nom = celui du modèle (ex.
+  // "Studio"), prix à 0 et inactive tant qu'elle n'est pas personnalisée —
+  // l'éditeur qui s'ouvre juste après sert à fixer le vrai prix et l'activer
+  // (voir validate() côté API : une ressource inactive peut avoir un prix nul,
+  // une ressource active non). Plus besoin de ressaisir un nom au préalable.
+  const createFromPreset = async (preset: ResourcePreset) => {
+    setCreatingPresetId(preset.id); setCreateError("");
     try {
       const response = await apiClient.post<KarnetResource>("/karnet/resources/", {
-        name: newName.trim(), price: newPrice, category: preset.category, resource_type: preset.resource_type,
+        name: preset.label, price: "0", is_active: false, category: preset.category, resource_type: preset.resource_type,
         billing_unit: preset.billing_unit, capacity: preset.capacity ?? null, equipment: preset.equipment || "",
       });
       setResources((current) => [...current, response.data]);
@@ -122,7 +124,7 @@ export default function ResourceBuilder({ autoOpenCreate = false }: Props) {
     } catch (err) {
       setCreateError(normalizeApiError(err).message || "Impossible de créer cette ressource.");
     } finally {
-      setCreating(false);
+      setCreatingPresetId(null);
     }
   };
 
@@ -230,51 +232,59 @@ export default function ResourceBuilder({ autoOpenCreate = false }: Props) {
         </div>
       )}
 
-      {/* Étape 1 : nom + repartir d'un modèle (comme la création de formulaire) */}
-      <Modal open={createOpen} onClose={() => setCreateOpen(false)} title="Ajouter une ressource" description="Pars d’un modèle, puis personnalise-le dans l’éditeur." wide>
-        <form onSubmit={submitCreate} className="space-y-5">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-ink">Nom de la ressource</label>
-              <input autoFocus required value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Ex. Chambre 204, Table 3, Bureau A" className={inputClass} />
-            </div>
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-ink">Prix de départ (FCFA)</label>
-              <input type="number" min="0" required value={newPrice} onChange={(e) => setNewPrice(e.target.value)} placeholder="Ex. 25000" className={inputClass} />
-            </div>
-          </div>
-          <div>
-            <div className="mb-2 flex items-center justify-between gap-3">
-              <label className="block text-sm font-medium text-ink">Repartir d’un modèle</label>
-              <div className="relative w-48">
-                <MagnifyingGlass size={14} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-ink-soft" />
-                <input value={presetSearch} onChange={(e) => setPresetSearch(e.target.value)} placeholder="Rechercher…" className="w-full rounded-lg border border-border bg-canvas py-1.5 pl-7 pr-2 text-xs text-ink outline-none focus:border-cta" />
-              </div>
-            </div>
-            <div className="max-h-72 space-y-4 overflow-y-auto pr-1">
-              {presetsByCategory.map((cat) => (
-                <div key={cat.id}>
-                  <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-ink-soft">{cat.label}</p>
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    {cat.presets.map((preset) => (
-                      <label key={preset.id} className={`cursor-pointer rounded-xl border p-3 transition ${presetId === preset.id ? "border-cta bg-cta/5" : "border-border"}`}>
-                        <input type="radio" name="preset" value={preset.id} checked={presetId === preset.id} onChange={() => setPresetId(preset.id)} className="sr-only" />
-                        <span className="block font-medium text-ink">{preset.label}</span>
-                        <span className="mt-1 block text-xs text-ink-soft">{BILLING_LABELS[preset.billing_unit]}{preset.capacity ? ` · ${preset.capacity} pers.` : ""}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              ))}
-              {presetsByCategory.length === 0 && <p className="text-sm text-ink-soft">Aucun modèle ne correspond à cette recherche.</p>}
-            </div>
+      {/* Étape 1 : type de ressource en accordéon → un clic sur un sous-type crée
+          la ressource directement (nom = sous-type), sans ressaisie. */}
+      <Modal open={createOpen} onClose={() => setCreateOpen(false)} title="Ajouter une ressource" description="Choisis un type pour déplier ses sous-types, puis clique sur un sous-type : la ressource est créée aussitôt, à personnaliser dans l’éditeur." wide>
+        <div className="space-y-4">
+          <div className="relative">
+            <MagnifyingGlass size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-soft" />
+            <input value={presetSearch} onChange={(e) => setPresetSearch(e.target.value)} placeholder="Rechercher un sous-type…" className="w-full rounded-lg border border-border bg-canvas py-2 pl-8 pr-3 text-sm text-ink outline-none focus:border-cta" />
           </div>
           {createError && <p role="alert" className="text-sm text-error-text">{createError}</p>}
-          <div className="flex justify-end gap-2">
-            <button type="button" onClick={() => setCreateOpen(false)} className="rounded-full border border-border px-4 py-2.5 text-sm text-ink">Annuler</button>
-            <button disabled={creating} className="rounded-full bg-cta px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{creating ? "Création…" : "Créer et personnaliser"}</button>
+          <div className="max-h-[28rem] space-y-2 overflow-y-auto pr-1">
+            {presetsByCategory.map((cat) => {
+              const isSearching = presetSearch.trim().length > 0;
+              const isOpen = isSearching || expandedCategory === cat.id;
+              const Icon = CATEGORY_ICONS[cat.id] ?? Cube;
+              return (
+                <div key={cat.id} className="overflow-hidden rounded-xl border border-border">
+                  <button
+                    type="button"
+                    onClick={() => setExpandedCategory((current) => (current === cat.id ? null : cat.id))}
+                    aria-expanded={isOpen}
+                    className="flex w-full items-center justify-between gap-3 bg-canvas/60 px-4 py-3 text-left transition hover:bg-canvas"
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <Icon size={18} weight="bold" className="text-cta" />
+                      <span className="text-sm font-semibold text-ink">{cat.label}</span>
+                      <span className="text-xs text-ink-soft">({cat.presets.length})</span>
+                    </span>
+                    <CaretDown size={16} className={`shrink-0 text-ink-soft transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                  </button>
+                  {isOpen && (
+                    <div className="grid gap-2 border-t border-border p-3 sm:grid-cols-2">
+                      {cat.presets.map((preset) => (
+                        <button
+                          type="button"
+                          key={preset.id}
+                          onClick={() => createFromPreset(preset)}
+                          disabled={creatingPresetId !== null}
+                          className="rounded-xl border border-border p-3 text-left transition hover:border-cta hover:bg-cta/5 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          <span className="block font-medium text-ink">{preset.label}</span>
+                          <span className="mt-1 block text-xs text-ink-soft">
+                            {creatingPresetId === preset.id ? "Création…" : `${BILLING_LABELS[preset.billing_unit]}${preset.capacity ? ` · ${preset.capacity} pers.` : ""}`}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+            {presetsByCategory.length === 0 && <p className="text-sm text-ink-soft">Aucun modèle ne correspond à cette recherche.</p>}
           </div>
-        </form>
+        </div>
       </Modal>
 
       {/* Étape 2 : éditeur complet, comme le modal de modification de formulaire */}

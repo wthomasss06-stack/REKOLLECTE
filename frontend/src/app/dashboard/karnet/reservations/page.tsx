@@ -182,7 +182,7 @@ export default function KarnetReservationsPage() {
                 <div className="flex items-center gap-2">
                   <CalendarCheck size={16} className="shrink-0 text-ink-soft" />
                   <p className="truncate font-medium text-ink">
-                    {r.resource_name} · <Link href={`/dashboard/karnet/clients/${r.client}`} className="text-cta hover:underline">{r.client_name}</Link>
+                    <span className="text-ink-soft">#{r.number}</span> · {r.resource_name} · <Link href={`/dashboard/karnet/clients/${r.client}`} className="text-cta hover:underline">{r.client_name}</Link>
                   </p>
                 </div>
                 <p className="mt-1 text-xs text-ink-soft">

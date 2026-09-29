@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from .models import Client, Reservation, Resource
@@ -14,15 +15,23 @@ class ClientSerializer(serializers.ModelSerializer):
 
 
 class ClientDetailSerializer(ClientSerializer):
-    """Fiche client complète (phase 7) : ajoute les compteurs utiles à l'en-tête
-    sans que l'appelant ait à recouper plusieurs requêtes lui-même."""
+    """Fiche client complète (phase 7) et ligne de la liste Karn3t : ajoute les
+    compteurs utiles sans que l'appelant ait à recouper plusieurs requêtes
+    lui-même. Attend un client issu de `Client.objects.with_activity()`."""
 
     checkins_count = serializers.IntegerField(read_only=True)
     reservations_count = serializers.IntegerField(read_only=True)
-    last_visit_at = serializers.DateTimeField(read_only=True, allow_null=True)
+    last_visit_at = serializers.SerializerMethodField()
 
     class Meta(ClientSerializer.Meta):
         fields = ClientSerializer.Meta.fields + ["checkins_count", "reservations_count", "last_visit_at"]
+
+    @extend_schema_field(serializers.DateTimeField(allow_null=True))
+    def get_last_visit_at(self, client):
+        # La dernière visite est la plus récente entre un passage à l'accueil et
+        # une réservation : un client qui ne fait que réserver reste « actif ».
+        moments = [moment for moment in (client.last_checkin_at, client.last_reservation_at) if moment]
+        return serializers.DateTimeField().to_representation(max(moments)) if moments else None
 
 
 class ResourceSerializer(serializers.ModelSerializer):
@@ -40,9 +49,20 @@ class ResourceSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "unit_display", "billing_unit_display", "category_display", "created_at"]
 
     def validate_price(self, value):
-        if value <= 0:
-            raise serializers.ValidationError("Le prix doit être supérieur à 0.")
+        if value < 0:
+            raise serializers.ValidationError("Le prix ne peut pas être négatif.")
         return value
+
+    def validate(self, attrs):
+        price = attrs.get("price", getattr(self.instance, "price", None))
+        is_active = attrs.get("is_active", getattr(self.instance, "is_active", True))
+        # Un brouillon (créé depuis un modèle du catalogue, prix pas encore saisi)
+        # peut avoir un prix nul tant qu'il est inactif : il ne se réserve nulle
+        # part. Une ressource active doit avoir un prix > 0, sinon le montant figé
+        # à la création d'une réservation serait faux.
+        if is_active and price is not None and price <= 0:
+            raise serializers.ValidationError({"price": "Le prix doit être supérieur à 0."})
+        return attrs
 
     def validate_capacity(self, value):
         if value is not None and value <= 0:
@@ -62,7 +82,7 @@ class ReservationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reservation
         fields = [
-            "id", "client", "client_name", "client_phone", "resource", "resource_name", "resource_unit",
+            "id", "number", "client", "client_name", "client_phone", "resource", "resource_name", "resource_unit",
             "quantity", "unit_price", "total_amount", "starts_at", "ends_at", "status",
             "is_paid", "paid_at", "reminder_acknowledged", "reminder_due", "created_at",
         ]

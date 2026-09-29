@@ -139,6 +139,9 @@ export type KarnetReservationStatus = "en_cours" | "terminee" | "annulee";
 
 export interface KarnetReservation {
   id: string;
+  /** Numéro lisible, séquentiel par établissement (1, 2, 3…) — celui que l'équipe
+   * dicte au téléphone ou retrouve dans l'historique d'un client. */
+  number: number;
   client: string;
   client_name: string;
   client_phone: string;

@@ -7,17 +7,7 @@ from django.utils import timezone
 from apps.karnet.models import Client, Reservation, Resource
 from apps.testing_utils import auth_client
 
-
-def enable_karnet(organization):
-    organization.karnet_enabled = True
-    organization.save(update_fields=["karnet_enabled"])
-    return organization
-
-
-def make_resource(organization, **overrides):
-    defaults = {"organization": organization, "name": "Chambre 12", "unit": Resource.Unit.JOUR, "price": Decimal("30000")}
-    defaults.update(overrides)
-    return Resource.objects.create(**defaults)
+from .helpers import enable_karnet, make_resource
 
 
 def test_karnet_endpoints_are_blocked_when_not_enabled(db, boss_user, organization):

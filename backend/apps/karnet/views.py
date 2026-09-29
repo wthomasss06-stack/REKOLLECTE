@@ -29,11 +29,11 @@ class ClientListView(APIView):
     permission_classes = [IsAuthenticated, IsOrgMember, HasKarnetEnabled]
 
     def get(self, request):
-        clients = Client.objects.filter(organization=request.user.organization)
+        clients = Client.objects.filter(organization=request.user.organization).with_activity()
         search = request.query_params.get("search")
         if search:
             clients = clients.filter(full_name__icontains=search)
-        return Response(ClientSerializer(clients, many=True).data)
+        return Response(ClientDetailSerializer(clients, many=True).data)
 
     def post(self, request):
         serializer = ClientSerializer(data=request.data)
@@ -49,19 +49,13 @@ class ClientDetailView(APIView):
         return Client.objects.filter(id=pk, organization=request.user.organization).first()
 
     def get(self, request, pk):
-        client = self.get_object(request, pk)
+        client = Client.objects.filter(id=pk, organization=request.user.organization).with_activity().first()
         if not client:
             return error_response("Client introuvable.", status.HTTP_404_NOT_FOUND)
         # Phase 7 — fiche client complète : compteurs calculés pour l'en-tête,
         # l'historique détaillé (passages, réservations) reste sur ses propres
         # endpoints (/checkins/?client=, /karnet/reservations/?client=) pour
         # profiter de leur pagination et de leurs filtres existants.
-        client.checkins_count = client.checkins.count()
-        client.reservations_count = client.reservations.count()
-        last_checkin = client.checkins.order_by("-created_at_client").values_list("created_at_client", flat=True).first()
-        last_reservation = client.reservations.order_by("-starts_at").values_list("starts_at", flat=True).first()
-        candidates = [d for d in (last_checkin, last_reservation) if d]
-        client.last_visit_at = max(candidates) if candidates else None
         return Response(ClientDetailSerializer(client).data)
 
     def patch(self, request, pk):
@@ -155,8 +149,10 @@ class ReservationListView(APIView):
             qs = qs.filter(client_id=params["client"])
         if params.get("is_paid"):
             qs = qs.filter(is_paid=_as_bool(params["is_paid"]))
+        if params.get("has_slot") and _as_bool(params["has_slot"]):
+            qs = qs.filter(ends_at__isnull=False)
         if params.get("reminder_due") and _as_bool(params["reminder_due"]):
-            qs = qs.filter(resource__unit=Resource.Unit.HEURE, status=Reservation.Status.EN_COURS, reminder_acknowledged=False, ends_at__lte=timezone.now())
+            qs = qs.filter(status=Reservation.Status.EN_COURS, reminder_acknowledged=False, ends_at__lte=timezone.now())
         return qs
 
     def get(self, request):
@@ -199,10 +195,15 @@ class ReservationListView(APIView):
             if conflict:
                 return error_response("Cette ressource est déjà réservée sur ce créneau.", status.HTTP_409_CONFLICT)
 
+        # On paie avant de consommer : l'encaissement est enregistré avec la
+        # réservation, l'équipe n'a plus à le marquer à la main. Le créneau de
+        # rappel (starts_at -> ends_at) existe dès cet instant : c'est la
+        # réservation elle-même qui apparaît dans Rappels à son échéance.
+        now = timezone.now()
         reservation = Reservation.objects.create(
             organization=organization, client=client, resource=resource, quantity=quantity,
             unit_price=resource.price, total_amount=resource.price * quantity,
-            starts_at=starts_at, ends_at=ends_at, created_by=request.user,
+            starts_at=starts_at, ends_at=ends_at, is_paid=True, paid_at=now, created_by=request.user,
         )
         return Response(ReservationSerializer(reservation).data, status=status.HTTP_201_CREATED)
 
