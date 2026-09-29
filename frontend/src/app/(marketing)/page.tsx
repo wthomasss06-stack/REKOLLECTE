@@ -47,10 +47,10 @@ const STEPS = [
 ];
 
 const KARNET_HIGHLIGHTS = [
-  { title: "Visiteurs & clients", body: "Un carnet de fiches relié à ton registre, avec historique des passages." },
-  { title: "Ressources", body: "Chambres, tables, salles ou équipements, avec leur prix déclaré." },
-  { title: "Réservations", body: "Montant calculé automatiquement à chaque créneau ou consommation." },
-  { title: "Paiements & rappels", body: "Suivi des montants dus et sonnerie de fin de créneau horaire." },
+  { title: "Visiteurs & clients", body: "Chaque client a sa fiche : passages, réservations, numéros — tout l'historique en un clic, sans ressaisir son nom." },
+  { title: "Ressources", body: "Chambre, table ou salle : un modèle suffit pour créer la ressource, prix à ajuster ensuite." },
+  { title: "Réservations", body: "Numérotées, calculées, payées d'avance — chaque réservation part déjà réglée." },
+  { title: "Paiements & rappels", body: "Sonnerie à la fin du créneau, jour ou heure — à toi de valider ou d'annuler." },
 ];
 
 const FAQS = [
@@ -197,6 +197,11 @@ export default function LandingPage() {
               personne ne peut le consulter à distance. R3NS3IGN3M3NT garde la simplicité du cahier et ajoute
               ce qu&apos;il ne pourra jamais faire.
             </p>
+            <p className="mt-4 text-sm leading-relaxed text-mk-sage">
+              Et le jour où ce visiteur devient client — il réserve, il consomme, il doit payer et
+              repartir à l&apos;heure — un deuxième cahier entre en scène, avec ses propres pages
+              raturées. C&apos;est celui-là que <em className="font-mk-serif italic font-bold text-mk-lime">KARN3T</em> remplace.
+            </p>
             <div className="mt-8 flex items-center gap-4 font-mk-mono text-[10px] leading-relaxed text-mk-sage">
               <Logo size={40} className="rounded-full border border-mk-sage/40 bg-deep-ink/5 p-1.5" />
               <span>
@@ -250,9 +255,10 @@ export default function LandingPage() {
             Ton registre peut <em className="font-mk-serif italic font-bold text-mk-lime">devenir KARN3T.</em>
           </h2>
           <p className="mt-6 max-w-sm text-sm leading-relaxed text-mk-sage">
-            Le registre reste le socle : rien n&apos;y change. Quand ton établissement est prêt, active
-            KARN3T depuis tes paramètres pour ajouter la gestion des visiteurs, des ressources et des
-            réservations, débloquées progressivement.
+            Le registre reste le socle : rien n&apos;y change. Mais un visiteur qui réserve, paie
+            et attend un rappel mérite mieux qu&apos;un carnet à part. Active KARN3T depuis tes
+            paramètres — réservations, paiements et rappels rejoignent le même endroit que le
+            registre.
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
