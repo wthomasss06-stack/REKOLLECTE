@@ -8,7 +8,7 @@ export default function MentionsLegalesPage() {
     <h2>Éditeur du site et concepteur du produit</h2>
     <p><strong>AKATech Studio</strong>, entreprise digitale basée à Abidjan, Côte d’Ivoire.</p>
     <p>AKATech Studio conçoit et développe le produit REKOLLECTE ainsi que ses interfaces, son infrastructure applicative et sa documentation.</p>
-    <p>Contact officiel : <a href="mailto:wthomasss06@gmail.com">wthomasss06@gmail.com</a><br />Téléphone : <a href="tel:+2250142507750">+225 01 42 50 77 50</a><br />Site : <a href="https://rekollecte.vercel.app/" target="_blank" rel="noreferrer">rekollecte.vercel.app</a></p>
+    <p>Contact officiel : <a href="mailto:wthomasss06@gmail.com">wthomasss06@gmail.com</a><br />Téléphone : <a href="tel:+2250142507750">+225 01 42 50 77 50</a><br />Site : <a href="https://rekollecte-ci.vercel.app/" target="_blank" rel="noreferrer">rekollecte.vercel.app</a></p>
     <p>La forme juridique, le numéro RCCM et l’adresse physique complète de l’entreprise sont en cours de formalisation et seront ajoutés dès leur disponibilité.</p>
 
     <h2>Objet du service</h2>

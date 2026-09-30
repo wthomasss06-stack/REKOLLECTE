@@ -2,4 +2,4 @@
 // (JSON-LD, "use client") : un module à part évite qu'importer cette seule valeur
 // n'entraîne tout layout.tsx — et son export `metadata` réservé au serveur — dans
 // le bundle client.
-export const SITE_URL = "https://rekollecte.vercel.app";
+export const SITE_URL = "https://rekollecte-ci.vercel.app";

@@ -161,7 +161,7 @@ CLOUDINARY_API_KEY = os.environ.get("CLOUDINARY_API_KEY", "")
 CLOUDINARY_API_SECRET = os.environ.get("CLOUDINARY_API_SECRET", "")
 
 CSRF_TRUSTED_ORIGINS = [
-    o.strip() for o in os.environ.get("CSRF_TRUSTED_ORIGINS", "https://rekollecte.vercel.app").split(",")
+    o.strip() for o in os.environ.get("CSRF_TRUSTED_ORIGINS", "https://rekollecte-ci.vercel.app").split(",")
 ]
 
 # --- Securite prod (desactives en dev pour ne pas gener http://localhost) --------

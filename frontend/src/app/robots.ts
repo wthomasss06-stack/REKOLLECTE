@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-  const base = "https://rekollecte.vercel.app";
+  const base = "https://rekollecte-ci.vercel.app";
   return { rules: [{ userAgent: "*", allow: "/", disallow: ["/dashboard", "/admin", "/api/"] }], sitemap: `${base}/sitemap.xml` };
 }

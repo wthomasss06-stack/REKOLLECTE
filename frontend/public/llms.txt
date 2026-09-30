@@ -59,7 +59,7 @@ REKOLLECTE remplace le registre papier des bureaux, restaurants, hôtels et acc�
 
 ## Références officielles
 
-- Site produit : https://rekollecte.vercel.app/
+- Site produit : https://rekollecte-ci.vercel.app/
 - Éditeur : AKATech Studio 
 - Contact : wthomasss06@gmail.com
 - Site AKATech Studio  https://akatech.vercel.app/
