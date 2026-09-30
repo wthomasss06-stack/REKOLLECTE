@@ -13,8 +13,19 @@ import { SITE_URL } from "@/lib/site";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
+const FAQS = [
+  { question: "Le visiteur doit-il créer un compte ?", answer: "Non. Il scanne simplement le QR Code, remplit le formulaire depuis son téléphone ou la tablette d’accueil, puis signe. Aucune application ni inscription n’est nécessaire." },
+  { question: "Est-ce que REKOLLECTE fonctionne sans connexion ?", answer: "Oui. Le formulaire continue d’enregistrer les visites hors-ligne sur l’appareil. Les données se synchronisent automatiquement dès que la connexion revient." },
+  { question: "Puis-je adapter le formulaire à mon activité ?", answer: "Oui. Tu peux choisir les champs utiles à ton établissement — bureau, restaurant, hôtel, chantier ou autre — puis les modifier à tout moment depuis les paramètres." },
+  { question: "Qui peut consulter les visites enregistrées ?", answer: "Tu contrôles les accès depuis ton espace. Le patron peut gérer l’ensemble du registre et inviter un gérant ou un membre du staff avec des permissions adaptées à son rôle." },
+  { question: "Que deviennent les données des visiteurs ?", answer: "Elles sont enregistrées dans l’espace sécurisé de ton établissement et restent accessibles depuis ton dashboard. Tu peux consulter le registre, suivre les motifs de visite et exporter les données en CSV." },
+  { question: "Combien de temps faut-il pour commencer ?", answer: "Quelques minutes suffisent. Connecte-toi avec Google, renseigne ton établissement, choisis ton formulaire et affiche le QR Code à l’accueil. Tu peux compléter la configuration plus tard." },
+];
+
 // Organisation ombrelle (REKOLLECTE) + ses deux produits, en @graph pour que Google
-// relie les deux SoftwareApplication à la même entité sans les dupliquer.
+// relie les deux SoftwareApplication à la même entité sans les dupliquer. Le schéma
+// FAQPage est dérivé de FAQS : une seule source de vérité, jamais désynchronisée du
+// texte affiché plus bas dans la page.
 const JSON_LD = {
   "@context": "https://schema.org",
   "@graph": [
@@ -27,23 +38,32 @@ const JSON_LD = {
     },
     {
       "@type": "SoftwareApplication",
-      "@id": `${SITE_URL}/#REKOLLECTE`,
+      "@id": `${SITE_URL}/#rekollecte`,
       name: "REKOLLECTE",
       applicationCategory: "BusinessApplication",
       operatingSystem: "Web",
-      description: "Registre visiteurs numérique par QR Code, sans compte pour le visiteur, fonctionnant hors ligne.",
+      description: "Registre visiteurs numérique par QR Code à Abidjan, sans compte pour le visiteur, fonctionnant hors ligne.",
       provider: { "@id": `${SITE_URL}/#organization` },
       isPartOf: { "@id": `${SITE_URL}/#organization` },
     },
     {
       "@type": "SoftwareApplication",
-      "@id": `${SITE_URL}/#REKOLLECTE+`,
+      "@id": `${SITE_URL}/#rekollecte-plus`,
       name: "REKOLLECTE+",
       applicationCategory: "BusinessApplication",
       operatingSystem: "Web",
       description: "Gestion des clients, ressources, réservations, paiements et rappels — niveau 2 de REKOLLECTE, activable depuis les paramètres.",
       provider: { "@id": `${SITE_URL}/#organization` },
       isPartOf: { "@id": `${SITE_URL}/#organization` },
+    },
+    {
+      "@type": "FAQPage",
+      "@id": `${SITE_URL}/#faq`,
+      mainEntity: FAQS.map((faq) => ({
+        "@type": "Question",
+        name: faq.question,
+        acceptedAnswer: { "@type": "Answer", text: faq.answer },
+      })),
     },
   ],
 };
@@ -87,15 +107,6 @@ const KARNET_HIGHLIGHTS = [
   { title: "Ressources", body: "Chambre, table ou salle : un modèle suffit pour créer la ressource, prix à ajuster ensuite." },
   { title: "Réservations", body: "Numérotées, calculées, payées d'avance — chaque réservation part déjà réglée." },
   { title: "Paiements & rappels", body: "Sonnerie à la fin du créneau, jour ou heure — à toi de valider ou d'annuler." },
-];
-
-const FAQS = [
-  { question: "Le visiteur doit-il créer un compte ?", answer: "Non. Il scanne simplement le QR Code, remplit le formulaire depuis son téléphone ou la tablette d’accueil, puis signe. Aucune application ni inscription n’est nécessaire." },
-  { question: "Est-ce que REKOLLECTE fonctionne sans connexion ?", answer: "Oui. Le formulaire continue d’enregistrer les visites hors-ligne sur l’appareil. Les données se synchronisent automatiquement dès que la connexion revient." },
-  { question: "Puis-je adapter le formulaire à mon activité ?", answer: "Oui. Tu peux choisir les champs utiles à ton établissement — bureau, restaurant, hôtel, chantier ou autre — puis les modifier à tout moment depuis les paramètres." },
-  { question: "Qui peut consulter les visites enregistrées ?", answer: "Tu contrôles les accès depuis ton espace. Le patron peut gérer l’ensemble du registre et inviter un gérant ou un membre du staff avec des permissions adaptées à son rôle." },
-  { question: "Que deviennent les données des visiteurs ?", answer: "Elles sont enregistrées dans l’espace sécurisé de ton établissement et restent accessibles depuis ton dashboard. Tu peux consulter le registre, suivre les motifs de visite et exporter les données en CSV." },
-  { question: "Combien de temps faut-il pour commencer ?", answer: "Quelques minutes suffisent. Connecte-toi avec Google, renseigne ton établissement, choisis ton formulaire et affiche le QR Code à l’accueil. Tu peux compléter la configuration plus tard." },
 ];
 
 export default function LandingPage() {
