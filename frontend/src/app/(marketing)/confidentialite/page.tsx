@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Politique de confidentialité", robo
 export default function ConfidentialitePage() {
   return <LegalLayout title="Politique de confidentialité">
     <h2>Responsable du service</h2>
-    <p><strong>AKATech Studio</strong>, entreprise digitale basée à Abidjan, Côte d’Ivoire, conçoit et édite R3NS3IGN3M3NT. Contact : <a href="mailto:wthomasss06@gmail.com">wthomasss06@gmail.com</a> — <a href="tel:+2250142507750">+225 01 42 50 77 50</a>. Site public : <a href="https://renseignement.vercel.app/" target="_blank" rel="noreferrer">renseignement.vercel.app</a>.</p>
+    <p><strong>AKATech Studio</strong>, entreprise digitale basée à Abidjan, Côte d’Ivoire, conçoit et édite R3NS3IGN3M3NT. Contact : <a href="mailto:wthomasss06@gmail.com">wthomasss06@gmail.com</a> — <a href="tel:+2250142507750">+225 01 42 50 77 50</a>. Site public : <a href="https://rekollecte.vercel.app/" target="_blank" rel="noreferrer">renseignement.vercel.app</a>.</p>
     <p>Pour les données collectées auprès de ses propres visiteurs, chaque établissement utilisateur détermine les finalités, les champs et la durée de conservation et assume les responsabilités qui lui incombent. Son identité et son contact peuvent être affichés dans son propre parcours d’information.</p>
 
     <h2>Données traitées</h2>

@@ -52,7 +52,7 @@ R3NS3IGN3M3NT remplace le registre papier des bureaux, restaurants, hôtels et a
 
 ## Références officielles
 
-- Site produit : https://renseignement.vercel.app/
+- Site produit : https://rekollecte.vercel.app/
 - Éditeur : AKATech Studio 
 - Contact : wthomasss06@gmail.com
 - Site AKATech Studio  https://akatech.vercel.app/

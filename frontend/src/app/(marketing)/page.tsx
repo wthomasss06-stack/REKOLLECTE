@@ -9,8 +9,44 @@ import { useGSAP } from "@gsap/react";
 import { ArrowDownRight, ArrowUpRight, CheckMark } from "@/components/icons";
 import Logo from "@/components/Logo";
 import PwaInstallButton from "@/components/marketing/PwaInstallButton";
+import { SITE_URL } from "@/lib/site";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
+
+// Organisation ombrelle (REKOLLECTE) + ses deux produits, en @graph pour que Google
+// relie les deux SoftwareApplication à la même entité sans les dupliquer.
+const JSON_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: "REKOLLECTE",
+      url: SITE_URL,
+      logo: `${SITE_URL}/icons/icon-512.png`,
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": `${SITE_URL}/#r3ns3ign3m3nt`,
+      name: "R3NS3IGN3M3NT",
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web",
+      description: "Registre visiteurs numérique par QR Code, sans compte pour le visiteur, fonctionnant hors ligne.",
+      provider: { "@id": `${SITE_URL}/#organization` },
+      isPartOf: { "@id": `${SITE_URL}/#organization` },
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": `${SITE_URL}/#karn3t`,
+      name: "KARN3T",
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web",
+      description: "Gestion des clients, ressources, réservations, paiements et rappels — niveau 2 de REKOLLECTE, activable depuis les paramètres.",
+      provider: { "@id": `${SITE_URL}/#organization` },
+      isPartOf: { "@id": `${SITE_URL}/#organization` },
+    },
+  ],
+};
 
 const FEATURES = [
   {
@@ -130,6 +166,7 @@ export default function LandingPage() {
 
   return (
     <div ref={heroRef} className="min-w-0 max-w-full overflow-x-hidden">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
       {/* Hero */}
       <section className="relative grid min-h-[calc(100svh-72px)] w-full max-w-full items-center gap-10 overflow-hidden px-5 pb-12 pt-24 sm:px-10 sm:pb-16 sm:pt-28 lg:min-h-[calc(100svh-72px)] lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-24">
         <div className="min-w-0 max-w-full">

@@ -5,7 +5,7 @@ import Providers from "@/components/Providers";
 import { THEME_INIT_SCRIPT } from "@/hooks/useTheme";
 import "./globals.css";
 
-const SITE_URL = "https://renseignement.vercel.app";
+export const SITE_URL = "https://rekollecte.vercel.app";
 
 // Police unique du site appliquée partout : Chelsea Market.
 const sans = Chelsea_Market({
@@ -18,13 +18,13 @@ const sans = Chelsea_Market({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   alternates: { canonical: SITE_URL },
-  title: { default: "R3NS3IGN3M3NT | Registre visiteurs numérique par QR Code", template: "%s — R3NS3IGN3M3NT" },
-  description: "Remplacez le cahier d’accueil papier par un registre visiteurs numérique avec QR Code. Fonctionne hors ligne, sans compte ni application pour les visiteurs.",
-  keywords: ["registre visiteurs numérique", "QR Code accueil", "registre digital", "tablette accueil", "visiteurs sans compte", "R3NS3IGN3M3NT", "Abidjan"],
+  title: { default: "REKOLLECTE | Registre visiteurs QR Code & gestion d’établissement", template: "%s — REKOLLECTE" },
+  description: "REKOLLECTE digitalise l’accueil : registre visiteurs par QR Code (R3NS3IGN3M3NT), puis gestion des ressources, réservations, paiements et rappels avec KARN3T. Fonctionne hors ligne.",
+  keywords: ["registre visiteurs numérique", "QR Code accueil", "registre digital", "tablette accueil", "visiteurs sans compte", "gestion d’établissement", "logiciel de réservation", "R3NS3IGN3M3NT", "KARN3T", "REKOLLECTE", "Abidjan"],
   applicationName: "R3NS3IGN3M3NT",
   authors: [{ name: "AKATech Studio", url: SITE_URL }],
-  openGraph: { type: "website", locale: "fr_FR", siteName: "R3NS3IGN3M3NT", title: "R3NS3IGN3M3NT | Registre visiteurs numérique par QR Code", description: "Un registre visiteurs numérique avec QR Code, sans compte pour les visiteurs et utilisable hors ligne.", url: SITE_URL, images: [{ url: "/landing-images/hero.webp", width: 1200, height: 1200, alt: "R3NS3IGN3M3NT sur tablette" }] },
-  twitter: { card: "summary_large_image", title: "R3NS3IGN3M3NT | Registre visiteurs numérique", description: "Un QR Code pour accueillir les visiteurs sans compte, même hors ligne.", images: ["/landing-images/hero.webp"] },
+  openGraph: { type: "website", locale: "fr_FR", siteName: "REKOLLECTE", title: "REKOLLECTE | Registre visiteurs QR Code & gestion d’établissement", description: "Registre visiteurs par QR Code, sans compte ni réseau requis — puis gestion des réservations et paiements avec KARN3T.", url: SITE_URL, images: [{ url: "/landing-images/hero.webp", width: 1200, height: 1200, alt: "REKOLLECTE — R3NS3IGN3M3NT sur tablette" }] },
+  twitter: { card: "summary_large_image", title: "REKOLLECTE | Registre visiteurs & gestion d’établissement", description: "Un QR Code pour accueillir sans compte, une gestion complète pour ce qui suit.", images: ["/landing-images/hero.webp"] },
   manifest: "/manifest.json",
   icons: {
     icon: "/favicon.png",
