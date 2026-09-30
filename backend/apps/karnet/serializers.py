@@ -15,7 +15,7 @@ class ClientSerializer(serializers.ModelSerializer):
 
 
 class ClientDetailSerializer(ClientSerializer):
-    """Fiche client complète (phase 7) et ligne de la liste Karn3t : ajoute les
+    """Fiche client complète (phase 7) et ligne de la liste REKOLLECTE+ : ajoute les
     compteurs utiles sans que l'appelant ait à recouper plusieurs requêtes
     lui-même. Attend un client issu de `Client.objects.with_activity()`."""
 

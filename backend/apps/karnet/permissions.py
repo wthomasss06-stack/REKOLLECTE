@@ -8,7 +8,7 @@ class HasKarnetEnabled(BasePermission):
     même un membre valide de l'organisation ne peut pas contourner l'activation
     en appelant l'API directement."""
 
-    message = "KARN3T n'est pas activé pour cet établissement."
+    message = "REKOLLECTE+ n'est pas activé pour cet établissement."
 
     def has_permission(self, request, view):
         return bool(

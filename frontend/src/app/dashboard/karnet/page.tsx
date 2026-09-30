@@ -11,7 +11,7 @@ import { apiClient } from "@/lib/api";
 import type { KarnetClientDetail } from "@/types";
 
 /**
- * Karn3t (ex "Vue d'ensemble") : les visiteurs de l'accueil devenus clients,
+ * REKOLLECTE+ (ex "Vue d'ensemble") : les visiteurs de l'accueil devenus clients,
  * avec ce qu'ils ont fait chez toi. Un clic ouvre l'historique complet dans un
  * modal, sans quitter la liste (voir ClientHistoryModal).
  */

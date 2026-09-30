@@ -8,7 +8,7 @@ import Loader from "@/components/Loader";
 import { useAuthContext } from "@/context/AuthContext";
 
 const TABS = [
-  { href: "/dashboard/karnet", label: "Karn3t", exact: true },
+  { href: "/dashboard/karnet", label: "REKOLLECTE+", exact: true },
   { href: "/dashboard/karnet/ressources", label: "Ressources", exact: false },
   { href: "/dashboard/karnet/reservations", label: "Réservations", exact: false },
   { href: "/dashboard/karnet/paiements", label: "Paiements", exact: false },
@@ -33,7 +33,7 @@ export default function KarnetLayout({ children }: { children: React.ReactNode }
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-ink">KARN3T</h1>
+        <h1 className="text-2xl font-bold text-ink">REKOLLECTE+</h1>
         <p className="mt-1 text-sm text-ink-soft">Les ressources, réservations, paiements et rappels de ton établissement.</p>
       </div>
       <div className="flex gap-1 overflow-x-auto border-b border-border">
@@ -49,7 +49,7 @@ export default function KarnetLayout({ children }: { children: React.ReactNode }
           </Link>
         ))}
         {/* Le journal reste unique et deja construit dans Administration : on y renvoie
-            plutot que de dupliquer un second historique specifique a KARN3T. */}
+            plutot que de dupliquer un second historique specifique a REKOLLECTE+. */}
         <Link href="/dashboard/parametres/administration" className="whitespace-nowrap border-b-2 border-transparent px-4 py-2.5 text-sm font-medium text-ink-soft hover:text-ink">
           Audit
         </Link>

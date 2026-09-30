@@ -27,8 +27,8 @@ const JSON_LD = {
     },
     {
       "@type": "SoftwareApplication",
-      "@id": `${SITE_URL}/#r3ns3ign3m3nt`,
-      name: "R3NS3IGN3M3NT",
+      "@id": `${SITE_URL}/#REKOLLECTE`,
+      name: "REKOLLECTE",
       applicationCategory: "BusinessApplication",
       operatingSystem: "Web",
       description: "Registre visiteurs numérique par QR Code, sans compte pour le visiteur, fonctionnant hors ligne.",
@@ -37,8 +37,8 @@ const JSON_LD = {
     },
     {
       "@type": "SoftwareApplication",
-      "@id": `${SITE_URL}/#karn3t`,
-      name: "KARN3T",
+      "@id": `${SITE_URL}/#REKOLLECTE+`,
+      name: "REKOLLECTE+",
       applicationCategory: "BusinessApplication",
       operatingSystem: "Web",
       description: "Gestion des clients, ressources, réservations, paiements et rappels — niveau 2 de REKOLLECTE, activable depuis les paramètres.",
@@ -91,7 +91,7 @@ const KARNET_HIGHLIGHTS = [
 
 const FAQS = [
   { question: "Le visiteur doit-il créer un compte ?", answer: "Non. Il scanne simplement le QR Code, remplit le formulaire depuis son téléphone ou la tablette d’accueil, puis signe. Aucune application ni inscription n’est nécessaire." },
-  { question: "Est-ce que R3NS3IGN3M3NT fonctionne sans connexion ?", answer: "Oui. Le formulaire continue d’enregistrer les visites hors-ligne sur l’appareil. Les données se synchronisent automatiquement dès que la connexion revient." },
+  { question: "Est-ce que REKOLLECTE fonctionne sans connexion ?", answer: "Oui. Le formulaire continue d’enregistrer les visites hors-ligne sur l’appareil. Les données se synchronisent automatiquement dès que la connexion revient." },
   { question: "Puis-je adapter le formulaire à mon activité ?", answer: "Oui. Tu peux choisir les champs utiles à ton établissement — bureau, restaurant, hôtel, chantier ou autre — puis les modifier à tout moment depuis les paramètres." },
   { question: "Qui peut consulter les visites enregistrées ?", answer: "Tu contrôles les accès depuis ton espace. Le patron peut gérer l’ensemble du registre et inviter un gérant ou un membre du staff avec des permissions adaptées à son rôle." },
   { question: "Que deviennent les données des visiteurs ?", answer: "Elles sont enregistrées dans l’espace sécurisé de ton établissement et restent accessibles depuis ton dashboard. Tu peux consulter le registre, suivre les motifs de visite et exporter les données en CSV." },
@@ -177,7 +177,7 @@ export default function LandingPage() {
             Le registre visiteurs numérique
           </h1>
           <p className="hero-lead mt-6 max-w-md text-[1.05rem] leading-relaxed text-mk-ink/70">
-            R3NS3IGN3M3NT remplace le registre papier des bureaux, restaurants, hôtels et accès chantier — par un
+            REKOLLECTE remplace le registre papier des bureaux, restaurants, hôtels et accès chantier — par un
             QR Code que le visiteur scanne sans jamais créer de compte.
           </p>
           <div className="hero-actions mt-9 flex flex-wrap items-center gap-5">
@@ -205,7 +205,7 @@ export default function LandingPage() {
           <div className="overflow-hidden rounded-[1.4rem] shadow-[0_30px_70px_rgba(23,52,38,0.18)]">
             <Image
               src="/landing-images/hero.webp"
-              alt="Formulaire R3NS3IGN3M3NT sur tablette, badge visiteur avec QR Code"
+              alt="Formulaire REKOLLECTE sur tablette, badge visiteur avec QR Code"
               width={1200}
               height={1200}
               className="h-auto w-full"
@@ -231,13 +231,13 @@ export default function LandingPage() {
           <div className="mt-16 max-w-sm border-t border-deep-ink/15 pt-6">
             <p className="text-sm leading-relaxed text-mk-sage">
               Le papier ne tombe jamais en panne, ne demande pas de réseau. Mais il se perd, s&apos;abîme, et
-              personne ne peut le consulter à distance. R3NS3IGN3M3NT garde la simplicité du cahier et ajoute
+              personne ne peut le consulter à distance. REKOLLECTE garde la simplicité du cahier et ajoute
               ce qu&apos;il ne pourra jamais faire.
             </p>
             <p className="mt-4 text-sm leading-relaxed text-mk-sage">
               Et le jour où ce visiteur devient client — il réserve, il consomme, il doit payer et
               repartir à l&apos;heure — un deuxième cahier entre en scène, avec ses propres pages
-              raturées. C&apos;est celui-là que <em className="font-mk-serif italic font-bold text-mk-lime">KARN3T</em> remplace.
+              raturées. C&apos;est celui-là que <em className="font-mk-serif italic font-bold text-mk-lime">REKOLLECTE+</em> remplace.
             </p>
             <div className="mt-8 flex items-center gap-4 font-mk-mono text-[10px] leading-relaxed text-mk-sage">
               <Logo size={40} className="rounded-full border border-mk-sage/40 bg-deep-ink/5 p-1.5" />
@@ -282,18 +282,18 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Niveau 2 — KARN3T */}
+      {/* Niveau 2 — REKOLLECTE+ */}
       <section className="grid gap-10 bg-mk-deep px-5 py-24 text-deep-ink sm:px-10 lg:grid-cols-[1fr_1.4fr] lg:py-36">
         <div>
           <div className="flex items-center gap-2.5 font-mk-mono text-[10px] uppercase tracking-[0.12em] text-mk-sage">
             <span className="h-px w-7 bg-current" /> Niveau 2
           </div>
           <h2 className="mt-6 text-[2.6rem] leading-[0.95] tracking-[-0.03em] sm:text-[3.5rem]">
-            Ton registre peut <em className="font-mk-serif italic font-bold text-mk-lime">devenir KARN3T.</em>
+            Ton registre peut <em className="font-mk-serif italic font-bold text-mk-lime">devenir REKOLLECTE+.</em>
           </h2>
           <p className="mt-6 max-w-sm text-sm leading-relaxed text-mk-sage">
             Le registre reste le socle : rien n&apos;y change. Mais un visiteur qui réserve, paie
-            et attend un rappel mérite mieux qu&apos;un carnet à part. Active KARN3T depuis tes
+            et attend un rappel mérite mieux qu&apos;un carnet à part. Active REKOLLECTE+ depuis tes
             paramètres — réservations, paiements et rappels rejoignent le même endroit que le
             registre.
           </p>
@@ -353,7 +353,7 @@ export default function LandingPage() {
       <section className="border-t border-mk-ink/10 px-5 py-20 sm:px-10">
         <div className="flex justify-between font-mk-mono text-[10px] uppercase tracking-[0.08em] text-mk-moss">
           <span>Pensé pour le terrain</span>
-          <span>R3NS3IGN3M3NT / 2026</span>
+          <span>REKOLLECTE / 2026</span>
         </div>
         <p className="mt-10 max-w-3xl text-2xl font-bold leading-snug tracking-[-0.02em] sm:text-4xl">
           Une bonne expérience d&apos;accueil <em className="font-mk-serif italic font-bold text-mk-moss">se remarque quand elle ne pose aucun problème.</em>

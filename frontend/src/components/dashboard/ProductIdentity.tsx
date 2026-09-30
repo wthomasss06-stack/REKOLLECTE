@@ -5,8 +5,8 @@ import { useEffect } from "react";
 import type { OrganizationCapabilities } from "@/types";
 
 const IDENTITIES = {
-  base: { title: "R3NS3IGN3M3NT", icon: "/favicon.png", apple: "/icons/icon-192.png", manifest: "/manifest.json" },
-  karnet: { title: "KARN3T", icon: "/brand/karnet-favicon.png", apple: "/icons/karnet-apple-touch-icon.png", manifest: "/manifest-karnet.json" },
+  base: { title: "REKOLLECTE", icon: "/favicon.png", apple: "/icons/icon-192.png", manifest: "/manifest.json" },
+  karnet: { title: "REKOLLECTE+", icon: "/brand/karnet-favicon.png", apple: "/icons/karnet-apple-touch-icon.png", manifest: "/manifest-karnet.json" },
 };
 
 function setLinkIcon(rel: string, href: string) {
@@ -21,7 +21,7 @@ function setLinkIcon(rel: string, href: string) {
 
 /**
  * Bascule l'identité du navigateur ET du manifest PWA (titre d'onglet, favicon,
- * manifest installable) entre Renseignement et KARN3T selon
+ * manifest installable) entre Renseignement et REKOLLECTE+ selon
  * `organization.capabilities.karnet` — un état décidé côté serveur uniquement (cf. plan
  * de bascule Niveau 1 → Niveau 2), jamais calculé ici.
  *

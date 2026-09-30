@@ -6,11 +6,11 @@ export const metadata: Metadata = { title: "Politique de confidentialité", robo
 export default function ConfidentialitePage() {
   return <LegalLayout title="Politique de confidentialité">
     <h2>Responsable du service</h2>
-    <p><strong>AKATech Studio</strong>, entreprise digitale basée à Abidjan, Côte d’Ivoire, conçoit et édite R3NS3IGN3M3NT. Contact : <a href="mailto:wthomasss06@gmail.com">wthomasss06@gmail.com</a> — <a href="tel:+2250142507750">+225 01 42 50 77 50</a>. Site public : <a href="https://rekollecte.vercel.app/" target="_blank" rel="noreferrer">renseignement.vercel.app</a>.</p>
+    <p><strong>AKATech Studio</strong>, entreprise digitale basée à Abidjan, Côte d’Ivoire, conçoit et édite REKOLLECTE. Contact : <a href="mailto:wthomasss06@gmail.com">wthomasss06@gmail.com</a> — <a href="tel:+2250142507750">+225 01 42 50 77 50</a>. Site public : <a href="https://rekollecte.vercel.app/" target="_blank" rel="noreferrer">rekollecte.vercel.app</a>.</p>
     <p>Pour les données collectées auprès de ses propres visiteurs, chaque établissement utilisateur détermine les finalités, les champs et la durée de conservation et assume les responsabilités qui lui incombent. Son identité et son contact peuvent être affichés dans son propre parcours d’information.</p>
 
     <h2>Données traitées</h2>
-    <h3>Membres de l’établissement</h3><p>Lors de la connexion Google, le service reçoit notamment l’adresse email, le nom et l’avatar disponibles auprès de Google. Ces données servent à authentifier le membre, rattacher une invitation et appliquer son rôle Patron, Gérant ou Staff. Aucun mot de passe R3NS3IGN3M3NT n’est stocké.</p>
+    <h3>Membres de l’établissement</h3><p>Lors de la connexion Google, le service reçoit notamment l’adresse email, le nom et l’avatar disponibles auprès de Google. Ces données servent à authentifier le membre, rattacher une invitation et appliquer son rôle Patron, Gérant ou Staff. Aucun mot de passe REKOLLECTE n’est stocké.</p>
     <h3>Visiteurs</h3><p>Les champs collectés dépendent du formulaire configuré par l’établissement : par exemple nom, téléphone, email, société, motif ou signature. L’établissement choisit ces champs et demeure responsable de leur pertinence, de leur information préalable et de leur licéité.</p>
     <h3>Données techniques</h3><p>Des journaux techniques nécessaires à la sécurité et à la limitation des abus peuvent être traités. Le service conserve également, pour chaque point d’accueil, son nom, le formulaire associé, l’état du QR et, lorsque l’appareil contacte le serveur, une date de dernière activité. L’appareil kiosque peut conserver localement le formulaire et des soumissions en attente dans son stockage navigateur avant synchronisation.</p>
 

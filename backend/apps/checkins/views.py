@@ -244,7 +244,7 @@ class CheckInListView(generics.ListAPIView):
         if self.request.query_params.get("to"):
             queryset = queryset.filter(created_at_client__lte=self.request.query_params["to"])
         if self.request.query_params.get("client"):
-            # Historique des passages d'une fiche client KARN3T (phase 7).
+            # Historique des passages d'une fiche client REKOLLECTE+ (phase 7).
             queryset = queryset.filter(client_id=self.request.query_params["client"])
         return queryset
 

@@ -89,7 +89,7 @@ def test_disabling_karnet_preserves_capability_state(db, boss_user, organization
 
 
 def test_reactivating_karnet_restores_capabilities_and_keeps_existing_data(db, boss_user, organization):
-    """Recette phase 10 — désactiver puis réactiver KARN3T ne doit ni perdre la
+    """Recette phase 10 — désactiver puis réactiver REKOLLECTE+ ne doit ni perdre la
     configuration des sous-capacités ni supprimer les fiches déjà créées."""
     from apps.karnet.models import Client
 

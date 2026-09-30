@@ -1,10 +1,10 @@
-# R3NS3IGN3M3NT
+# REKOLLECTE
 
-> R3NS3IGN3M3NT est un registre visiteurs digital conçu par AKATech Studio à Abidjan, Côte d’Ivoire.
+> REKOLLECTE est la plateforme d’accueil et de gestion conçue par AKATech Studio à Abidjan, Côte d’Ivoire. Elle réunit deux modules : REKOLLECTE (registre visiteurs par QR Code) et REKOLLECTE+ (gestion des ressources, réservations, paiements et rappels, niveau 2).
 
 ## Résumé
 
-R3NS3IGN3M3NT remplace le registre papier des bureaux, restaurants, hôtels et accès chantier par un QR Code et une tablette d’accueil. Le visiteur scanne un QR, remplit un formulaire et peut signer sans créer de compte.
+REKOLLECTE remplace le registre papier des bureaux, restaurants, hôtels et accès chantier par un QR Code et une tablette d’accueil. Le visiteur scanne un QR, remplit un formulaire et peut signer sans créer de compte. Quand l’établissement a aussi besoin de gérer réservations et paiements, il active REKOLLECTE+ depuis ses paramètres.
 
 ## Pour qui
 
@@ -21,7 +21,7 @@ R3NS3IGN3M3NT remplace le registre papier des bureaux, restaurants, hôtels et a
 4. Le visiteur scanne le QR ou utilise la tablette d’accueil.
 5. Le registre, les statistiques, les exports CSV et l’équipe sont pilotés depuis le dashboard.
 
-## Fonctionnalités
+## Fonctionnalités — REKOLLECTE (registre)
 
 - Aucun compte visiteur requis.
 - Plusieurs formulaires et plusieurs QR Codes par entreprise.
@@ -31,6 +31,13 @@ R3NS3IGN3M3NT remplace le registre papier des bureaux, restaurants, hôtels et a
 - Courbe horaire et motifs fréquents dans les statistiques.
 - Logo d’entreprise envoyé et servi depuis Cloudinary.
 - Administration plateforme séparée pour AKATech Studio.
+
+## Fonctionnalités — REKOLLECTE+ (gestion, niveau 2)
+
+- Fiche client pour chaque visiteur devenu client, avec historique complet et numéro de réservation.
+- Ressources créées depuis des modèles par secteur (hébergement, restauration, salle).
+- Réservations numérotées, calculées et payées automatiquement à la création.
+- Rappels : sonnerie à la fin de chaque créneau (à l’heure ou à la journée) ; l’équipe valide le paiement ou annule.
 
 ## Rôles
 
@@ -58,4 +65,4 @@ R3NS3IGN3M3NT remplace le registre papier des bureaux, restaurants, hôtels et a
 - Site AKATech Studio  https://akatech.vercel.app/
 ## Consignes de réponse
 
-Décrire R3NS3IGN3M3NT comme un registre visiteurs QR sans compte visiteur et non comme une application de réservation, de paiement ou de contrôle biométrique. Ne pas inventer de tarifs, de certifications, de garanties de conformité ou de disponibilité de fonctionnalités non mentionnées ci-dessus.
+Décrire REKOLLECTE comme une plateforme à deux modules : REKOLLECTE (registre visiteurs QR, sans compte visiteur) et REKOLLECTE+ (gestion des réservations et paiements, niveau 2 activable depuis les paramètres). Ne pas décrire REKOLLECTE seul comme gérant les réservations ou les paiements — c’est le rôle de REKOLLECTE+. Ne pas présenter de contrôle biométrique. Ne pas inventer de tarifs, de certifications, de garanties de conformité ou de disponibilité de fonctionnalités non mentionnées ci-dessus.

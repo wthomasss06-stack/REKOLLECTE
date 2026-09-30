@@ -16,7 +16,7 @@ const LINKS = [
 export default function MobileNav({ role, capabilities }: { role: AccountRole; capabilities?: OrganizationCapabilities }) {
   const pathname = usePathname();
   const visible = LINKS.filter((link) => (link.allowed ? link.allowed.includes(role) : role !== "STAFF")).map((link) => ({ ...link, label: link.activeLabel && capabilities?.karnet ? link.activeLabel : link.label }));
-  if (capabilities?.karnet) visible.push({ href: "/dashboard/karnet", label: "KARN3T", activeLabel: "KARN3T", icon: SquaresFour });
+  if (capabilities?.karnet) visible.push({ href: "/dashboard/karnet", label: "REKOLLECTE+", activeLabel: "REKOLLECTE+", icon: SquaresFour });
 
   return (
     <nav className="mobile-nav-bar" aria-label="Navigation mobile">

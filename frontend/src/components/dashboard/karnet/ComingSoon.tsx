@@ -1,7 +1,7 @@
 import type { ElementType } from "react";
 
 /**
- * Ecran "bientot disponible" pour une sous-section KARN3T dont le modele metier
+ * Ecran "bientot disponible" pour une sous-section REKOLLECTE+ dont le modele metier
  * n'existe pas encore dans le produit. Volontairement honnete sur son statut plutot
  * que de simuler une fonctionnalite : `active` distingue "deja debloque pour cet
  * etablissement, interface a venir" de "pas encore debloque".

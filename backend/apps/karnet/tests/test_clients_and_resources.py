@@ -1,4 +1,4 @@
-"""Liste Karn3t (clients avec leur activité) et ressources créées en brouillon
+"""Liste REKOLLECTE+ (clients avec leur activité) et ressources créées en brouillon
 depuis le catalogue de modèles."""
 import uuid
 from datetime import timedelta

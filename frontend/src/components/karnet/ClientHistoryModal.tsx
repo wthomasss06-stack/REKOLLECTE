@@ -4,7 +4,7 @@ import Modal from "@/components/ui/Modal";
 import ClientHistoryPanel from "./ClientHistoryPanel";
 
 /**
- * Historique complet d'un client, ouvert en un clic depuis la liste Karn3t —
+ * Historique complet d'un client, ouvert en un clic depuis la liste REKOLLECTE+ —
  * sans quitter la liste. `clientId` nul ferme le modal (Modal.open devient
  * false), ce qui évite de garder un second état "open" à synchroniser.
  */

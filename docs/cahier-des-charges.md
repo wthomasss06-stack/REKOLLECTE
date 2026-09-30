@@ -1,12 +1,12 @@
-# Cahier des charges — R3NS3IGN3M3NT (nom de code de développement : `qr-register-saas`)
+# Cahier des charges — REKOLLECTE (nom de code de développement : `qr-register-saas`)
 
 | | |
 |---|---|
 | **Porteur** | AKATech Studio (Elvis) |
-| **Statut** | V1.2 (Niveau 1 — registre) livré. **Niveau 2 — KARN3T** (clients, ressources, réservations, paiements, rappels) fusionné dans le même produit, phases 1 à 9 livrées et vérifiées (backend + frontend), phase 10 (recette complète) en cours — voir `docs/phase-10-recette.md`. |
+| **Statut** | V1.2 (Niveau 1 — registre) livré. **Niveau 2 — REKOLLECTE+** (clients, ressources, réservations, paiements, rappels) fusionné dans le même produit, phases 1 à 9 livrées et vérifiées (backend + frontend), phase 10 (recette complète) en cours — voir `docs/phase-10-recette.md`. |
 | **Version du document** | 1.5 |
 
-> Nom commercial retenu : **R3NS3IGN3M3NT**. `qr-register-saas` reste le nom de code utilisé dans le code et les dossiers du projet. Le Niveau 2 optionnel porte le nom commercial **KARN3T**.
+> Nom commercial retenu : **REKOLLECTE**. `qr-register-saas` reste le nom de code utilisé dans le code et les dossiers du projet. Le Niveau 2 optionnel porte le nom commercial **REKOLLECTE+**.
 
 ## 1. Contexte & problème
 
@@ -222,9 +222,9 @@ La sécurité de session est renforcée par une Content Security Policy frontend
 
 Le registre n’est plus limité à un lot fixe de 100 visites. Le backend expose une pagination serveur avec `page`, `page_size`, `count`, `next` et `previous`. Le dashboard demande 20 enregistrements par page sur ordinateur et 10 sur mobile. La taille maximale d’une page est contrôlée côté API.
 
-## 16. Niveau 2 — KARN3T (hébergement, beauté, coworking, événementiel…) — septembre 2026
+## 16. Niveau 2 — REKOLLECTE+ (hébergement, beauté, coworking, événementiel…) — septembre 2026
 
-R3NS3IGN3M3NT reste utilisable seul (Niveau 1 — registre de visiteurs). KARN3T est un
+REKOLLECTE reste utilisable seul (Niveau 1 — registre de visiteurs). REKOLLECTE+ est un
 Niveau 2 optionnel, activable/désactivable à tout moment par le Patron
 (`Paramètres > Administration`), qui transforme le registre en gestion clients
 complète pour un établissement qui vend des créneaux ou des séjours : hôtel,
@@ -233,20 +233,20 @@ salon de beauté, coworking, restaurant/événementiel, parking, sport et loisir
 ### 16.1 Principe
 
 ```
-Visiteur → formulaire QR → CheckIn → Client KARN3T → Réservation → Paiement
+Visiteur → formulaire QR → CheckIn → Client REKOLLECTE+ → Réservation → Paiement
 ```
 
-Le visiteur remplit le même formulaire qu'au Niveau 1. Si KARN3T est actif, sa
+Le visiteur remplit le même formulaire qu'au Niveau 1. Si REKOLLECTE+ est actif, sa
 visite crée ou retrouve automatiquement une fiche client (identifiée par email
-puis téléphone, normalisés), sans ressaisie. Rien n'est perdu si KARN3T est
+puis téléphone, normalisés), sans ressaisie. Rien n'est perdu si REKOLLECTE+ est
 désactivé puis réactivé plus tard : les fiches et réservations restent en base,
 seule leur interface disparaît temporairement.
 
-### 16.2 Modèle de données KARN3T
+### 16.2 Modèle de données REKOLLECTE+
 
 | Entité | Champs clés | Notes |
 |---|---|---|
-| `Client` | `full_name`, `phone`, `email`, `note` | Rattaché à un `CheckIn` via une relation nullable ; jamais supprimé par la désactivation de KARN3T |
+| `Client` | `full_name`, `phone`, `email`, `note` | Rattaché à un `CheckIn` via une relation nullable ; jamais supprimé par la désactivation de REKOLLECTE+ |
 | `Resource` | `category`, `resource_type`, `billing_unit`, `unit`, `price`, `capacity`, `code`, `location`, `duration_label`, `equipment` | `billing_unit` (par heure/séance/jour/nuit/mois/forfait) est ce que Patron/Gérant choisissent dans **ResourceBuilder** ; `unit` (jour/heure/unité) en est **dérivé automatiquement côté serveur** et reste seul consulté par le moteur de réservation (calcul de `ends_at`, détection de conflit) |
 | `Reservation` | `client`, `resource`, `quantity`, `unit_price`, `total_amount` (figé à la création), `starts_at`, `ends_at`, `status`, `is_paid`, `reminder_acknowledged` | Le montant facturé à la création n'est jamais recalculé si le tarif change ensuite |
 
@@ -260,17 +260,17 @@ Suite, Studio, Appartement, Villa) et peut être complétée manuellement.
 
 Au-delà de l'interrupteur principal `karnet_enabled`, trois sous-capacités sont
 réglables indépendamment par le Patron : **Réservations**, **Paiements**,
-**Rappels**. Elles sont actives par défaut dès l'activation de KARN3T, mais
+**Rappels**. Elles sont actives par défaut dès l'activation de REKOLLECTE+, mais
 peuvent être désactivées une à une (ex. un établissement qui veut le carnet de
 clients sans le suivi des paiements). L'état de chaque sous-capacité est
-conservé même quand KARN3T entier est désactivé, pour être restauré tel quel à
+conservé même quand REKOLLECTE+ entier est désactivé, pour être restauré tel quel à
 la réactivation.
 
 ### 16.4 Rôles et permissions (vérifiées côté API, pas seulement affichées)
 
 | Action | Patron | Gérant | Staff |
 |---|---|---|---|
-| Activer/désactiver KARN3T et ses sous-capacités | ✅ | ❌ | ❌ |
+| Activer/désactiver REKOLLECTE+ et ses sous-capacités | ✅ | ❌ | ❌ |
 | Créer/modifier/supprimer une ressource (ResourceBuilder) | ✅ | ✅ | ❌ (lecture seule) |
 | Créer un client, créer une réservation | ✅ | ✅ | ✅ (si la capacité est active) |
 | Encaisser un paiement | ✅ | ✅ | ✅ |
@@ -279,7 +279,7 @@ la réactivation.
 
 ### 16.5 Onboarding ResourceBuilder
 
-À l'activation de KARN3T, le Patron est redirigé vers un assistant de création
+À l'activation de REKOLLECTE+, le Patron est redirigé vers un assistant de création
 de ressources (catégorie → type → personnalisation → tarif → enregistrement),
 avec une option explicite « Plus tard » : la configuration des ressources n'est
 jamais bloquante pour continuer à utiliser le registre. Chaque ressource créée
@@ -294,7 +294,7 @@ dernière visite), solde dû, historique détaillé des passages (réponses du
 formulaire d'origine) et l'ensemble de ses réservations/paiements, avec une
 action directe « Créer une réservation » qui préremplit le client.
 
-### 16.7 État des livraisons (phases de fusion registre + KARN3T)
+### 16.7 État des livraisons (phases de fusion registre + REKOLLECTE+)
 
 | Phase | Contenu | État |
 |---|---|---|
@@ -307,7 +307,7 @@ action directe « Créer une réservation » qui préremplit le client.
 | 9 | Permissions finales par rôle, règle métier paiements | ✅ livré |
 | 10 | Recette complète (desktop/mobile, offline réel, multi-tablettes) | 🟡 tests automatisés livrés, recette manuelle documentée dans `docs/phase-10-recette.md`, à dérouler avant ouverture commerciale |
 
-Voir `rapport-fusion-r3ns3ign3m3nt-karnet.md` pour le détail livraison par
+Voir `rapport-fusion-REKOLLECTE-karnet.md` pour le détail livraison par
 livraison, et `docs/phase-10-recette.md` pour la checklist de recette manuelle.
 
 ### 16.8 Normalisation téléphone Côte d'Ivoire — corrigée

@@ -57,7 +57,7 @@ export default function StaggeredMenu({ open, onClose, items }: { open: boolean;
       <div className="qr-staggered-menu__topline" data-stagger-item>
         <Link href="/" onClick={onClose} className="flex items-center gap-3" aria-label="Retour à l’accueil">
           <Logo size={36} />
-          <span><strong className="block text-sm font-bold text-mk-ink">Navigation</strong><small className="block text-[11px] text-mk-ink/60">R3NS3IGN3M3NT</small></span>
+          <span><strong className="block text-sm font-bold text-mk-ink">Navigation</strong><small className="block text-[11px] text-mk-ink/60">REKOLLECTE</small></span>
         </Link>
         <button ref={closeRef} type="button" onClick={onClose} className="qr-staggered-menu__close" aria-label="Fermer le menu"><CloseIcon size={20} /></button>
       </div>

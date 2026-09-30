@@ -1,4 +1,4 @@
-# Cahier des charges — R3NS3IGN3M3NT (nom de code de développement : `qr-register-saas`)
+# Cahier des charges — REKOLLECTE (nom de code de développement : `qr-register-saas`)
 
 | | |
 |---|---|
@@ -6,7 +6,7 @@
 | **Statut** | V1.2 — Formulaires multiples, QR par point d’accueil et gestion multi-tablettes livrés. Recette production maintenue comme étape de contrôle. |
 | **Version du document** | 1.4 |
 
-> Nom commercial retenu : **R3NS3IGN3M3NT**. `qr-register-saas` reste le nom de code utilisé dans le code et les dossiers du projet.
+> Nom commercial retenu : **REKOLLECTE**. `qr-register-saas` reste le nom de code utilisé dans le code et les dossiers du projet.
 
 ## 1. Contexte & problème
 

@@ -1,4 +1,4 @@
-# Les six flows et permissions — R3NS3IGN3M3NT
+# Les six flows et permissions — REKOLLECTE
 
 ## Les six flows
 

@@ -41,7 +41,7 @@ class CheckIn(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     organization = models.ForeignKey("organizations.Organization", on_delete=models.CASCADE, related_name="checkins")
     form_template = models.ForeignKey(FormTemplate, on_delete=models.SET_NULL, null=True)
-    # Une visite peut alimenter une fiche client quand KARN3T est actif. La
+    # Une visite peut alimenter une fiche client quand REKOLLECTE+ est actif. La
     # relation reste nullable pour conserver l'historique du Niveau 1.
     client = models.ForeignKey(
         "karnet.Client",

@@ -15,7 +15,7 @@ export default function LoginPage() {
       {loading && (
         <div className="qr-login-loader" role="status" aria-live="polite" aria-label="Connexion en cours">
           <div className="qr-login-loader__content">
-            <div className="qr-login-loader__brand"><Logo size={52} /><span className="font-heading text-lg font-bold">R3NS3IGN3M3NT</span></div>
+            <div className="qr-login-loader__brand"><Logo size={52} /><span className="font-heading text-lg font-bold">REKOLLECTE</span></div>
             <div className="qr-login-loader__head"><span>Connexion sécurisée</span><strong>—</strong></div>
             <div className="qr-login-loader__track"><span /></div>
             <p className="qr-login-loader__label">Connexion en cours… Préparation de ton espace.</p>
@@ -28,7 +28,7 @@ export default function LoginPage() {
         <div className="relative hidden flex-col justify-between overflow-hidden bg-mk-deep p-12 text-deep-ink lg:flex">
           <Image
             src="/landing-images/securite-carre.webp"
-            alt="R3NS3IGN3M3NT — données protégées, accès par rôle"
+            alt="REKOLLECTE — données protégées, accès par rôle"
             fill
             className="object-cover opacity-40 mix-blend-overlay"
             sizes="(min-width: 1024px) 50vw, 100vw"

@@ -35,7 +35,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       void alert(info.isNew
         ? { tone: "brand", mood: "excited", title: `Bienvenue${firstName ? `, ${firstName}` : ""} !`, message: "Ton espace est prêt. Tu peux commencer par consulter le registre ou ouvrir les paramètres.", okLabel: "Commencer" }
         : isKarnet
-          ? { tone: "brand", mood: "cheeky", title: `Bon retour${firstName ? `, ${firstName}` : ""} !`, message: "Ton établissement est au Niveau 2 : les visiteurs deviennent des clients, puis KARN3T prend le relais pour les ressources, réservations et paiements.", okLabel: "C’est parti" }
+          ? { tone: "brand", mood: "cheeky", title: `Bon retour${firstName ? `, ${firstName}` : ""} !`, message: "Ton établissement est au Niveau 2 : les visiteurs deviennent des clients, puis REKOLLECTE+ prend le relais pour les ressources, réservations et paiements.", okLabel: "C’est parti" }
           : { tone: "brand", mood: "cheeky", title: `Bon retour${firstName ? `, ${firstName}` : ""} !`, message: "Content de te revoir. Ton registre t’attend.", okLabel: "C’est parti" });
     } catch {
       // Une donnée de session corrompue ne doit pas bloquer l’espace.

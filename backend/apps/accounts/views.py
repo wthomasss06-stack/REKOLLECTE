@@ -232,7 +232,7 @@ class RevokeMemberView(APIView):
 
 class AuditEventPagination(PageNumberPagination):
     # Le journal d'audit grossit sans limite avec l'activité de l'établissement
-    # (connexions, révocations, activation KARN3T...) ; le `[:100]` d'origine
+    # (connexions, révocations, activation REKOLLECTE+...) ; le `[:100]` d'origine
     # cachait silencieusement tout ce qui précédait les 100 événements les plus
     # récents, sans le signaler ni permettre de remonter dans l'historique.
     page_size = 20

@@ -8,7 +8,7 @@ from django.utils import timezone
 class ClientQuerySet(models.QuerySet):
     def with_activity(self):
         """Ajoute passages, réservations et dernière activité : ce que la liste
-        Karn3t et la fiche client affichent, calculé en une seule requête plutôt
+        REKOLLECTE+ et la fiche client affichent, calculé en une seule requête plutôt
         que N requêtes par client."""
         return self.annotate(
             checkins_count=Count("checkins", distinct=True),

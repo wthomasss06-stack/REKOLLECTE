@@ -6,7 +6,7 @@ import { ArrowLeft } from "@phosphor-icons/react";
 import ClientHistoryPanel from "@/components/karnet/ClientHistoryPanel";
 
 /** Lien direct/partageable vers une fiche client — même contenu que le modal
- * ouvert depuis Karn3t (voir ClientHistoryPanel), avec un bouton retour en plus. */
+ * ouvert depuis REKOLLECTE+ (voir ClientHistoryPanel), avec un bouton retour en plus. */
 export default function KarnetClientDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();

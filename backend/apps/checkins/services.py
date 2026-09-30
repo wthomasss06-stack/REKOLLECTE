@@ -1,6 +1,6 @@
 """Validation et ingestion offline-first idempotente pour plusieurs points d'accueil.
 
-Quand KARN3T est actif, une visite valide alimente automatiquement une fiche
+Quand REKOLLECTE+ est actif, une visite valide alimente automatiquement une fiche
 client. Le check-in reste toujours la source historique du passage.
 """
 from dataclasses import dataclass, field

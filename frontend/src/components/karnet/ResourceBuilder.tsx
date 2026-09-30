@@ -40,7 +40,7 @@ function toEditDraft(r: KarnetResource): EditDraft {
 }
 
 /**
- * Créateur/éditeur de ressources KARN3T — même expérience que la création de
+ * Créateur/éditeur de ressources REKOLLECTE+ — même expérience que la création de
  * formulaire (voir /dashboard/parametres/formulaire) : un petit modal "Nom +
  * Repartir d'un modèle" pour démarrer vite depuis un catalogue qui couvre
  * plusieurs métiers (pas figé sur l'hôtellerie), puis un modal plus large pour
@@ -84,7 +84,7 @@ export default function ResourceBuilder({ autoOpenCreate = false }: Props) {
 
   useEffect(() => {
     if (autoOpenCreate && canManage) openCreate();
-    // Ne se déclenche qu'au montage (arrivée depuis l'activation de KARN3T) —
+    // Ne se déclenche qu'au montage (arrivée depuis l'activation de REKOLLECTE+) —
     // pas à chaque changement de canManage/openCreate.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoOpenCreate]);
@@ -179,7 +179,7 @@ export default function ResourceBuilder({ autoOpenCreate = false }: Props) {
     <div className="space-y-6">
       <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-ink-soft">Configuration KARN3T</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-ink-soft">Configuration REKOLLECTE+</p>
           <h1 className="mt-1 text-2xl font-bold text-ink">Mes ressources</h1>
           <p className="mt-2 max-w-2xl text-sm text-ink-soft">Crée les espaces ou équipements que tes clients pourront réserver — hôtel, salon, coworking, restaurant, parking, sport… Chaque ressource est enregistrée dès que tu la valides.</p>
         </div>

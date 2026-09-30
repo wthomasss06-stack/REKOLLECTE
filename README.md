@@ -1,7 +1,7 @@
-# R3NS3IGN3M3NT
+# REKOLLECTE
 
 <div align="center">
-  <img src="frontend/public/brand/logo-mark.png" alt="Logo R3NS3IGN3M3NT" width="120" />
+  <img src="frontend/public/brand/logo-mark.png" alt="Logo REKOLLECTE" width="120" />
   <h3>Le registre digital des établissements</h3>
   <p>QR Code, tablette d’accueil, formulaire visiteur, signatures et dashboard par rôles.</p>
   <p><a href="https://akatech.vercel.app/">Conçu par AKATech Studio</a></p>
@@ -11,7 +11,7 @@
 
 ## Présentation
 
-R3NS3IGN3M3NT est une solution SaaS de registre d’accueil sans contact conçue par **AKATech Studio**, entreprise digitale basée à Abidjan, Côte d’Ivoire. Un établissement configure plusieurs formulaires, crée plusieurs points d’accueil avec leurs QR Codes et tablettes, puis consulte les arrivées dans un dashboard sécurisé.
+REKOLLECTE est une solution SaaS de registre d’accueil sans contact conçue par **AKATech Studio**, entreprise digitale basée à Abidjan, Côte d’Ivoire. Un établissement configure plusieurs formulaires, crée plusieurs points d’accueil avec leurs QR Codes et tablettes, puis consulte les arrivées dans un dashboard sécurisé.
 
 Le visiteur n’a pas besoin de créer un compte. Le mode kiosque fonctionne offline-first : après un premier chargement avec Internet, chaque appareil conserve le formulaire de son point d’accueil et les soumissions en attente dans IndexedDB, puis synchronise automatiquement dès que le réseau revient.
 
@@ -19,12 +19,12 @@ Le visiteur n’a pas besoin de créer un compte. Le mode kiosque fonctionne off
 
 | Élément | Information |
 |---|---|
-| Produit | R3NS3IGN3M3NT |
+| Produit | REKOLLECTE |
 | Concepteur et éditeur du produit | AKATech Studio |
 | Site AKATech Studio | [akatech.vercel.app](https://akatech.vercel.app/) |
 | Contact | wthomasss06@gmail.com · +225 01 42 50 77 50 |
 | Localisation déclarée | Abidjan, Côte d’Ivoire |
-| Statut | V1.2 (Niveau 1 — registre) fonctionnelle. Niveau 2 KARN3T fusionné (clients, ressources, réservations, paiements, rappels), phases 1 à 9 livrées, phase 10 (recette) en cours. |
+| Statut | V1.2 (Niveau 1 — registre) fonctionnelle. Niveau 2 REKOLLECTE+ fusionné (clients, ressources, réservations, paiements, rappels), phases 1 à 9 livrées, phase 10 (recette) en cours. |
 
 ## Fonctionnalités livrées
 
@@ -73,11 +73,11 @@ Le visiteur n’a pas besoin de créer un compte. Le mode kiosque fonctionne off
 - Motifs de visite les plus fréquents.
 - Export CSV.
 
-### Niveau 2 — KARN3T (clients, ressources, réservations)
+### Niveau 2 — REKOLLECTE+ (clients, ressources, réservations)
 
 Optionnel, activable/désactivable à tout moment par le Patron sans perte de
 données (`Paramètres > Administration`). Une fois actif, le registre devient
-l’espace **Clients** et la navigation ajoute une section **KARN3T**.
+l’espace **Clients** et la navigation ajoute une section **REKOLLECTE+**.
 
 - **Ressources (ResourceBuilder)** : catalogue par catégorie (Hébergement,
   Beauté et soins, Espaces professionnels, Événementiel et restauration,
@@ -85,7 +85,7 @@ l’espace **Clients** et la navigation ajoute une section **KARN3T**.
   fauteuil, bureau, table…) et champs personnalisables (capacité, prix, mode de
   tarification, emplacement, équipements). Chaque ressource est enregistrée
   immédiatement ; réservé à Patron/Gérant, consultation seule pour le Staff.
-  Proposé automatiquement à l’activation de KARN3T, avec option « Plus tard ».
+  Proposé automatiquement à l’activation de REKOLLECTE+, avec option « Plus tard ».
 - **Clients** : une visite valide crée ou retrouve automatiquement une fiche
   client (email puis téléphone, normalisés), sans ressaisie. Fiche client
   complète (`/dashboard/karnet/clients/<id>`) : coordonnées, compteurs,
@@ -99,16 +99,16 @@ l’espace **Clients** et la navigation ajoute une section **KARN3T**.
 - **Rappels** : sonnerie de fin de créneau pour les ressources facturées à
   l’heure, acquittable par toute l’équipe.
 - Trois sous-capacités (Réservations, Paiements, Rappels) activables/
-  désactivables indépendamment, avec état conservé même si KARN3T entier est
+  désactivables indépendamment, avec état conservé même si REKOLLECTE+ entier est
   désactivé puis réactivé.
-- Voir `rapport-fusion-r3ns3ign3m3nt-karnet.md` pour l’historique de livraison
+- Voir `rapport-fusion-REKOLLECTE-karnet.md` pour l’historique de livraison
   détaillé et `docs/phase-10-recette.md` pour la checklist de recette manuelle
   (multi-appareils, offline réel) restant à dérouler avant ouverture commerciale.
 
 ### Vitrine et conformité
 
 - Landing page marketing responsive et PWA.
-- Header/footer avec logo R3NS3IGN3M3NT.
+- Header/footer avec logo REKOLLECTE.
 - Logo AKATech Studio révélé au survol du crédit concepteur dans le footer.
 - Pages Aide, CGU, Confidentialité et Mentions légales.
 - Les informations encore en formalisation juridique sont indiquées dans les pages légales sans être inventées.
@@ -159,7 +159,7 @@ qr-register-saas/
 | Authentification | Google OAuth, JWT, refresh token httpOnly |
 | Base de données | PostgreSQL sur Neon en production, SQLite possible en local |
 | Infrastructure | GitHub, Vercel pour le frontend, Render pour le backend, Neon pour PostgreSQL |
-| Design | Logo officiel R3NS3IGN3M3NT, Phosphor Icons, Plus Jakarta Sans/Geist et tokens de marque |
+| Design | Logo officiel REKOLLECTE, Phosphor Icons, Plus Jakarta Sans/Geist et tokens de marque |
 
 ## Routes frontend principales
 
@@ -209,12 +209,12 @@ Toutes les routes API sont préfixées par `/api/v1`.
 | `POST` | `/org/me/regenerate-qr/` | Patron | Invalider l’ancien QR |
 | `GET` | `/auth/audit/?page=&page_size=` | Patron | Journal d’audit, paginé (`count`/`next`/`previous`) |
 | `GET` | `/health/` | Public | Vérifier la disponibilité backend |
-| `PATCH` | `/org/me/karnet/` | Patron | Activer/désactiver KARN3T et ses sous-capacités |
-| `GET/POST` | `/karnet/clients/` | Membre (KARN3T actif) | Lister/créer une fiche client |
+| `PATCH` | `/org/me/karnet/` | Patron | Activer/désactiver REKOLLECTE+ et ses sous-capacités |
+| `GET/POST` | `/karnet/clients/` | Membre (REKOLLECTE+ actif) | Lister/créer une fiche client |
 | `GET/PATCH` | `/karnet/clients/<id>/` | Membre / Patron·Gérant | Fiche client complète (compteurs) / modifier |
 | `GET/POST` | `/karnet/resources/` | Membre (lecture) / Patron·Gérant (création) | Catalogue de ressources (ResourceBuilder) |
 | `PATCH/DELETE` | `/karnet/resources/<id>/` | Patron/Gérant | Modifier ou désactiver/supprimer une ressource |
-| `GET/POST` | `/karnet/reservations/` | Membre (KARN3T actif) | Lister/créer une réservation (calcul automatique du montant) |
+| `GET/POST` | `/karnet/reservations/` | Membre (REKOLLECTE+ actif) | Lister/créer une réservation (calcul automatique du montant) |
 | `PATCH` | `/karnet/reservations/<id>/` | Membre / Patron·Gérant pour annuler un paiement | Statut, paiement, accusé de rappel |
 | `GET` | `/checkins/?client=<id>` | Membre | Historique des passages d’un client (fiche client) |
 | `POST` | `/admin/login/` | Public avec identifiants Render | Ouvrir une session admin plateforme |
@@ -317,7 +317,7 @@ npm run type-check
 npm run build
 ```
 
-État de la dernière validation : **65 tests backend passants (dont KARN3T : clients, ressources, réservations, permissions, réactivation), `tsc --noEmit` sans erreur**. Le build `next build` échoue dans cet environnement de développement uniquement à cause du blocage réseau vers `fonts.googleapis.com` (police `Chelsea Market`) — sans rapport avec le code applicatif ; à revérifier en environnement avec accès réseau complet avant mise en production.
+État de la dernière validation : **65 tests backend passants (dont REKOLLECTE+ : clients, ressources, réservations, permissions, réactivation), `tsc --noEmit` sans erreur**. Le build `next build` échoue dans cet environnement de développement uniquement à cause du blocage réseau vers `fonts.googleapis.com` (police `Chelsea Market`) — sans rapport avec le code applicatif ; à revérifier en environnement avec accès réseau complet avant mise en production.
 
 ## Déploiement production
 
@@ -357,7 +357,7 @@ Avant chaque mise en production :
 - [`docs/flow-tablette-employe.md`](docs/flow-tablette-employe.md) — parcours tablette/kiosque.
 - [`docs/flows/`](docs/flows/) — six diagrammes SVG des parcours et permissions.
 - [`docs/modele-economique.md`](docs/modele-economique.md) — stratégie gratuit, offres payantes et indicateurs de lancement.
-- [`rapport-fusion-r3ns3ign3m3nt-karnet.md`](rapport-fusion-r3ns3ign3m3nt-karnet.md) — historique de livraison de la fusion registre + KARN3T, phase par phase.
+- [`rapport-fusion-REKOLLECTE-karnet.md`](rapport-fusion-REKOLLECTE-karnet.md) — historique de livraison de la fusion registre + REKOLLECTE+, phase par phase.
 - [`docs/phase-10-recette.md`](docs/phase-10-recette.md) — checklist de recette manuelle (multi-appareils, offline réel) à dérouler avant ouverture commerciale.
 
 ## Limitations et prochaines évolutions
@@ -408,10 +408,10 @@ Le flux d’images accepte les avatars Google ainsi que les photos et logos envo
 
 La version actuelle a été vérifiée avec **34 tests backend passants**, une migration Django cohérente, un type-check TypeScript réussi et un build Next.js réussi. L’archive de livraison exclut uniquement les dépendances générées `node_modules`, `.next` et les couvertures de test générées.
 
-## Mise à jour — fusion KARN3T, phases 7 à 10 — 26 septembre 2026
+## Mise à jour — fusion REKOLLECTE+, phases 7 à 10 — 26 septembre 2026
 
-Le Niveau 2 KARN3T (clients, ressources, réservations, paiements, rappels) est
-fusionné dans le registre R3NS3IGN3M3NT. Cette mise à jour livre les phases 7 à
+Le Niveau 2 REKOLLECTE+ (clients, ressources, réservations, paiements, rappels) est
+fusionné dans le registre REKOLLECTE. Cette mise à jour livre les phases 7 à
 9 et démarre la phase 10 :
 
 - **Fiche client complète** (`/dashboard/karnet/clients/<id>`) : compteurs
@@ -430,9 +430,9 @@ fusionné dans le registre R3NS3IGN3M3NT. Cette mise à jour livre les phases 7 
   `unit` (jour/heure/unité), seul connu du moteur de réservation, est désormais
   **dérivé automatiquement** du mode de tarification choisi (`billing_unit`) ;
   compatibilité conservée pour un appel qui fixerait encore `unit` directement.
-  Proposé à l’activation de KARN3T avec option « Plus tard ».
+  Proposé à l’activation de REKOLLECTE+ avec option « Plus tard ».
 - **Phase 10 (recette)** : scénarios de doublons (téléphone avec tirets/espaces,
-  email en casse différente) et de réactivation de KARN3T couverts par des
+  email en casse différente) et de réactivation de REKOLLECTE+ couverts par des
   tests automatisés ; le reste (multi-appareils, offline réel, tablette) est
   documenté dans `docs/phase-10-recette.md` pour une recette manuelle avant
   ouverture commerciale.

@@ -1,4 +1,4 @@
-# Modèle économique proposé — R3NS3IGN3M3NT
+# Modèle économique proposé — REKOLLECTE
 
 ## Phase actuelle : gratuit et collecte de signal
 

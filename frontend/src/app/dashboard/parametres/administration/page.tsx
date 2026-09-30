@@ -14,9 +14,9 @@ const ACTION_LABELS: Record<string, string> = {
   "auth.logout": "Déconnexion",
   "invitation.revoked": "Invitation révoquée",
   "member.revoked": "Membre révoqué",
-  "organization.karnet_enabled": "KARN3T activé",
-  "organization.karnet_disabled": "KARN3T désactivé",
-  "organization.karnet_capability_updated": "Capacité KARN3T mise à jour",
+  "organization.karnet_enabled": "REKOLLECTE+ activé",
+  "organization.karnet_disabled": "REKOLLECTE+ désactivé",
+  "organization.karnet_capability_updated": "Capacité REKOLLECTE+ mise à jour",
 };
 
 const CAPABILITY_LABELS: { key: keyof OrganizationCapabilities; label: string }[] = [
@@ -41,14 +41,14 @@ export default function AdministrationPage() {
     const enabling = !organization?.karnet_enabled;
     const activated = await confirm({
       tone: "brand",
-      title: enabling ? "Activer KARN3T ?" : "Désactiver KARN3T ?",
+      title: enabling ? "Activer REKOLLECTE+ ?" : "Désactiver REKOLLECTE+ ?",
       message: enabling
-        ? "Ton établissement passe au Niveau 2 : le registre devient l’espace Clients et KARN3T ajoute les ressources, réservations, paiements et rappels."
-        : "Les sections KARN3T disparaissent de la barre latérale. Rien n’est supprimé, tu pourras réactiver plus tard.",
+        ? "Ton établissement passe au Niveau 2 : le registre devient l’espace Clients et REKOLLECTE+ ajoute les ressources, réservations, paiements et rappels."
+        : "Les sections REKOLLECTE+ disparaissent de la barre latérale. Rien n’est supprimé, tu pourras réactiver plus tard.",
       confirmLabel: enabling ? "Activer" : "Désactiver",
       cancelLabel: "Annuler",
       runningLabel: enabling ? "Activation…" : "Désactivation…",
-      successTitle: enabling ? "KARN3T est activé !" : "KARN3T est désactivé.",
+      successTitle: enabling ? "REKOLLECTE+ est activé !" : "REKOLLECTE+ est désactivé.",
       successMessage: enabling
         ? "La barre latérale, le titre d’onglet et le favicon reflètent déjà le Niveau 2 — rien d’autre à faire."
         : "L’établissement repasse à l’identité Renseignement seule.",
@@ -104,10 +104,10 @@ export default function AdministrationPage() {
       <section className="rounded-xl border border-border bg-surface p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="font-semibold text-ink">Niveau 2 — KARN3T</h2>
+            <h2 className="font-semibold text-ink">Niveau 2 — REKOLLECTE+</h2>
             <p className="mt-1 max-w-md text-sm text-ink-soft">
               {organization?.karnet_enabled
-                ? "KARN3T est actif : les visiteurs enregistrés alimentent l’espace Clients, tandis que les opérations restent regroupées dans KARN3T."
+                ? "REKOLLECTE+ est actif : les visiteurs enregistrés alimentent l’espace Clients, tandis que les opérations restent regroupées dans REKOLLECTE+."
                 : "Ajoute les fonctions de gestion hôtelière autour de ton registre : clients, ressources, réservations, paiements et rappels."}
             </p>
           </div>
@@ -117,7 +117,7 @@ export default function AdministrationPage() {
               organization?.karnet_enabled ? "border border-border text-ink-soft hover:bg-canvas" : "bg-cta text-white"
             }`}
           >
-            {organization?.karnet_enabled ? "Désactiver KARN3T" : "Activer KARN3T"}
+            {organization?.karnet_enabled ? "Désactiver REKOLLECTE+" : "Activer REKOLLECTE+"}
           </button>
         </div>
         {organization?.karnet_enabled && (
