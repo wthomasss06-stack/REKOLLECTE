@@ -35,70 +35,136 @@
     "resourceType": "image",
     "updatedAt": "2026-09-17T05:26:28.528Z"
   },
-  "landing-images/01-accueil-moderne.webp": {
-    "hash": "3cf9ca3accbe9802e51d78e67f0c873f50cd2309ccf7cb03ae7ab26917edd5c7",
-    "publicId": "akatech/landing-images/01-accueil-moderne",
+  "akatech-studio-logo.webp": {
+    "hash": "a63609885061aa4857c8785dd2e04d1d12e038024923d66ddafddac49b6dfbe2",
+    "publicId": "akatech/akatech-studio-logo",
     "resourceType": "image",
-    "updatedAt": "2026-09-17T05:27:26.617Z"
+    "updatedAt": "2026-10-01T07:52:03.550Z"
   },
-  "landing-images/01-hero-landing.webp": {
-    "hash": "3a662b7df0427bc439aad3d02e6036ea73dcf6f33b642bf28e9f9a93ca48e392",
-    "publicId": "akatech/landing-images/01-hero-landing",
+  "brand/karnet-favicon.png": {
+    "hash": "d618e1e42f87e80c97350003ad29b8e19a74508ebc9ce18743c57ab183683bda",
+    "publicId": "akatech/brand/karnet-favicon",
     "resourceType": "image",
-    "updatedAt": "2026-09-17T05:27:29.330Z"
+    "updatedAt": "2026-10-01T07:52:04.545Z"
   },
-  "landing-images/02-sans-reseau.webp": {
-    "hash": "91989bfa822348a887cda8fa12dc5ea2bc0cc18b4347c656a0c05846180b82a7",
-    "publicId": "akatech/landing-images/02-sans-reseau",
+  "brand/karnet-logo-mark.webp": {
+    "hash": "a13d2198c20f58171124380f24684ecc0c8c083c2ad667a0edb61c09b9430d79",
+    "publicId": "akatech/brand/karnet-logo-mark",
     "resourceType": "image",
-    "updatedAt": "2026-09-17T05:27:43.899Z"
+    "updatedAt": "2026-10-01T07:52:06.436Z"
   },
-  "landing-images/03-signe-et-passe.webp": {
-    "hash": "6eacfd4b0012e8cbe58222f8a0a90a83456adcef819bd472a35cf960166967a2",
-    "publicId": "akatech/landing-images/03-signe-et-passe",
+  "brand/karnet-logo-source.webp": {
+    "hash": "8a86e77b823b7842b7ee7c7581405146a75f25893780c23528786fb89a75567f",
+    "publicId": "akatech/brand/karnet-logo-source",
     "resourceType": "image",
-    "updatedAt": "2026-09-17T05:27:52.660Z"
+    "updatedAt": "2026-10-01T07:52:07.488Z"
   },
-  "landing-images/04-papier-vers-digital.webp": {
-    "hash": "7c8cafdeb6eb707dadaca2a08e3b2d4b9d5245ee5b517d9560de71aefa9086fb",
-    "publicId": "akatech/landing-images/04-papier-vers-digital",
+  "icons/karnet-apple-touch-icon.png": {
+    "hash": "a74563813dfcc938934d968b0f6aa855343e7bb269942ff840e93a296295e552",
+    "publicId": "akatech/icons/karnet-apple-touch-icon",
     "resourceType": "image",
-    "updatedAt": "2026-09-17T05:28:00.746Z"
+    "updatedAt": "2026-10-01T07:52:08.922Z"
   },
-  "landing-images/05-qr-accueil.webp": {
-    "hash": "1fc0c4ed260e79e02fe68587157b0f8251d1fe48d616a01eaa15a046dd59eb0a",
-    "publicId": "akatech/landing-images/05-qr-accueil",
+  "icons/karnet-icon-192.png": {
+    "hash": "20bb60e116cf7ed532b736f18fa0f189390f2da2f35e3eba70059522b6a9a53f",
+    "publicId": "akatech/icons/karnet-icon-192",
     "resourceType": "image",
-    "updatedAt": "2026-09-17T05:28:04.889Z"
+    "updatedAt": "2026-10-01T07:52:10.367Z"
   },
-  "landing-images/06-patron-dashboard.webp": {
-    "hash": "cf80a1f3081e26a0126d92b9897f2938a89b23355b5876e51b3b0873808b9ec7",
-    "publicId": "akatech/landing-images/06-patron-dashboard",
+  "icons/karnet-icon-192.webp": {
+    "hash": "35032eeb1db48338f0cb51db59435c7d0410b0f5e742a419e443aea4ffadda95",
+    "publicId": "akatech/icons/karnet-icon-192",
     "resourceType": "image",
-    "updatedAt": "2026-09-17T05:28:08.650Z"
+    "updatedAt": "2026-10-01T07:52:11.896Z"
   },
-  "landing-images/07-pour-tous-les-etablissements.webp": {
-    "hash": "54f1281613d362d795fcf40a4674d4c2cc2be7be8e8f85155428e6250df63c83",
-    "publicId": "akatech/landing-images/07-pour-tous-les-etablissements",
+  "icons/karnet-icon-512.png": {
+    "hash": "0d25ac349984e0ffffee00b9652cdcc4508846243178226d1b9b11115eb32056",
+    "publicId": "akatech/icons/karnet-icon-512",
     "resourceType": "image",
-    "updatedAt": "2026-09-17T05:28:13.845Z"
+    "updatedAt": "2026-10-01T07:52:12.994Z"
   },
-  "landing-images/08-confidentialite.webp": {
-    "hash": "6e45d67074cd1b2c3c81219cf88d68a107ede02dc2cd12566b67875c93b6724a",
-    "publicId": "akatech/landing-images/08-confidentialite",
+  "icons/karnet-icon-512.webp": {
+    "hash": "a7f8933d036695cb28f77b66a90f599683859caf7aa72e6db222a77d9a4db384",
+    "publicId": "akatech/icons/karnet-icon-512",
     "resourceType": "image",
-    "updatedAt": "2026-09-17T05:28:16.355Z"
+    "updatedAt": "2026-10-01T07:52:15.109Z"
   },
-  "landing-images/09-mise-en-place.webp": {
-    "hash": "995b2f00789203e41c4dd7a45cc2540f0f68c5c0cac9baeb294d929329d22208",
-    "publicId": "akatech/landing-images/09-mise-en-place",
+  "icons/karnet-icon-maskable-512.png": {
+    "hash": "0a1248d07c2f2518fa04cf2ec4b063ca6ab20a21fb8d96c0a416ed9337f2f579",
+    "publicId": "akatech/icons/karnet-icon-maskable-512",
     "resourceType": "image",
-    "updatedAt": "2026-09-17T05:28:21.146Z"
+    "updatedAt": "2026-10-01T07:52:17.356Z"
   },
-  "landing-images/10-signature-marque.webp": {
-    "hash": "d7aa304615204115befbcf46c60a795eef85e8bd8d823bcb55573cbf18f70f45",
-    "publicId": "akatech/landing-images/10-signature-marque",
+  "landing-images/Hero+.webp": {
+    "hash": "57ce725c4a59bbdbe986c6348b6d972f5bb6160eb650216ed7538c31579fc392",
+    "publicId": "akatech/landing-images/Hero+",
     "resourceType": "image",
-    "updatedAt": "2026-09-17T05:28:25.870Z"
+    "updatedAt": "2026-10-01T07:52:19.426Z"
+  },
+  "landing-images/hero.webp": {
+    "hash": "51ae39714f87318a6eecef55bab99bb2fe675c7e07be0bef6d32d248eaf4a345",
+    "publicId": "akatech/landing-images/hero",
+    "resourceType": "image",
+    "updatedAt": "2026-10-01T07:52:23.124Z"
+  },
+  "landing-images/offline+.webp": {
+    "hash": "d27831316e744ec1f60e4ad18b07621b41e087ab0e5195de1051f055667bd7c1",
+    "publicId": "akatech/landing-images/offline+",
+    "resourceType": "image",
+    "updatedAt": "2026-10-01T07:52:27.911Z"
+  },
+  "landing-images/offline.webp": {
+    "hash": "3f19c74b6f12861182aa4cdc200f0e43aaa2b182f57cec080ceb72823ddff971",
+    "publicId": "akatech/landing-images/offline",
+    "resourceType": "image",
+    "updatedAt": "2026-10-01T07:52:30.961Z"
+  },
+  "landing-images/offlinnnnnnne.webp": {
+    "hash": "113c595346968976aca285fa74f6633d4ed4c1716674436b7350b59832c9f630",
+    "publicId": "akatech/landing-images/offlinnnnnnne",
+    "resourceType": "image",
+    "updatedAt": "2026-10-01T07:52:34.346Z"
+  },
+  "landing-images/REKOLLECTE+.webp": {
+    "hash": "faf9bbb7c19d19a09d7a83bd8ea1d020d8d039a295db87ab0275e7fcf348e887",
+    "publicId": "akatech/landing-images/REKOLLECTE+",
+    "resourceType": "image",
+    "updatedAt": "2026-10-01T07:52:37.198Z"
+  },
+  "landing-images/secteurs+.webp": {
+    "hash": "9ad2096c5b6e0ba794c2f5862557bf8af5a442bd87c1d65446dc5162d2bfdeb0",
+    "publicId": "akatech/landing-images/secteurs+",
+    "resourceType": "image",
+    "updatedAt": "2026-10-01T07:52:39.479Z"
+  },
+  "landing-images/secteurs.webp": {
+    "hash": "4f56210e171bc867b639e1ac35490d7e077363e7c31b17249c3294a7eb44bf58",
+    "publicId": "akatech/landing-images/secteurs",
+    "resourceType": "image",
+    "updatedAt": "2026-10-01T07:52:43.346Z"
+  },
+  "landing-images/securite-carre+.webp": {
+    "hash": "ca2d6eb4dbdc191f0cc535e887742a80f48b4899c070edd99b1073739484316b",
+    "publicId": "akatech/landing-images/securite-carre+",
+    "resourceType": "image",
+    "updatedAt": "2026-10-01T07:52:45.920Z"
+  },
+  "landing-images/securite-carre.webp": {
+    "hash": "52ddcff440730585123d65897b13e462f983cdc180202de814e070c011cca33c",
+    "publicId": "akatech/landing-images/securite-carre",
+    "resourceType": "image",
+    "updatedAt": "2026-10-01T07:52:47.500Z"
+  },
+  "landing-images/securite-wide+.webp": {
+    "hash": "1d9887a2663ba3304732a6dc4254dfd6c0b4d5546da17a7b05b1101b3af61e48",
+    "publicId": "akatech/landing-images/securite-wide+",
+    "resourceType": "image",
+    "updatedAt": "2026-10-01T07:52:48.963Z"
+  },
+  "landing-images/securite-wide.webp": {
+    "hash": "4c840cd4fcc0489d69d708a5458ff5300dadd31a8373916a01ca9083a21c318d",
+    "publicId": "akatech/landing-images/securite-wide",
+    "resourceType": "image",
+    "updatedAt": "2026-10-01T07:52:50.320Z"
   }
 }

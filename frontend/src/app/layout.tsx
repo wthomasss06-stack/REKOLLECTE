@@ -26,7 +26,12 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: "REKOLLECTE | Registre visiteurs & gestion d’établissement", description: "Un QR Code pour accueillir sans compte, une gestion complète pour ce qui suit.", images: ["/landing-images/hero.webp"] },
   manifest: "/manifest.json",
   icons: {
-    icon: "/favicon.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "48x48" },
+      { url: "/favicon.png", sizes: "48x48", type: "image/png" },
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
     apple: "/icons/icon-192.png",
   },
 };

@@ -8,6 +8,7 @@ import { useGSAP } from "@gsap/react";
 
 import { ArrowDownRight, ArrowUpRight, CheckMark } from "@/components/icons";
 import Logo from "@/components/Logo";
+import AutoSlide from "@/components/marketing/AutoSlide";
 import PwaInstallButton from "@/components/marketing/PwaInstallButton";
 import { SITE_URL } from "@/lib/site";
 
@@ -102,9 +103,18 @@ const STEPS = [
   { n: "04", title: "Synchroniser", body: "Envoi automatique dès que l'appareil retrouve une connexion. Le patron voit tout depuis son dashboard." },
 ];
 
-const KARNET_HIGHLIGHTS = [
-  { title: "Visiteurs & clients", body: "Chaque client a sa fiche : passages, réservations, numéros — tout l'historique en un clic, sans ressaisir son nom." },
-  { title: "Ressources", body: "Chambre, table ou salle : un modèle suffit pour créer la ressource, prix à ajuster ensuite." },
+// Même parcours en quatre temps, côté REKOLLECTE+ (niveau 2) : deuxième diapositive
+// du bloc "Le parcours", une fois le registre activé en gestion complète.
+const REKOLLECTE_STEPS = [
+  { n: "01", title: "Activer", body: "Depuis les paramètres, active REKOLLECTE+ pour ton établissement — le registre continue de tourner sans interruption." },
+  { n: "02", title: "Créer une ressource", body: "Choisis un type, un sous-type : la ressource est prête. Le prix s'ajuste ensuite, en un clic." },
+  { n: "03", title: "Réserver", body: "Le client réserve une ressource ; la réservation est numérotée et déjà réglée, sans calcul à faire." },
+  { n: "04", title: "Être alerté", body: "À la fin du créneau, une sonnerie prévient l'équipe. Un geste suffit pour valider ou annuler." },
+];
+
+const KARNET_HIGHLIGHTS: { title: string; body: string; image?: string }[] = [
+  { title: "Visiteurs & clients", body: "Chaque client a sa fiche : passages, réservations, numéros — tout l'historique en un clic, sans ressaisir son nom.", image: "/landing-images/securite-carre+.webp" },
+  { title: "Ressources", body: "Chambre, table ou salle : un modèle suffit pour créer la ressource, prix à ajuster ensuite.", image: "/landing-images/offline+.webp" },
   { title: "Réservations", body: "Numérotées, calculées, payées d'avance — chaque réservation part déjà réglée." },
   { title: "Paiements & rappels", body: "Sonnerie à la fin du créneau, jour ou heure — à toi de valider ou d'annuler." },
 ];
@@ -149,7 +159,7 @@ export default function LandingPage() {
       });
     });
 
-    gsap.from(".method-steps li", {
+    gsap.from(".method-steps-list li", {
       scrollTrigger: { trigger: ".method-steps", start: "top 80%" },
       x: 30,
       opacity: 0,
@@ -213,16 +223,30 @@ export default function LandingPage() {
         </div>
 
         <div className="hero-visual relative min-w-0 max-w-full">
-          <div className="overflow-hidden rounded-[1.4rem] shadow-[0_30px_70px_rgba(23,52,38,0.18)]">
-            <Image
-              src="/landing-images/hero.webp"
-              alt="Formulaire REKOLLECTE sur tablette, badge visiteur avec QR Code"
-              width={1200}
-              height={1200}
-              className="h-auto w-full"
-              priority
-            />
-          </div>
+          <AutoSlide
+            interval={7000}
+            slides={[
+              <div key="niveau1" className="overflow-hidden rounded-[1.4rem] shadow-[0_30px_70px_rgba(23,52,38,0.18)]">
+                <Image
+                  src="/landing-images/hero.webp"
+                  alt="Formulaire REKOLLECTE sur tablette, badge visiteur avec QR Code"
+                  width={1200}
+                  height={1200}
+                  className="h-auto w-full"
+                  priority
+                />
+              </div>,
+              <div key="niveau2" className="overflow-hidden rounded-[1.4rem] shadow-[0_30px_70px_rgba(23,52,38,0.18)]">
+                <Image
+                  src="/landing-images/Hero+.webp"
+                  alt="REKOLLECTE+ : fini le surbooking, des réservations claires pour l'équipe"
+                  width={1254}
+                  height={1254}
+                  className="h-auto w-full"
+                />
+              </div>,
+            ]}
+          />
           <div className="mt-4 flex flex-wrap justify-between gap-x-4 gap-y-1 px-2 font-mk-mono text-[10px] uppercase tracking-[0.08em] text-mk-ink">
             <span className="min-w-0">Une prise en main immédiate.</span>
             <span className="min-w-0">Un accueil qui reste fluide.</span>
@@ -311,26 +335,57 @@ export default function LandingPage() {
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           {KARNET_HIGHLIGHTS.map((item) => (
-            <div key={item.title} className="karnet-card rounded-[1.2rem] border border-deep-ink/15 p-6">
-              <p className="font-bold text-deep-ink">{item.title}</p>
-              <p className="mt-2 text-sm leading-relaxed text-mk-sage">{item.body}</p>
+            <div key={item.title} className="karnet-card overflow-hidden rounded-[1.2rem] border border-deep-ink/15">
+              {item.image && (
+                <div className="aspect-square overflow-hidden">
+                  <Image src={item.image} alt={item.title} width={640} height={640} className="h-full w-full object-cover" />
+                </div>
+              )}
+              <div className="p-6">
+                <p className="font-bold text-deep-ink">{item.title}</p>
+                <p className="mt-2 text-sm leading-relaxed text-mk-sage">{item.body}</p>
+              </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Méthode / Comment ça marche */}
       {/* Sécurité & rôles */}
       <section className="px-5 py-20 sm:px-10 lg:py-28">
-        <div className="overflow-hidden rounded-[1.4rem]">
-          <Image
-            src="/landing-images/securite-wide.webp"
-            alt="Rôles Patron, Gérant et Staff, données protégées"
-            width={2000}
-            height={860}
-            className="h-auto w-full"
-          />
-        </div>
+        <AutoSlide
+          interval={7500}
+          slides={[
+            <div key="niveau1" className="relative overflow-hidden rounded-[1.4rem]">
+              <Image
+                src="/landing-images/securite-wide.webp"
+                alt="Rôles Patron et Agent d'accueil, accès protégés"
+                width={2000}
+                height={780}
+                className="h-auto w-full"
+              />
+              <Link
+                href="/connexion"
+                className="absolute left-[4%] top-[74%] inline-flex items-center gap-2 rounded-full bg-mk-moss px-[clamp(0.6rem,1.8vw,1.3rem)] py-[clamp(0.3rem,0.9vw,0.65rem)] text-[clamp(0.55rem,1.3vw,0.85rem)] font-bold uppercase tracking-[0.04em] text-white shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl"
+              >
+                Se connecter <ArrowUpRight />
+              </Link>
+            </div>,
+            <Link
+              key="niveau2"
+              href="/connexion"
+              className="group relative block overflow-hidden rounded-[1.4rem]"
+              aria-label="Essayer REKOLLECTE+ — créer un compte"
+            >
+              <Image
+                src="/landing-images/securite-wide+.webp"
+                alt="REKOLLECTE+ : du chaos à la clarté, centraliser clients, ressources et réservations"
+                width={2007}
+                height={784}
+                className="h-auto w-full transition-transform duration-500 group-hover:scale-[1.015]"
+              />
+            </Link>,
+          ]}
+        />
       </section>
 
       <section id="comment-ca-marche" className="grid gap-12 px-5 py-24 sm:px-10 lg:grid-cols-[1fr_1.4fr] lg:py-36">
@@ -347,17 +402,41 @@ export default function LandingPage() {
             chaque visiteur.
           </p>
         </div>
-        <ol className="method-steps flex flex-col gap-8">
-          {STEPS.map((step) => (
-            <li key={step.n} className="flex gap-6 border-t border-mk-ink/10 pt-6 first:border-t-0 first:pt-0">
-              <span className="font-mk-mono text-sm text-mk-moss">{step.n}</span>
-              <div>
-                <h3 className="text-lg font-bold">{step.title}</h3>
-                <p className="mt-1 max-w-md text-sm leading-relaxed text-mk-ink/70">{step.body}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
+        <div className="method-steps">
+          <AutoSlide
+            interval={7500}
+            slides={[
+              <div key="niveau1">
+                <p className="mb-5 font-mk-mono text-[10px] uppercase tracking-[0.1em] text-mk-moss">R3NS3IGN3M3NT — niveau 1</p>
+                <ol className="method-steps-list flex flex-col gap-8">
+                  {STEPS.map((step) => (
+                    <li key={step.n} className="flex gap-6 border-t border-mk-ink/10 pt-6 first:border-t-0 first:pt-0">
+                      <span className="font-mk-mono text-sm text-mk-moss">{step.n}</span>
+                      <div>
+                        <h3 className="text-lg font-bold">{step.title}</h3>
+                        <p className="mt-1 max-w-md text-sm leading-relaxed text-mk-ink/70">{step.body}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </div>,
+              <div key="niveau2">
+                <p className="mb-5 font-mk-mono text-[10px] uppercase tracking-[0.1em] text-mk-moss">REKOLLECTE+ — niveau 2</p>
+                <ol className="flex flex-col gap-8">
+                  {REKOLLECTE_STEPS.map((step) => (
+                    <li key={step.n} className="flex gap-6 border-t border-mk-ink/10 pt-6 first:border-t-0 first:pt-0">
+                      <span className="font-mk-mono text-sm text-mk-moss">{step.n}</span>
+                      <div>
+                        <h3 className="text-lg font-bold">{step.title}</h3>
+                        <p className="mt-1 max-w-md text-sm leading-relaxed text-mk-ink/70">{step.body}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </div>,
+            ]}
+          />
+        </div>
       </section>
 
       {/* Promesses */}

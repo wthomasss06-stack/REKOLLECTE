@@ -16,7 +16,10 @@ for (const envPath of envPaths) {
     if (!trimmed || trimmed.startsWith('#')) return;
     const equalsIdx = trimmed.indexOf('=');
     if (equalsIdx === -1) return;
-    process.env[trimmed.slice(0, equalsIdx).trim()] = trimmed.slice(equalsIdx + 1).trim();
+    const key = trimmed.slice(0, equalsIdx).trim();
+    if (process.env[key] === undefined) {
+      process.env[key] = trimmed.slice(equalsIdx + 1).trim();
+    }
   });
 }
 
@@ -25,11 +28,13 @@ const apiKey = process.env.CLOUDINARY_API_KEY;
 const apiSecret = process.env.CLOUDINARY_API_SECRET;
 
 if (!cloudName || !apiKey || !apiSecret) {
-  console.error('❌ CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY ou CLOUDINARY_API_SECRET manquant.');
-  console.error('PowerShell correct :');
-  console.error("  $env:CLOUDINARY_CLOUD_NAME='gks3f2st'");
-  console.error("  $env:CLOUDINARY_API_KEY='674331848559466'");
-  console.error("  $env:CLOUDINARY_API_SECRET='V8-tl1howLhCFFPDNcdwS4XjB64faut'");
+  const missing = [
+    ['CLOUDINARY_CLOUD_NAME', cloudName],
+    ['CLOUDINARY_API_KEY', apiKey],
+    ['CLOUDINARY_API_SECRET', apiSecret],
+  ].filter(([, value]) => !value).map(([name]) => name);
+  console.error(`❌ Variable(s) manquante(s) : ${missing.join(', ')}`);
+  console.error("Définissez-les dans cette même fenêtre PowerShell avant de lancer le script.");
   process.exit(1);
 }
 
