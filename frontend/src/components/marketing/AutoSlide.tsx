@@ -15,10 +15,14 @@ export default function AutoSlide({
   slides,
   interval = 6500,
   className = "",
+  showDots = true,
 }: {
   slides: React.ReactNode[];
   interval?: number;
   className?: string;
+  /** Masque les puces de navigation — utile quand le carrousel sert de simple
+   * fond d'image (ex. section CTA) plutôt que de contenu principal. */
+  showDots?: boolean;
 }) {
   const [active, setActive] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -45,37 +49,39 @@ export default function AutoSlide({
   if (slides.length <= 1) return <div className={className}>{slides[0]}</div>;
 
   return (
-    <div className={className}>
-      <div className="relative">
+    <div className={`h-full ${className}`}>
+      <div className="relative h-full">
         {slides.map((slide, index) => (
           <div
             key={index}
             aria-hidden={index !== active}
             className={
               index === active
-                ? "relative opacity-100 transition-opacity duration-700 ease-out"
-                : "pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-700 ease-out"
+                ? "relative h-full opacity-100 transition-opacity duration-700 ease-out"
+                : "pointer-events-none absolute inset-0 h-full opacity-0 transition-opacity duration-700 ease-out"
             }
           >
             {slide}
           </div>
         ))}
       </div>
-      <div className="mt-4 flex justify-center gap-2">
-        {slides.map((_, index) => (
-          <button
-            key={index}
-            type="button"
-            aria-label={`Diapositive ${index + 1} sur ${slides.length}`}
-            aria-current={index === active}
-            onClick={() => {
-              setActive(index);
-              restart();
-            }}
-            className={`h-1.5 rounded-full transition-all ${index === active ? "w-6 bg-mk-moss" : "w-1.5 bg-mk-ink/20 hover:bg-mk-ink/40"}`}
-          />
-        ))}
-      </div>
+      {showDots && (
+        <div className="mt-4 flex justify-center gap-2">
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              type="button"
+              aria-label={`Diapositive ${index + 1} sur ${slides.length}`}
+              aria-current={index === active}
+              onClick={() => {
+                setActive(index);
+                restart();
+              }}
+              className={`h-1.5 rounded-full transition-all ${index === active ? "w-6 bg-mk-moss" : "w-1.5 bg-mk-ink/20 hover:bg-mk-ink/40"}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -129,8 +129,28 @@ export default function LandingPage() {
       .from(".hero-kicker", { opacity: 0, x: -20, duration: 0.6 })
       .from(".hero-h1", { y: 40, opacity: 0, duration: 0.9 }, "-=0.3")
       .from(".hero-lead", { y: 20, opacity: 0, duration: 0.7 }, "-=0.5")
-      .from(".hero-actions", { y: 20, opacity: 0, duration: 0.6 }, "-=0.4")
-      .from(".hero-visual", { scale: 0.92, opacity: 0, duration: 1 }, "-=0.7");
+      .from(".hero-actions", { y: 20, opacity: 0, duration: 0.6 }, "-=0.4");
+
+    // Visuel du bas de hero : se révèle depuis le coin bas-droit au fil du scroll
+    // (clip-path scrubbé, pas de pin — reste léger et sûr sur mobile). Les valeurs
+    // de départ sont adoucies sur petit écran via matchMedia, comme dans la
+    // référence corner-scroll fournie.
+    const heroVisualMM = gsap.matchMedia();
+    heroVisualMM.add(
+      { isMobile: "(max-width: 639px)", isDesktop: "(min-width: 640px)" },
+      (context) => {
+        const { isMobile } = context.conditions as { isMobile: boolean };
+        gsap.fromTo(
+          ".hero-corner-visual",
+          { clipPath: isMobile ? "inset(18% 0% 0% 0%)" : "inset(38% 0% 0% 42%)" },
+          {
+            clipPath: "inset(0% 0% 0% 0%)",
+            ease: "none",
+            scrollTrigger: { trigger: ".hero-corner-visual", start: "top 95%", end: "top 55%", scrub: 0.6 },
+          },
+        );
+      },
+    );
 
     gsap.from(".big-statement", {
       scrollTrigger: { trigger: ".manifesto", start: "top 75%" },
@@ -189,12 +209,12 @@ export default function LandingPage() {
     <div ref={heroRef} className="min-w-0 max-w-full overflow-x-hidden">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
       {/* Hero */}
-      <section className="relative grid min-h-[calc(100svh-72px)] w-full max-w-full items-center gap-10 overflow-hidden px-5 pb-12 pt-24 sm:px-10 sm:pb-16 sm:pt-28 lg:min-h-[calc(100svh-72px)] lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-24">
-        <div className="min-w-0 max-w-full">
+      <section className="relative w-full max-w-full overflow-hidden px-5 pb-16 pt-24 sm:px-10 sm:pb-20 sm:pt-28">
+        <div className="mx-auto max-w-2xl">
           <div className="hero-kicker flex items-center gap-2.5 font-mk-mono text-[10px] uppercase tracking-[0.12em] text-mk-ink">
             <span className="h-px w-7 bg-current" /> Registre d&apos;accueil sans papier
           </div>
-          <h1 className="hero-h1 mt-6 max-w-full break-words text-[clamp(2.45rem,9vw,7rem)] font-bold leading-[0.9] tracking-[-0.07em]">
+          <h1 className="hero-h1 mt-6 max-w-full break-words text-[clamp(2.45rem,9vw,6rem)] font-bold leading-[0.9] tracking-[-0.07em]">
             Le registre visiteurs numérique
           </h1>
           <p className="hero-lead mt-6 max-w-md text-[1.05rem] leading-relaxed text-mk-ink/70">
@@ -222,35 +242,37 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className="hero-visual relative min-w-0 max-w-full">
+        {/* Visuel en bas du hero : révélé au scroll (clip-path depuis le coin bas-droit,
+            scrub lié au scroll — même esprit que l'effet "corner scroll", sans pin pour
+            rester léger et sûr sur mobile), puis slide auto entre Niveau 1 et Niveau 2. */}
+        <div className="hero-corner-visual relative mx-auto mt-16 max-w-4xl overflow-hidden rounded-[1.4rem] shadow-[0_30px_70px_rgba(23,52,38,0.18)] will-change-[clip-path]">
           <AutoSlide
             interval={7000}
+            showDots={false}
             slides={[
-              <div key="niveau1" className="overflow-hidden rounded-[1.4rem] shadow-[0_30px_70px_rgba(23,52,38,0.18)]">
-                <Image
-                  src="/landing-images/hero.webp"
-                  alt="Formulaire REKOLLECTE sur tablette, badge visiteur avec QR Code"
-                  width={1200}
-                  height={1200}
-                  className="h-auto w-full"
-                  priority
-                />
-              </div>,
-              <div key="niveau2" className="overflow-hidden rounded-[1.4rem] shadow-[0_30px_70px_rgba(23,52,38,0.18)]">
-                <Image
-                  src="/landing-images/Hero+.webp"
-                  alt="REKOLLECTE+ : fini le surbooking, des réservations claires pour l'équipe"
-                  width={1254}
-                  height={1254}
-                  className="h-auto w-full"
-                />
-              </div>,
+              <Image
+                key="niveau1"
+                src="/landing-images/hero.webp"
+                alt="Formulaire REKOLLECTE sur tablette, badge visiteur avec QR Code"
+                width={1200}
+                height={1200}
+                className="h-auto w-full"
+                priority
+              />,
+              <Image
+                key="niveau2"
+                src="/landing-images/Hero+.webp"
+                alt="REKOLLECTE+ : fini le surbooking, des réservations claires pour l'équipe"
+                width={1254}
+                height={1254}
+                className="h-auto w-full"
+              />,
             ]}
           />
-          <div className="mt-4 flex flex-wrap justify-between gap-x-4 gap-y-1 px-2 font-mk-mono text-[10px] uppercase tracking-[0.08em] text-mk-ink">
-            <span className="min-w-0">Une prise en main immédiate.</span>
-            <span className="min-w-0">Un accueil qui reste fluide.</span>
-          </div>
+        </div>
+        <div className="mx-auto mt-4 flex max-w-4xl flex-wrap justify-between gap-x-4 gap-y-1 px-2 font-mk-mono text-[10px] uppercase tracking-[0.08em] text-mk-ink">
+          <span className="min-w-0">Une prise en main immédiate.</span>
+          <span className="min-w-0">Un accueil qui reste fluide.</span>
         </div>
       </section>
 
@@ -348,44 +370,6 @@ export default function LandingPage() {
             </div>
           ))}
         </div>
-      </section>
-
-      {/* Sécurité & rôles */}
-      <section className="px-5 py-20 sm:px-10 lg:py-28">
-        <AutoSlide
-          interval={7500}
-          slides={[
-            <div key="niveau1" className="relative overflow-hidden rounded-[1.4rem]">
-              <Image
-                src="/landing-images/securite-wide.webp"
-                alt="Rôles Patron et Agent d'accueil, accès protégés"
-                width={2000}
-                height={780}
-                className="h-auto w-full"
-              />
-              <Link
-                href="/connexion"
-                className="absolute left-[4%] top-[74%] inline-flex items-center gap-2 rounded-full bg-mk-moss px-[clamp(0.6rem,1.8vw,1.3rem)] py-[clamp(0.3rem,0.9vw,0.65rem)] text-[clamp(0.55rem,1.3vw,0.85rem)] font-bold uppercase tracking-[0.04em] text-white shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl"
-              >
-                Se connecter <ArrowUpRight />
-              </Link>
-            </div>,
-            <Link
-              key="niveau2"
-              href="/connexion"
-              className="group relative block overflow-hidden rounded-[1.4rem]"
-              aria-label="Essayer REKOLLECTE+ — créer un compte"
-            >
-              <Image
-                src="/landing-images/securite-wide+.webp"
-                alt="REKOLLECTE+ : du chaos à la clarté, centraliser clients, ressources et réservations"
-                width={2007}
-                height={784}
-                className="h-auto w-full transition-transform duration-500 group-hover:scale-[1.015]"
-              />
-            </Link>,
-          ]}
-        />
       </section>
 
       <section id="comment-ca-marche" className="grid gap-12 px-5 py-24 sm:px-10 lg:grid-cols-[1fr_1.4fr] lg:py-36">
@@ -491,18 +475,30 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA final */}
+      {/* CTA final — le carrousel Sécurité (Niveau 1 / REKOLLECTE+) sert de fond */}
       <section className="px-5 py-24 sm:px-10 lg:py-32">
-        <div className="rounded-[1.4rem] bg-mk-stone px-8 py-16 text-center sm:px-16">
-          <h2 className="mx-auto max-w-lg text-3xl font-bold tracking-[-0.02em] sm:text-4xl">
+        <div className="relative isolate overflow-hidden rounded-[1.4rem] px-8 py-20 text-center sm:px-16">
+          <div className="absolute inset-0 -z-20">
+            <AutoSlide
+              interval={7500}
+              showDots={false}
+              className="h-full"
+              slides={[
+                <Image key="niveau1" src="/landing-images/securite-wide.webp" alt="" width={2000} height={780} className="h-full w-full object-cover" />,
+                <Image key="niveau2" src="/landing-images/securite-wide+.webp" alt="" width={2007} height={784} className="h-full w-full object-cover" />,
+              ]}
+            />
+          </div>
+          <div className="absolute inset-0 -z-10 bg-deep-ink/72" />
+          <h2 className="relative mx-auto max-w-lg text-3xl font-bold tracking-[-0.02em] text-white sm:text-4xl">
             Prêt à ranger le cahier ?
           </h2>
-          <p className="mx-auto mt-4 max-w-sm text-sm text-mk-ink/70">
+          <p className="relative mx-auto mt-4 max-w-sm text-sm text-white/80">
             Connecte-toi avec Google — ton espace, ton QR et ton premier formulaire sont prêts en quelques secondes.
           </p>
           <Link
             href="/connexion"
-            className="mt-8 inline-flex items-center gap-3 rounded-full bg-cta px-7 py-4 text-xs font-bold uppercase tracking-[0.05em] text-cta-ink transition-all duration-200 hover:-translate-y-0.5 hover:bg-cta-hover"
+            className="relative mt-8 inline-flex items-center gap-3 rounded-full bg-cta px-7 py-4 text-xs font-bold uppercase tracking-[0.05em] text-cta-ink transition-all duration-200 hover:-translate-y-0.5 hover:bg-cta-hover"
           >
             Se connecter <ArrowUpRight />
           </Link>
