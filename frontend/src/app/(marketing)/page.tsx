@@ -69,6 +69,21 @@ const JSON_LD = {
   ],
 };
 
+// Dix visuels déjà en place dans /public/landing-images mais encore inutilisés sur
+// la page — une bande défilante plutôt qu'une nouvelle génération d'images.
+const GALLERY = [
+  { src: "01-accueil-moderne.webp", alt: "Accueil visiteurs sur tablette, formulaire simple" },
+  { src: "02-sans-reseau.webp", alt: "Fonctionne même sans réseau" },
+  { src: "03-signe-et-passe.webp", alt: "Signature au doigt, puis le visiteur passe" },
+  { src: "04-papier-vers-digital.webp", alt: "Du cahier papier au registre numérique" },
+  { src: "05-qr-accueil.webp", alt: "QR Code affiché à l'accueil" },
+  { src: "06-patron-dashboard.webp", alt: "Dashboard patron : visites, export, QR actif" },
+  { src: "07-pour-tous-les-etablissements.webp", alt: "Pour bureaux, restaurants, hôtels et chantiers" },
+  { src: "08-confidentialite.webp", alt: "Données hébergées dans un espace protégé" },
+  { src: "09-mise-en-place.webp", alt: "Mise en place en quelques minutes" },
+  { src: "10-signature-marque.webp", alt: "REKOLLECTE, conçu pour le terrain" },
+];
+
 const FEATURES = [
   {
     n: "01",
@@ -126,7 +141,8 @@ export default function LandingPage() {
   useGSAP(() => {
     const heroTl = gsap.timeline({ defaults: { ease: "power3.out" } });
     heroTl
-      .from(".hero-kicker", { opacity: 0, x: -20, duration: 0.6 })
+      .from(".hero-badge", { opacity: 0, y: -12, duration: 0.5 })
+      .from(".hero-kicker", { opacity: 0, x: -20, duration: 0.6 }, "-=0.2")
       .from(".hero-h1", { y: 40, opacity: 0, duration: 0.9 }, "-=0.3")
       .from(".hero-lead", { y: 20, opacity: 0, duration: 0.7 }, "-=0.5")
       .from(".hero-actions", { y: 20, opacity: 0, duration: 0.6 }, "-=0.4");
@@ -196,6 +212,15 @@ export default function LandingPage() {
       stagger: 0.1,
     });
 
+    gsap.from(".gallery-item", {
+      scrollTrigger: { trigger: ".gallery-strip", start: "top 85%" },
+      y: 24,
+      opacity: 0,
+      duration: 0.6,
+      stagger: 0.08,
+      ease: "power2.out",
+    });
+
     gsap.from(".faq-card", {
       scrollTrigger: { trigger: ".faq-section", start: "top 78%" },
       y: 36,
@@ -211,7 +236,14 @@ export default function LandingPage() {
       {/* Hero */}
       <section className="relative w-full max-w-full overflow-hidden px-5 pb-16 pt-24 sm:px-10 sm:pb-20 sm:pt-28">
         <div className="mx-auto max-w-2xl">
-          <div className="hero-kicker flex items-center gap-2.5 font-mk-mono text-[10px] uppercase tracking-[0.12em] text-mk-ink">
+          <div className="hero-badge inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-full border border-mk-ink/15 bg-white/60 px-4 py-2 font-mk-mono text-[10px] uppercase tracking-[0.1em] text-mk-ink">
+            <span className="flex items-center gap-1.5"><span className="text-mk-moss"><CheckMark size={12} /></span> Hors-ligne</span>
+            <span className="text-mk-ink/30">·</span>
+            <span className="flex items-center gap-1.5"><span className="text-mk-moss"><CheckMark size={12} /></span> Sans carte bancaire</span>
+            <span className="text-mk-ink/30">·</span>
+            <span className="flex items-center gap-1.5"><span className="text-mk-moss"><CheckMark size={12} /></span> Prêt en 2 minutes</span>
+          </div>
+          <div className="hero-kicker mt-5 flex items-center gap-2.5 font-mk-mono text-[10px] uppercase tracking-[0.12em] text-mk-ink">
             <span className="h-px w-7 bg-current" /> Registre d&apos;accueil sans papier
           </div>
           <h1 className="hero-h1 mt-6 max-w-full break-words text-[clamp(2.45rem,9vw,6rem)] font-bold leading-[0.9] tracking-[-0.07em]">
@@ -276,6 +308,28 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Galerie défilante */}
+      <section className="gallery-strip overflow-hidden py-16 sm:py-20">
+        <div className="mb-8 px-5 sm:px-10">
+          <div className="flex items-center gap-2.5 font-mk-mono text-[10px] uppercase tracking-[0.12em] text-mk-ink">
+            <span className="h-px w-7 bg-current" /> En images
+          </div>
+        </div>
+        <div className="scrollbar-none flex gap-4 overflow-x-auto px-5 pb-4 sm:px-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {GALLERY.map((item) => (
+            <div key={item.src} className="gallery-item w-[62vw] shrink-0 overflow-hidden rounded-[1.1rem] border border-mk-ink/10 shadow-[0_18px_40px_rgba(23,52,38,0.12)] sm:w-[280px]">
+              <Image
+                src={`/landing-images/${item.src}`}
+                alt={item.alt}
+                width={1664}
+                height={2080}
+                className="h-full w-full object-cover"
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Manifesto */}
       <section className="manifesto grid gap-12 bg-mk-deep px-5 py-24 text-deep-ink sm:px-10 lg:grid-cols-[1fr_3fr] lg:py-36">
         <div className="flex items-start justify-between font-mk-mono text-[10px] uppercase tracking-[0.12em] text-mk-sage lg:flex-col lg:gap-4">
@@ -318,24 +372,33 @@ export default function LandingPage() {
           </h2>
         </div>
         <div className="grid gap-5 sm:grid-cols-2">
-          {FEATURES.map((f) => (
-            <article key={f.n} className="feature-card overflow-hidden rounded-[1.4rem] border border-mk-ink/10 bg-white/40">
-              <div className="aspect-[4/3] overflow-hidden">
-                <Image
-                  src={f.image}
-                  alt={f.title}
-                  width={640}
-                  height={480}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <div className="p-8">
-                <span className="font-mk-mono text-xs text-mk-moss">{f.n}</span>
-                <h3 className="mt-4 text-xl font-bold tracking-[-0.01em]">{f.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-mk-ink/70">{f.body}</p>
-              </div>
-            </article>
-          ))}
+          {FEATURES.map((f, i) => {
+            // Rythme délibéré sur 4 cartes : claire, lime, claire, sombre — la dernière
+            // (le dashboard) ferme la section sur la note la plus affirmée.
+            const variant = i === 1 ? "lime" : i === 3 ? "dark" : "light";
+            const cardBg = variant === "lime" ? "bg-mk-lime" : variant === "dark" ? "bg-mk-deep" : "bg-white/40";
+            const textColor = variant === "dark" ? "text-deep-ink" : "text-mk-ink";
+            const bodyColor = variant === "dark" ? "text-mk-sage" : variant === "lime" ? "text-mk-deep/70" : "text-mk-ink/70";
+            const numberColor = variant === "dark" ? "text-mk-lime" : variant === "lime" ? "text-mk-deep" : "text-mk-moss";
+            return (
+              <article key={f.n} className={`feature-card overflow-hidden rounded-[1.4rem] border border-mk-ink/10 transition-transform duration-300 hover:-translate-y-1 ${cardBg}`}>
+                <div className="aspect-[4/3] overflow-hidden">
+                  <Image
+                    src={f.image}
+                    alt={f.title}
+                    width={640}
+                    height={480}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <div className="p-8">
+                  <span className={`font-mk-mono text-xs ${numberColor}`}>{f.n}</span>
+                  <h3 className={`mt-4 text-xl font-bold tracking-[-0.01em] ${textColor}`}>{f.title}</h3>
+                  <p className={`mt-2 text-sm leading-relaxed ${bodyColor}`}>{f.body}</p>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
 
@@ -432,16 +495,16 @@ export default function LandingPage() {
         <p className="mt-10 max-w-3xl text-2xl font-bold leading-snug tracking-[-0.02em] sm:text-4xl">
           Une bonne expérience d&apos;accueil <em className="font-mk-serif italic font-bold text-mk-moss">se remarque quand elle ne pose aucun problème.</em>
         </p>
-        <div className="promise-list mt-10 grid gap-4 sm:grid-cols-2">
+        <div className="promise-list mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
             "Zéro compte, zéro friction pour le visiteur",
             "Hors-ligne par défaut, pas en option",
             "Un formulaire adapté à chaque secteur",
             "Export CSV et QR régénérable à tout moment",
           ].map((item) => (
-            <div key={item} className="promise-item flex items-center gap-3 text-sm text-mk-ink">
-              <CheckMark size={16} />
-              {item}
+            <div key={item} className="promise-item rounded-[1.1rem] border border-mk-ink/10 bg-white/50 p-5">
+              <span className="text-mk-moss"><CheckMark size={18} /></span>
+              <p className="mt-3 text-sm font-semibold leading-snug text-mk-ink">{item}</p>
             </div>
           ))}
         </div>
