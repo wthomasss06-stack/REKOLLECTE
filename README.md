@@ -4,14 +4,14 @@
   <img src="frontend/public/brand/logo-mark.png" alt="Logo REKOLLECTE" width="120" />
   <h3>Le registre digital des établissements</h3>
   <p>QR Code, tablette d’accueil, formulaire visiteur, signatures et dashboard par rôles.</p>
-  <p><a href="https://akatech.vercel.app/">Conçu par AKATech Studio</a></p>
+  <p><a href="https://akatech.vercel.app/">Conçu par AKATech Studio.</a></p>
 </div>
 
-> **Note logo AKATech Studio :** le footer utilise `/akatech-studio-logo.webp` pour révéler le logo au survol de « Conçu par AKATech Studio ». Déposer le fichier fourni dans `frontend/public/akatech-studio-logo.webp` avant le déploiement si le fichier n’est pas déjà présent dans l’arborescence.
+> **Note logo AKATech Studio. :** le footer utilise `/akatech-studio-logo.webp` pour révéler le logo au survol de « Conçu par AKATech Studio. ». Déposer le fichier fourni dans `frontend/public/akatech-studio-logo.webp` avant le déploiement si le fichier n’est pas déjà présent dans l’arborescence.
 
 ## Présentation
 
-REKOLLECTE est une solution SaaS de registre d’accueil sans contact conçue par **AKATech Studio**, entreprise digitale basée à Abidjan, Côte d’Ivoire. Un établissement configure plusieurs formulaires, crée plusieurs points d’accueil avec leurs QR Codes et tablettes, puis consulte les arrivées dans un dashboard sécurisé.
+REKOLLECTE est une solution SaaS de registre d’accueil sans contact conçue par **AKATech Studio.**, entreprise digitale basée à Abidjan, Côte d’Ivoire. Un établissement configure plusieurs formulaires, crée plusieurs points d’accueil avec leurs QR Codes et tablettes, puis consulte les arrivées dans un dashboard sécurisé.
 
 Le visiteur n’a pas besoin de créer un compte. Le mode kiosque fonctionne offline-first : après un premier chargement avec Internet, chaque appareil conserve le formulaire de son point d’accueil et les soumissions en attente dans IndexedDB, puis synchronise automatiquement dès que le réseau revient.
 
@@ -20,8 +20,8 @@ Le visiteur n’a pas besoin de créer un compte. Le mode kiosque fonctionne off
 | Élément | Information |
 |---|---|
 | Produit | REKOLLECTE |
-| Concepteur et éditeur du produit | AKATech Studio |
-| Site AKATech Studio | [akatech.vercel.app](https://akatech.vercel.app/) |
+| Concepteur et éditeur du produit | AKATech Studio. |
+| Site AKATech Studio. | [akatech.vercel.app](https://akatech.vercel.app/) |
 | Contact | wthomasss06@gmail.com · +225 01 42 50 77 50 |
 | Localisation déclarée | Abidjan, Côte d’Ivoire |
 | Statut | V1.2 (Niveau 1 — registre) fonctionnelle. Niveau 2 REKOLLECTE+ fusionné (clients, ressources, réservations, paiements, rappels), phases 1 à 9 livrées, phase 10 (recette) en cours. |
@@ -109,7 +109,7 @@ l’espace **Clients** et la navigation ajoute une section **REKOLLECTE+**.
 
 - Landing page marketing responsive et PWA.
 - Header/footer avec logo REKOLLECTE.
-- Logo AKATech Studio révélé au survol du crédit concepteur dans le footer.
+- Logo AKATech Studio. révélé au survol du crédit concepteur dans le footer.
 - Pages Aide, CGU, Confidentialité et Mentions légales.
 - Les informations encore en formalisation juridique sont indiquées dans les pages légales sans être inventées.
 
@@ -181,7 +181,7 @@ qr-register-saas/
 | `/cgu` | Conditions générales |
 | `/confidentialite` | Politique de confidentialité |
 | `/mentions-legales` | Mentions légales |
-| `/admin` | Administration AKATech Studio : métriques, entreprises, personnel et feedbacks |
+| `/admin` | Administration AKATech Studio. : métriques, entreprises, personnel et feedbacks |
 
 ## API principale
 
@@ -362,7 +362,7 @@ Avant chaque mise en production :
 
 ## Limitations et prochaines évolutions
 
-Les fonctions actuellement prévues mais non intégrées dans le périmètre courant sont l’agrégateur de paiement, la facturation récurrente, la notification WhatsApp, l’impression de badges et la gestion avancée de supervision temps réel des tablettes. Les formulaires multiples et les points d’accueil multi-tablettes sont désormais livrés. La forme juridique, le RCCM et l’adresse physique complète d’AKATech Studio seront ajoutés aux pages légales dès finalisation des documents de l’entreprise.
+Les fonctions actuellement prévues mais non intégrées dans le périmètre courant sont l’agrégateur de paiement, la facturation récurrente, la notification WhatsApp, l’impression de badges et la gestion avancée de supervision temps réel des tablettes. Les formulaires multiples et les points d’accueil multi-tablettes sont désormais livrés. La forme juridique, le RCCM et l’adresse physique complète d’AKATech Studio. seront ajoutés aux pages légales dès finalisation des documents de l’entreprise.
 
 ## Licence
 
@@ -376,7 +376,7 @@ Le logo de référence du projet est [`frontend/public/akatech-studio-logo.webp`
 
 La mise à jour de septembre 2026 centralise aussi la lecture des droits : l’onglet **Équipe** présente une seule icône d’information qui ouvre la matrice des permissions pour les trois rôles. Le frontend reste informatif ; le backend applique le RBAC réel, notamment la règle « Gérant → Staff » et « Patron → Gérant ou Staff ».
 
-Projet propriétaire / SaaS conçu par AKATech Studio. Les conditions d’utilisation et de réutilisation du code doivent être définies avant toute distribution publique.
+Projet propriétaire / SaaS conçu par AKATech Studio.. Les conditions d’utilisation et de réutilisation du code doivent être définies avant toute distribution publique.
 
 
 ## Mise à jour sécurité et pagination serveur — 22 septembre 2026

@@ -31,7 +31,7 @@ export default function Footer() {
           {COLUMNS.map((column) => <div key={column.title}><h3>{column.title}</h3><nav aria-label={column.title}>{column.links.map(([label, href]) => <Link key={href} href={href}>{label}</Link>)}</nav></div>)}
           <div><h3>Promesse</h3><p className="landing-footer__note">Un scan à l&apos;accueil. Un registre propre derrière. Même hors-ligne.</p></div>
         </div>
-        <div className="landing-footer__bottom"><span>© 2026 REKOLLECTE — AKATech Studio</span><button onClick={scrollTop}>Retour en haut <ArrowUp size={13} /></button></div>
+        <div className="landing-footer__bottom"><span>© 2026 REKOLLECTE — AKATech Studio.</span><button onClick={scrollTop}>Retour en haut <ArrowUp size={13} /></button></div>
       </div>
     </footer>
   );

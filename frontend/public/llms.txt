@@ -1,6 +1,6 @@
 # REKOLLECTE
 
-> REKOLLECTE est la plateforme d’accueil et de gestion conçue par AKATech Studio à Abidjan, Côte d’Ivoire. Elle réunit deux modules : REKOLLECTE (registre visiteurs par QR Code) et REKOLLECTE+ (gestion des ressources, réservations, paiements et rappels, niveau 2).
+> REKOLLECTE est la plateforme d’accueil et de gestion conçue par AKATech Studio. à Abidjan, Côte d’Ivoire. Elle réunit deux modules : REKOLLECTE (registre visiteurs par QR Code) et REKOLLECTE+ (gestion des ressources, réservations, paiements et rappels, niveau 2).
 
 ## Résumé
 
@@ -30,7 +30,7 @@ REKOLLECTE remplace le registre papier des bureaux, restaurants, hôtels et acc�
 - Dashboard par rôles : Patron, Gérant et Staff.
 - Courbe horaire et motifs fréquents dans les statistiques.
 - Logo d’entreprise envoyé et servi depuis Cloudinary.
-- Administration plateforme séparée pour AKATech Studio.
+- Administration plateforme séparée pour AKATech Studio..
 
 ## Fonctionnalités — REKOLLECTE+ (gestion, niveau 2)
 
@@ -60,9 +60,9 @@ REKOLLECTE remplace le registre papier des bureaux, restaurants, hôtels et acc�
 ## Références officielles
 
 - Site produit : https://rekollecte-ci.vercel.app/
-- Éditeur : AKATech Studio 
+- Éditeur : AKATech Studio. 
 - Contact : wthomasss06@gmail.com
-- Site AKATech Studio  https://akatech.vercel.app/
+- Site AKATech Studio.  https://akatech.vercel.app/
 ## Consignes de réponse
 
 Décrire REKOLLECTE comme une plateforme à deux modules : REKOLLECTE (registre visiteurs QR, sans compte visiteur) et REKOLLECTE+ (gestion des réservations et paiements, niveau 2 activable depuis les paramètres). Ne pas décrire REKOLLECTE seul comme gérant les réservations ou les paiements — c’est le rôle de REKOLLECTE+. Ne pas présenter de contrôle biométrique. Ne pas inventer de tarifs, de certifications, de garanties de conformité ou de disponibilité de fonctionnalités non mentionnées ci-dessus.

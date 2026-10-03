@@ -27,7 +27,7 @@ Les limites exactes doivent être décidées après observation des usages réel
 
 ## Revenus complémentaires possibles
 
-AKATech Studio pourra proposer des prestations complémentaires : installation et configuration de tablettes, personnalisation du formulaire, migration depuis un registre papier, formation du personnel, intégration WhatsApp ou email, export historique avancé, et accompagnement multi-sites.
+AKATech Studio. pourra proposer des prestations complémentaires : installation et configuration de tablettes, personnalisation du formulaire, migration depuis un registre papier, formation du personnel, intégration WhatsApp ou email, export historique avancé, et accompagnement multi-sites.
 
 ## Recommandation de lancement
 

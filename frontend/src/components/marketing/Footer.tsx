@@ -45,9 +45,9 @@ export default function Footer() {
         <div className="relative z-10 mt-6 flex flex-col items-start justify-between gap-4 border-t border-border pt-6 text-[11px] text-ink-soft sm:flex-row sm:items-center">
           <span>© 2026 REKOLLECTE</span>
           <Link href="/credits" className="group relative transition-colors hover:text-ink">
-            <span className="underline decoration-ink/20 underline-offset-4">Conçu par AKATech Studio</span>
+            <span className="underline decoration-ink/20 underline-offset-4">Conçu par AKATech Studio.</span>
             <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-4 w-44 -translate-x-1/2 translate-y-2 rounded-xl border border-border bg-canvas p-2 opacity-0 shadow-xl transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100">
-              <Image src="/akatech-studio-logo.webp" alt="Logo AKATech Studio" width={176} height={72} className="h-auto w-full rounded-lg object-contain" />
+              <Image src="/akatech-studio-logo.webp" alt="Logo AKATech Studio." width={176} height={72} className="h-auto w-full rounded-lg object-contain" />
             </span>
           </Link>
           <nav className="flex flex-wrap items-center gap-x-5 gap-y-2" aria-label="Légal">

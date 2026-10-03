@@ -40,7 +40,7 @@ Les variables Render/Vercel/Neon ne sont pas accessibles depuis l’archive. Dep
 
 ### 3. Documentation juridique et upload logo
 
-Le champ logo actuel accepte une URL. Si le besoin commercial exige un upload direct, il faut encore brancher un stockage validé avec contrôle MIME, taille et droits. Les mentions légales doivent encore recevoir les informations juridiques définitives d’AKATech Studio.
+Le champ logo actuel accepte une URL. Si le besoin commercial exige un upload direct, il faut encore brancher un stockage validé avec contrôle MIME, taille et droits. Les mentions légales doivent encore recevoir les informations juridiques définitives d’AKATech Studio..
 
 ## Corrections réalisées
 

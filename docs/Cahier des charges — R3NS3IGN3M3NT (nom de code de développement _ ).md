@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Porteur** | AKATech Studio (Elvis) |
+| **Porteur** | AKATech Studio. (Elvis) |
 | **Statut** | V1.2 — Formulaires multiples, QR par point d’accueil et gestion multi-tablettes livrés. Recette production maintenue comme étape de contrôle. |
 | **Version du document** | 1.4 |
 
@@ -186,7 +186,7 @@ Les tests d'intégration couvrent les flows critiques (voir `backend/apps/`) : i
 - Landing page (`/`) : palette et polices reprises d'une référence fournie (Playfair Display, Manrope, DM Mono ; vert forêt/crème), animée en GSAP (entrée hero, révélations au scroll, orbite continue).
 - Header + footer partagés sur les pages publiques, avec bouton d'installation PWA natif (`beforeinstallprompt`) dans le footer.
 - Connexion déplacée sur `/connexion` (la racine est maintenant la vitrine).
-- Pages légales : `/aide`, `/cgu`, `/confidentialite`, `/mentions-legales` — rédigées à partir de l'implémentation réelle, avec les formulaires multiples, les points d’accueil et les tablettes. La forme juridique, le RCCM et l’adresse physique complète d’AKATech Studio restent à ajouter dès formalisation.
+- Pages légales : `/aide`, `/cgu`, `/confidentialite`, `/mentions-legales` — rédigées à partir de l'implémentation réelle, avec les formulaires multiples, les points d’accueil et les tablettes. La forme juridique, le RCCM et l’adresse physique complète d’AKATech Studio. restent à ajouter dès formalisation.
 
 **Validation juridique recommandée avant mise en ligne commerciale**, en particulier sur les CGU (tarification, disponibilité) et la confidentialité (déclaration éventuelle auprès de l'ARTCI pour la collecte de données visiteurs).
 
