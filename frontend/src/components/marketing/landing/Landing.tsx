@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
@@ -16,7 +17,7 @@ import {
 import Marquee from "@/components/marketing/Marquee";
 import PwaInstallButton from "@/components/marketing/PwaInstallButton";
 import { useLenis } from "@/components/marketing/SmoothScroll";
-import { FAQS, FEATURE_ROWS, PRICING, PROMISES, SECTORS, STEPS, STEPS_PLUS, WHY } from "@/lib/landingData";
+import { FAQS, FEATURE_ROWS, GALLERY, PROMISES, SECTORS, SHOTS, STEPS, STEPS_PLUS, WHY } from "@/lib/landingData";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -38,12 +39,39 @@ function SectionHead({ label, title, lead }: { label: string; title: React.React
   );
 }
 
+function LevelTabs({ value, onChange }: { value: 0 | 1; onChange: (next: 0 | 1) => void }) {
+  return (
+    <div role="tablist" aria-label="Niveau" className="inline-flex rounded-full border border-border bg-surface p-1 shadow-subtle">
+      {(["REKOLLECTE", "REKOLLECTE+"] as const).map((name, i) => (
+        <button
+          key={name}
+          role="tab"
+          type="button"
+          aria-selected={value === i}
+          onClick={() => onChange(i as 0 | 1)}
+          className={`rounded-full px-5 py-2.5 text-xs font-bold transition-colors duration-300 ${value === i ? "bg-cta text-cta-ink" : "text-ink-soft hover:text-ink"}`}
+        >
+          {name}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function Landing() {
   const root = useRef<HTMLDivElement>(null);
   const lenis = useLenis();
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [whyActive, setWhyActive] = useState(0);
   const [level, setLevel] = useState<0 | 1>(0);
+  const [shot, setShot] = useState<0 | 1>(0);
+
+  // L'aperçu alterne tout seul entre les deux niveaux ; un clic remet le compteur à zéro.
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+    const timer = window.setInterval(() => setShot((v) => (v === 0 ? 1 : 0)), 6500);
+    return () => window.clearInterval(timer);
+  }, [shot]);
 
   useGSAP(
     () => {
@@ -63,6 +91,13 @@ export default function Landing() {
         const heroScroll = { trigger: ".lp-hero-wrap", start: 0, end: "bottom top", scrub: true };
         gsap.to(".lp-hero", { scale: 0.95, transformOrigin: "50% 0%", ease: "none", scrollTrigger: heroScroll });
         gsap.to(".hero-content", { yPercent: -10, opacity: 0.25, ease: "none", scrollTrigger: heroScroll });
+
+        // 2b. Aperçu produit : l'affiche remonte du hero et grandit jusqu'à sa taille pleine.
+        gsap.fromTo(
+          ".lp-shot",
+          { scale: 0.9, y: 40 },
+          { scale: 1, y: 0, ease: "none", scrollTrigger: { trigger: ".lp-shot", start: "top 98%", end: "top 40%", scrub: true } },
+        );
 
         // 3. Collines : chaque couche (data-hill) décalée à sa vitesse — transform uniquement.
         gsap.utils.toArray<HTMLElement>(".lp-hills").forEach((wrap) => {
@@ -113,7 +148,6 @@ export default function Landing() {
             scrollTrigger: { trigger, start: "top 82%", once: true },
           });
         stagger(".lp-why-card", ".lp-why-grid");
-        stagger(".lp-price-card", ".lp-price-grid");
         stagger(".lp-step-card", ".lp-steps", 36);
         stagger(".lp-promise-row", ".lp-promises", 36);
 
@@ -205,6 +239,31 @@ export default function Landing() {
           <div className="lp-hills absolute inset-x-0 bottom-0 z-0 h-[34%] sm:h-[38%]">
             <Hills className="h-full" />
           </div>
+        </div>
+      </section>
+
+      {/* ——— Aperçu produit (affiches des deux niveaux), qui chevauche le bas du hero ——— */}
+      <section className="relative z-10 -mt-24 px-4 sm:-mt-40 sm:px-6" aria-label="Aperçu du produit">
+        <div className="mx-auto flex max-w-[36rem] flex-col items-center">
+          <div className="lp-shot w-full rounded-[1.75rem] border border-border bg-surface p-2 shadow-[0_40px_80px_-30px_rgb(var(--c-ink)/0.5)]" data-skew>
+            <div className="relative aspect-square overflow-hidden rounded-[1.3rem] bg-canvas">
+              {SHOTS.map((img, i) => (
+                <Image
+                  key={img.src}
+                  src={img.src}
+                  alt={img.alt}
+                  width={img.w}
+                  height={img.h}
+                  sizes="(max-width: 640px) 92vw, 576px"
+                  priority={i === 0}
+                  aria-hidden={shot !== i}
+                  className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ease-out ${shot === i ? "opacity-100" : "opacity-0"}`}
+                />
+              ))}
+            </div>
+          </div>
+          <div className="mt-6" data-reveal><LevelTabs value={shot} onChange={setShot} /></div>
+          <p className="mt-4 text-center text-[11px] font-bold text-ink-soft" data-reveal>Une prise en main immédiate. Un accueil qui reste fluide.</p>
         </div>
       </section>
 
@@ -325,20 +384,7 @@ export default function Landing() {
           lead="Quatre étapes, pensées pour un accueil qui n'a pas le temps d'expliquer une application à chaque visiteur."
         />
         <div className="mt-8 flex justify-center" data-reveal>
-          <div role="tablist" aria-label="Niveau" className="inline-flex rounded-full border border-border bg-surface p-1 shadow-subtle">
-            {(["REKOLLECTE", "REKOLLECTE+"] as const).map((name, i) => (
-              <button
-                key={name}
-                role="tab"
-                type="button"
-                aria-selected={level === i}
-                onClick={() => setLevel(i as 0 | 1)}
-                className={`rounded-full px-5 py-2.5 text-xs font-bold transition-colors duration-300 ${level === i ? "bg-cta text-cta-ink" : "text-ink-soft hover:text-ink"}`}
-              >
-                {name}
-              </button>
-            ))}
-          </div>
+          <LevelTabs value={level} onChange={setLevel} />
         </div>
         <div className="lp-steps relative mt-12">
           <div className="absolute left-[12.5%] right-[12.5%] top-[1.35rem] hidden h-px bg-border lg:block" aria-hidden="true">
@@ -353,47 +399,6 @@ export default function Landing() {
               </li>
             ))}
           </ol>
-        </div>
-      </section>
-
-      {/* ——— Offres ——— */}
-      <section id="offres" className="mx-auto w-full max-w-[1180px] px-4 py-14 sm:px-6 sm:py-24">
-        <SectionHead
-          label="Offres"
-          title={<>Gratuit pendant<br />la phase pilote.</>}
-          lead="Le service reste gratuit le temps d'apprendre avec de vrais établissements. Les tarifs en FCFA seront annoncés ensuite, à partir des usages réels."
-        />
-        <div className="lp-price-grid mt-14 grid items-stretch gap-4 md:grid-cols-3">
-          {PRICING.map((plan) => (
-            <article
-              key={plan.name}
-              className={`lp-price-card relative isolate flex flex-col overflow-hidden rounded-[1.75rem] p-5 ${plan.popular ? "text-white md:-my-4 md:py-9" : "border border-border bg-surface text-ink"}`}
-            >
-              {plan.popular && (
-                <>
-                  <div className="lp-hero-bg absolute inset-0 -z-20" aria-hidden="true" />
-                  <div className="lp-hills absolute inset-x-0 bottom-0 -z-10 h-1/2 opacity-90" aria-hidden="true"><Hills className="h-full" flowers={false} /></div>
-                </>
-              )}
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-bold">{plan.name}</p>
-                {plan.popular && <span className="rounded-full border border-white/50 bg-white/20 px-3 py-1 text-[10px] font-bold backdrop-blur">Recommandé</span>}
-              </div>
-              <p className="mt-6 text-center text-[2.6rem] font-bold leading-none tracking-[-0.03em]">{plan.price}</p>
-              <p className={`mt-2 text-center text-[11px] font-bold ${plan.popular ? "text-white/80" : "text-ink-soft"}`}>{plan.note}</p>
-              <Link href={plan.cta.href} className={`mt-6 ${plan.popular ? "lp-glass lp-glass--primary justify-center" : "lp-btn justify-center"}`}>{plan.cta.label}</Link>
-              <div className={`mt-6 flex-1 rounded-2xl p-4 ${plan.popular ? "bg-surface text-ink" : "bg-ink/[0.04]"}`}>
-                <ul className="space-y-3">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2.5 text-[0.8rem] font-bold leading-snug">
-                      <span className="mt-0.5 shrink-0 text-cta"><CheckMark size={15} /></span> {feature}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              {plan.popular && <div className="h-28 md:h-32" aria-hidden="true" />}
-            </article>
-          ))}
         </div>
       </section>
 
@@ -416,6 +421,37 @@ export default function Landing() {
               </Marquee>
             );
           })}
+        </div>
+      </section>
+
+      {/* ——— En images (galerie défilante, une bande par niveau) ——— */}
+      <section className="py-14 sm:py-24" aria-label="En images">
+        <div className="px-4">
+          <SectionHead label="En images" title={<>Du cahier au dashboard,<br />en un coup d&apos;œil.</>} lead="REKOLLECTE et REKOLLECTE+ sur le terrain : accueil, hors-ligne, accès et suivi." />
+        </div>
+        <div className="mt-12 space-y-10">
+          {GALLERY.map((group, gi) => (
+            <div key={group.name}>
+              <div className="mx-auto mb-4 max-w-[1280px] px-5 sm:px-8" data-reveal><Label>{group.name}</Label></div>
+              <Marquee duration={gi === 0 ? 120 : 100} reverse={gi === 1}>
+                {[...group.items, ...group.items].map((img, i) => {
+                  const ratio = img.w / img.h;
+                  return (
+                    <div key={`${img.src}-${i}`} className="shrink-0 overflow-hidden rounded-2xl border border-border bg-surface shadow-[0_18px_40px_-24px_rgb(var(--c-ink)/0.4)]">
+                      <Image
+                        src={img.src}
+                        alt={img.alt}
+                        width={img.w}
+                        height={img.h}
+                        sizes={`(max-width: 640px) ${Math.round(240 * ratio)}px, ${Math.round(320 * ratio)}px`}
+                        className="h-60 w-auto max-w-none sm:h-80"
+                      />
+                    </div>
+                  );
+                })}
+              </Marquee>
+            </div>
+          ))}
         </div>
       </section>
 

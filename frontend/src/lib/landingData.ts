@@ -122,27 +122,34 @@ export const FEATURE_ROWS = [
   },
 ];
 
-export const PRICING = [
+type Visual = { src: string; alt: string; w: number; h: number };
+
+/** Aperçu sous le hero : une affiche par niveau (bascule REKOLLECTE / REKOLLECTE+). */
+export const SHOTS: Visual[] = [
+  { src: "/landing-images/hero.webp", alt: "Formulaire REKOLLECTE sur tablette, badge visiteur avec QR Code", w: 1920, h: 1920 },
+  { src: "/landing-images/Hero+.webp", alt: "REKOLLECTE+ : fini le surbooking, des réservations claires pour l'équipe", w: 1254, h: 1254 },
+];
+
+/** Galerie défilante : le reste des visuels de /public/landing-images, par niveau. */
+export const GALLERY: { name: string; items: Visual[] }[] = [
   {
-    name: "Découverte",
-    price: "Gratuit",
-    note: "offre d'entrée",
-    cta: { label: "Commencer", href: "/connexion" },
-    features: ["Un établissement, un formulaire, un QR Code", "Registre de base, signature au doigt", "Fonctionne hors-ligne", "Un modèle de formulaire par secteur"],
+    name: "REKOLLECTE",
+    items: [
+      { src: "/landing-images/offline.webp", alt: "Sans réseau, pas de problème : les fiches restent enregistrées sur l'appareil", w: 1254, h: 1254 },
+      { src: "/landing-images/secteurs.webp", alt: "Remplacez le cahier, gardez l'essentiel : bureaux, restaurants, hôtels, salles, chantiers", w: 1920, h: 1920 },
+      { src: "/landing-images/securite-wide.webp", alt: "Des accès adaptés au patron et à l'agent d'accueil", w: 2000, h: 780 },
+      { src: "/landing-images/offlinnnnnnne.webp", alt: "Accueille, enregistre, avance : le formulaire visiteur sur tablette", w: 1254, h: 1254 },
+      { src: "/landing-images/securite-carre.webp", alt: "Vos visiteurs, vos données, votre contrôle", w: 1920, h: 1920 },
+      { src: "/landing-images/secteurs+.webp", alt: "Voyez qui passe : registre, export CSV et QR actif sur le dashboard", w: 1254, h: 1254 },
+    ],
   },
   {
     name: "REKOLLECTE+",
-    price: "Gratuit",
-    note: "pendant la phase pilote",
-    popular: true,
-    cta: { label: "Commencer", href: "/connexion" },
-    features: ["Tout Découverte", "Équipe : patron, gérant, staff", "Export CSV et statistiques", "Clients, ressources, réservations", "Paiements et rappels de fin de créneau", "Plusieurs points d'accueil"],
-  },
-  {
-    name: "Sur mesure",
-    price: "Sur devis",
-    note: "réseaux et groupes",
-    cta: { label: "Nous écrire", href: "/aide" },
-    features: ["Multi-sites", "Intégrations (WhatsApp, e-mail)", "Installation et configuration des tablettes", "Migration depuis le registre papier", "Formation du personnel"],
+    items: [
+      { src: "/landing-images/REKOLLECTE+.webp", alt: "REKOLLECTE+ : tableau de bord, réservations, clients et ressources sur tablette et mobile", w: 1671, h: 941 },
+      { src: "/landing-images/offline+.webp", alt: "REKOLLECTE+ : votre gestion, plus simple, pour toute l'équipe", w: 1254, h: 1254 },
+      { src: "/landing-images/securite-wide+.webp", alt: "Du chaos à la clarté : centralisez clients, ressources et réservations", w: 2007, h: 784 },
+      { src: "/landing-images/securite-carre+.webp", alt: "Votre activité, votre contrôle : suivi en temps réel sur mobile", w: 1254, h: 1254 },
+    ],
   },
 ];

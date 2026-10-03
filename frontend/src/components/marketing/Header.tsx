@@ -18,7 +18,6 @@ const NAV_LINKS = [
   { href: "/#accueil", label: "Accueil", id: "accueil" },
   { href: "/#fonctionnalites", label: "Fonctionnalités", id: "fonctionnalites" },
   { href: "/#comment-ca-marche", label: "Comment ça marche", id: "comment-ca-marche" },
-  { href: "/#offres", label: "Offres", id: "offres" },
   { href: "/aide", label: "Aide" },
 ];
 const SECTION_IDS = NAV_LINKS.flatMap((link) => (link.id ? [link.id] : []));

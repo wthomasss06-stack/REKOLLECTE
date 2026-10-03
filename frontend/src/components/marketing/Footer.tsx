@@ -7,7 +7,7 @@ import { useLenis } from "@/components/marketing/SmoothScroll";
 import PwaInstallButton from "./PwaInstallButton";
 
 const COLUMNS: { title: string; links: [string, string][] }[] = [
-  { title: "Produit", links: [["Fonctionnalités", "/#fonctionnalites"], ["Comment ça marche", "/#comment-ca-marche"], ["Offres", "/#offres"], ["Se connecter", "/connexion"]] },
+  { title: "Produit", links: [["Fonctionnalités", "/#fonctionnalites"], ["Comment ça marche", "/#comment-ca-marche"], ["Se connecter", "/connexion"]] },
   { title: "Ressources", links: [["Aide", "/aide"], ["Crédits", "/credits"]] },
 ];
 
