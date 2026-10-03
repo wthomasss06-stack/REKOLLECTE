@@ -1,4 +1,4 @@
-import { getAccessToken, setAccessToken } from "./tokenStore";
+import { getAccessToken, peekStoredToken, setAccessToken } from "./tokenStore";
 
 // Le navigateur appelle le proxy Next.js same-origin afin que le cookie
 // httpOnly de refresh ne soit pas traité comme un cookie tiers.
@@ -42,11 +42,35 @@ async function doRefresh(): Promise<RefreshResult> {
   }
 }
 
+/** Refresh coordonne entre TOUS les onglets/fenetres de l'origine (PWA incluse) via Web Locks.
+ * Le backend tourne le refresh token a chaque appel : deux contextes qui rafraichissent en meme
+ * temps avec le meme cookie se font echouer l'un l'autre. Le verrou les met en file, et le
+ * suivant reutilise le jeton que le precedent vient de stocker au lieu d'appeler le serveur. */
+async function doRefreshAcrossTabs(): Promise<RefreshResult> {
+  const rejected = getAccessToken(); // jeton envoye puis refuse (ou null au demarrage)
+  const run = async (): Promise<RefreshResult> => {
+    const shared = peekStoredToken();
+    if (shared && shared !== rejected) {
+      setAccessToken(shared);
+      return { ok: true, transient: false, access: shared };
+    }
+    return doRefresh();
+  };
+  if (typeof navigator !== "undefined" && navigator.locks?.request) {
+    try {
+      return await navigator.locks.request("qr-session-refresh", run);
+    } catch {
+      return run(); // verrou indisponible : on retombe sur le comportement d'un seul onglet
+    }
+  }
+  return run();
+}
+
 /** Singleton : deux 401 simultanes (StrictMode, plusieurs requetes en parallele)
  * ne doivent declencher qu'un seul appel de refresh. */
 export function refreshOnce(): Promise<RefreshResult> {
   if (!refreshPromise) {
-    refreshPromise = doRefresh().finally(() => {
+    refreshPromise = doRefreshAcrossTabs().finally(() => {
       refreshPromise = null;
     });
   }

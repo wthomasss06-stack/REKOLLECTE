@@ -27,7 +27,24 @@ function readStoredToken(): string | null {
 
 accessToken = readStoredToken();
 
+// Un autre onglet (ou la PWA) renouvelle la session : son jeton arrive ici via l'événement
+// `storage`, ce qui évite à cet onglet de refuser un 401 puis de relancer un refresh de plus.
+if (typeof window !== "undefined") {
+  window.addEventListener("storage", (event) => {
+    if (event.key !== ACCESS_TOKEN_KEY) return;
+    accessToken = tokenIsUsable(event.newValue) ? event.newValue : null;
+  });
+}
+
+/** Jeton partagé par les autres onglets (localStorage), s'il est encore valide. */
+export function peekStoredToken(): string | null {
+  return readStoredToken();
+}
+
 export function getAccessToken(): string | null {
+  // Un onglet resté ouvert garde son jeton en mémoire bien après l'expiration (10 min) :
+  // on ne le renvoie que s'il est encore valable, sinon on retombe sur le stockage partagé.
+  if (accessToken && !tokenIsUsable(accessToken)) accessToken = null;
   if (!accessToken) accessToken = readStoredToken();
   return accessToken;
 }

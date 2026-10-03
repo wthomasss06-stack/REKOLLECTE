@@ -7,6 +7,7 @@ import gsap from "gsap";
 import { ArrowUpRight, CloseIcon } from "@/components/icons";
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
+import PwaInstallButton from "@/components/marketing/PwaInstallButton";
 
 interface MenuItem {
   href: string;
@@ -68,6 +69,8 @@ export default function StaggeredMenu({ open, onClose, items }: { open: boolean;
           <div><p className="text-xs font-bold uppercase tracking-[0.12em] text-mk-ink">Apparence</p><p className="mt-1 text-xs text-mk-ink/60">Choisir le thème</p></div>
           <ThemeToggle />
         </div>
+        {/* Ne s'affiche que si le navigateur propose l'installation (sinon rien, pas de bloc vide). */}
+        <div data-stagger-item className="flex justify-center"><PwaInstallButton /></div>
         <Link href="/connexion" onClick={onClose} data-stagger-item className="qr-staggered-menu__cta">Se connecter <ArrowUpRight size={18} /></Link>
       </nav>
       <p className="qr-staggered-menu__footer" data-stagger-item>Un accueil plus simple, même quand le réseau ne suit pas.</p>

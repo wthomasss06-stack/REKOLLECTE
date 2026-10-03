@@ -166,5 +166,29 @@
     "publicId": "akatech/landing-images/securite-wide",
     "resourceType": "image",
     "updatedAt": "2026-10-01T07:52:50.320Z"
+  },
+  "landing-images/cta-fond-mobile.webp": {
+    "hash": "22ba4de7923dcaf4f0da74fb46258974bd0b951e565578dcb5edc37e6e9b93c4",
+    "publicId": "akatech/landing-images/cta-fond-mobile",
+    "resourceType": "image",
+    "updatedAt": "2026-10-03T19:01:58.983Z"
+  },
+  "landing-images/cta-fond-pc.webp": {
+    "hash": "9966d7882ad07d55e9ae41341128829eec4b35c38f016390f47f42e7e76a9d0d",
+    "publicId": "akatech/landing-images/cta-fond-pc",
+    "resourceType": "image",
+    "updatedAt": "2026-10-03T19:02:00.312Z"
+  },
+  "landing-images/hero-fond-mobile.webp": {
+    "hash": "8d1590de5326a25eeecc7e3c6bc3f06a74cf9ae3ab0577982bf207540b0b9036",
+    "publicId": "akatech/landing-images/hero-fond-mobile",
+    "resourceType": "image",
+    "updatedAt": "2026-10-03T19:02:01.673Z"
+  },
+  "landing-images/hero-fond-pc.webp": {
+    "hash": "922133e60d06b38648c45725fcac536ff8f612e4d1a18e93a86518bddcd873e4",
+    "publicId": "akatech/landing-images/hero-fond-pc",
+    "resourceType": "image",
+    "updatedAt": "2026-10-03T19:02:02.868Z"
   }
 }

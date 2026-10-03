@@ -59,6 +59,17 @@ apiClient.interceptors.response.use(
     }
 
     originalRequest._retry = true;
+
+    // Le jeton a peut-etre deja ete renouvele depuis l'envoi de cette requete (autre requete
+    // du meme onglet, ou autre onglet) : on rejoue avec le jeton courant au lieu d'ouvrir un
+    // refresh de plus, qui risquerait de croiser le premier.
+    const sentToken = String(originalRequest.headers?.Authorization || "").replace(/^Bearer\s+/i, "");
+    const currentToken = getAccessToken();
+    if (currentToken && currentToken !== sentToken) {
+      if (originalRequest.headers) originalRequest.headers.Authorization = `Bearer ${currentToken}`;
+      return apiClient(originalRequest);
+    }
+
     const result = await refreshOnce();
     if (result.ok && result.access) {
       if (originalRequest.headers) originalRequest.headers.Authorization = `Bearer ${result.access}`;

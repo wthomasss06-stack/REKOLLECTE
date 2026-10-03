@@ -94,6 +94,7 @@ export const PROMISES: { text: string; tag: string }[] = [
 export const FEATURE_ROWS = [
   {
     id: "registre",
+    image: { src: "/landing-images/offlinnnnnnne.webp", alt: "Accueille, enregistre, avance : un visiteur signe le registre REKOLLECTE sur une tablette", w: 1254, h: 1254 },
     title: "Un registre qui se remplit au scan",
     body: "Chaque visite est enregistrée proprement, lisible par tous, sans relire l'écriture de quelqu'un. Le visiteur n'a rien à installer.",
     checks: ["Aucun compte à créer pour le visiteur", "Signature au doigt, directement à l'écran", "Les champs que tu as choisis, rien de plus"],
@@ -101,6 +102,7 @@ export const FEATURE_ROWS = [
   },
   {
     id: "hors-ligne",
+    image: { src: "/landing-images/offline.webp", alt: "Sans réseau, pas de problème : les fiches restent enregistrées sur l'appareil", w: 1254, h: 1254 },
     title: "Hors-ligne, puis synchro automatique",
     body: "Le réseau coupe, l'accueil continue. Les visites restent sur l'appareil et partent seules vers le dashboard au retour de la connexion.",
     checks: ["Enregistre des jours durant sans réseau", "Synchronise dès que la connexion revient", "Rien ne se perd en route"],
@@ -108,6 +110,7 @@ export const FEATURE_ROWS = [
   },
   {
     id: "roles",
+    image: { src: "/landing-images/securite-carre.webp", alt: "Vos visiteurs, vos données, votre contrôle : des accès adaptés à chaque rôle", w: 1920, h: 1920 },
     title: "Chacun voit ce qu'il doit voir",
     body: "Invite un gérant ou un membre du staff avec des permissions adaptées à son rôle. Le patron garde la main sur l'ensemble du registre.",
     checks: ["Patron, gérant, staff : trois niveaux d'accès", "Export CSV et régénération du QR en un clic", "Données dans l'espace sécurisé de ton établissement"],
@@ -115,6 +118,7 @@ export const FEATURE_ROWS = [
   },
   {
     id: "plus",
+    image: { src: "/landing-images/offline+.webp", alt: "REKOLLECTE+ : réservations, clients et ressources pour toute l'équipe", w: 1254, h: 1254 },
     title: "REKOLLECTE+ : du visiteur au client",
     body: "Quand un visiteur réserve, consomme et doit payer, le deuxième cahier disparaît aussi. Active REKOLLECTE+ depuis tes paramètres.",
     checks: ["Fiches clients avec tout l'historique", "Ressources : chambre, table ou salle", "Réservations numérotées, paiements et rappels"],
@@ -130,26 +134,13 @@ export const SHOTS: Visual[] = [
   { src: "/landing-images/Hero+.webp", alt: "REKOLLECTE+ : fini le surbooking, des réservations claires pour l'équipe", w: 1254, h: 1254 },
 ];
 
-/** Galerie défilante : le reste des visuels de /public/landing-images, par niveau. */
-export const GALLERY: { name: string; items: Visual[] }[] = [
-  {
-    name: "REKOLLECTE",
-    items: [
-      { src: "/landing-images/offline.webp", alt: "Sans réseau, pas de problème : les fiches restent enregistrées sur l'appareil", w: 1254, h: 1254 },
-      { src: "/landing-images/secteurs.webp", alt: "Remplacez le cahier, gardez l'essentiel : bureaux, restaurants, hôtels, salles, chantiers", w: 1920, h: 1920 },
-      { src: "/landing-images/securite-wide.webp", alt: "Des accès adaptés au patron et à l'agent d'accueil", w: 2000, h: 780 },
-      { src: "/landing-images/offlinnnnnnne.webp", alt: "Accueille, enregistre, avance : le formulaire visiteur sur tablette", w: 1254, h: 1254 },
-      { src: "/landing-images/securite-carre.webp", alt: "Vos visiteurs, vos données, votre contrôle", w: 1920, h: 1920 },
-      { src: "/landing-images/secteurs+.webp", alt: "Voyez qui passe : registre, export CSV et QR actif sur le dashboard", w: 1254, h: 1254 },
-    ],
-  },
-  {
-    name: "REKOLLECTE+",
-    items: [
-      { src: "/landing-images/REKOLLECTE+.webp", alt: "REKOLLECTE+ : tableau de bord, réservations, clients et ressources sur tablette et mobile", w: 1671, h: 941 },
-      { src: "/landing-images/offline+.webp", alt: "REKOLLECTE+ : votre gestion, plus simple, pour toute l'équipe", w: 1254, h: 1254 },
-      { src: "/landing-images/securite-wide+.webp", alt: "Du chaos à la clarté : centralisez clients, ressources et réservations", w: 2007, h: 784 },
-      { src: "/landing-images/securite-carre+.webp", alt: "Votre activité, votre contrôle : suivi en temps réel sur mobile", w: 1254, h: 1254 },
-    ],
-  },
-];
+/** Fonds photo : une version PC (paysage) et une version mobile (portrait). */
+export const HERO_BG = {
+  desktop: { src: "/landing-images/hero-fond-pc.webp", w: 1672, h: 941 },
+  mobile: { src: "/landing-images/hero-fond-mobile.webp", w: 941, h: 1672 },
+};
+
+export const CTA_BG = {
+  desktop: { src: "/landing-images/cta-fond-pc.webp", w: 1672, h: 941 },
+  mobile: { src: "/landing-images/cta-fond-mobile.webp", w: 940, h: 1672 },
+};

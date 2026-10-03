@@ -125,6 +125,10 @@ class RefreshSession(models.Model):
     last_used_at = models.DateTimeField(null=True, blank=True)
     expires_at = models.DateTimeField()
     revoked_at = models.DateTimeField(null=True, blank=True)
+    # Posé UNIQUEMENT quand la session est révoquée par rotation (jamais par déconnexion ou
+    # révocation manuelle). Sert de fenêtre de grâce : deux refresh simultanés avec le même
+    # cookie (onglets multiples, PWA + navigateur) ne doivent pas se faire échouer l'un l'autre.
+    rotated_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ["-created_at"]

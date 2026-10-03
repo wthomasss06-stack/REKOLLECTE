@@ -143,6 +143,11 @@ SIMPLE_JWT = {
 
 REFRESH_COOKIE_NAME = "qr_refresh_token"
 REFRESH_COOKIE_PATH = "/api/v1/auth/"
+# Fenêtre de grâce (secondes) pendant laquelle un refresh token DÉJÀ tourné reste accepté :
+# l'appel retardataire reçoit un nouvel access token mais ne touche pas au cookie (celui posé
+# par le premier appel reste le bon). Sans ça, deux refresh simultanés avec le même cookie
+# s'invalident et le 401 du second efface le cookie du premier : session perdue.
+REFRESH_ROTATION_LEEWAY_SECONDS = int(os.environ.get("REFRESH_ROTATION_LEEWAY_SECONDS", "30"))
 
 # --- CORS ----------------------------------------------------------------
 # Jamais de "*" : origines explicites, obligatoire car CORS_ALLOW_CREDENTIALS=True

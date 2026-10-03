@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
@@ -10,19 +9,16 @@ import { ChartBar, CheckCircle, ClipboardText, QrCode, WifiSlash } from "@phosph
 
 import { ArrowDownRight, ArrowUpRight, CheckMark } from "@/components/icons";
 import Logo from "@/components/Logo";
-import { cloudinaryLoader } from "@/lib/cloudinary";
-import Hills from "@/components/marketing/landing/Hills";
-import {
-  ChartPanel, MiniDash, MiniOffline, MiniScan, MiniSectors, ReservationsPanel, RolesPanel, VisitorsPanel,
-} from "@/components/marketing/landing/Mockups";
+import DepthShowcase from "@/components/marketing/landing/DepthShowcase";
+import LevelTabs from "@/components/marketing/landing/LevelTabs";
+import { ArtImage, CloudImage } from "@/components/marketing/landing/Media";
+import { MiniDash, MiniOffline, MiniScan, MiniSectors } from "@/components/marketing/landing/Mockups";
 import Marquee from "@/components/marketing/Marquee";
-import PwaInstallButton from "@/components/marketing/PwaInstallButton";
 import { useLenis } from "@/components/marketing/SmoothScroll";
-import { FAQS, FEATURE_ROWS, GALLERY, PROMISES, SECTORS, SHOTS, STEPS, STEPS_PLUS, WHY } from "@/lib/landingData";
+import { CTA_BG, FAQS, FEATURE_ROWS, HERO_BG, PROMISES, SECTORS, STEPS, STEPS_PLUS, WHY } from "@/lib/landingData";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const ROW_PANELS = [VisitorsPanel, ChartPanel, RolesPanel, ReservationsPanel];
 const WHY_VISUALS = [MiniScan, MiniOffline, MiniSectors, MiniDash];
 const WHY_GLYPHS = [QrCode, WifiSlash, ClipboardText, ChartBar];
 
@@ -40,39 +36,12 @@ function SectionHead({ label, title, lead }: { label: string; title: React.React
   );
 }
 
-function LevelTabs({ value, onChange }: { value: 0 | 1; onChange: (next: 0 | 1) => void }) {
-  return (
-    <div role="tablist" aria-label="Niveau" className="inline-flex rounded-full border border-border bg-surface p-1 shadow-subtle">
-      {(["REKOLLECTE", "REKOLLECTE+"] as const).map((name, i) => (
-        <button
-          key={name}
-          role="tab"
-          type="button"
-          aria-selected={value === i}
-          onClick={() => onChange(i as 0 | 1)}
-          className={`rounded-full px-5 py-2.5 text-xs font-bold transition-colors duration-300 ${value === i ? "bg-cta text-cta-ink" : "text-ink-soft hover:text-ink"}`}
-        >
-          {name}
-        </button>
-      ))}
-    </div>
-  );
-}
-
 export default function Landing() {
   const root = useRef<HTMLDivElement>(null);
   const lenis = useLenis();
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [whyActive, setWhyActive] = useState(0);
   const [level, setLevel] = useState<0 | 1>(0);
-  const [shot, setShot] = useState<0 | 1>(0);
-
-  // L'aperçu alterne tout seul entre les deux niveaux ; un clic remet le compteur à zéro.
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
-    const timer = window.setInterval(() => setShot((v) => (v === 0 ? 1 : 0)), 6500);
-    return () => window.clearInterval(timer);
-  }, [shot]);
 
   useGSAP(
     () => {
@@ -92,25 +61,6 @@ export default function Landing() {
         const heroScroll = { trigger: ".lp-hero-wrap", start: 0, end: "bottom top", scrub: true };
         gsap.to(".lp-hero", { scale: 0.95, transformOrigin: "50% 0%", ease: "none", scrollTrigger: heroScroll });
         gsap.to(".hero-content", { yPercent: -10, opacity: 0.25, ease: "none", scrollTrigger: heroScroll });
-
-        // 2b. Aperçu produit : l'affiche remonte du hero et grandit jusqu'à sa taille pleine.
-        gsap.fromTo(
-          ".lp-shot",
-          { scale: 0.9, y: 40 },
-          { scale: 1, y: 0, ease: "none", scrollTrigger: { trigger: ".lp-shot", start: "top 98%", end: "top 40%", scrub: true } },
-        );
-
-        // 3. Collines : chaque couche (data-hill) décalée à sa vitesse — transform uniquement.
-        gsap.utils.toArray<HTMLElement>(".lp-hills").forEach((wrap) => {
-          wrap.querySelectorAll<SVGElement>("[data-hill]").forEach((layer) => {
-            const depth = Number(layer.dataset.hill) - 1;
-            gsap.to(layer, {
-              y: depth * 42,
-              ease: "none",
-              scrollTrigger: { trigger: wrap.parentElement ?? wrap, start: "top bottom", end: "bottom top", scrub: true },
-            });
-          });
-        });
 
         // 4. Multi-vitesses (réf. gemini : data-speed) — <1 plus lent, >1 plus rapide.
         gsap.utils.toArray<HTMLElement>("[data-speed]").forEach((el) => {
@@ -189,12 +139,12 @@ export default function Landing() {
 
   return (
     <div ref={root} className="min-w-0 max-w-full overflow-x-clip">
-      {/* ——— Hero ——— */}
+      {/* ——— Hero : photo en fond (PC paysage / mobile portrait) + dégradé de lisibilité ——— */}
       <section id="accueil" className="lp-hero-wrap px-3 pb-6 pt-3 sm:px-5">
         <div className="lp-hero relative isolate mx-auto flex min-h-[40rem] max-w-[1280px] flex-col items-center overflow-hidden rounded-[1.75rem] text-center text-white sm:min-h-[45rem] sm:rounded-[2.25rem]">
-          <div className="lp-hero-bg absolute inset-0 -z-20" aria-hidden="true" />
-          <div className="absolute -left-10 top-16 -z-10 h-40 w-72 rounded-full bg-white/25 blur-3xl" aria-hidden="true" data-speed="0.8" />
-          <div className="absolute -right-16 top-36 -z-10 h-48 w-80 rounded-full bg-white/20 blur-3xl" aria-hidden="true" data-speed="0.7" />
+          <div className="lp-hero-bg absolute inset-0 -z-30" aria-hidden="true" />
+          <ArtImage desktop={HERO_BG.desktop} mobile={HERO_BG.mobile} priority className="-z-20" />
+          <div className="lp-hero-scrim absolute inset-0 -z-10" aria-hidden="true" />
 
           <div className="hero-content relative z-10 flex flex-col items-center px-5 pt-16 sm:pt-24">
             <h1 className="max-w-4xl text-balance text-[clamp(2.2rem,6vw,4.6rem)] font-bold leading-[1.06] tracking-[-0.035em]">
@@ -211,7 +161,7 @@ export default function Landing() {
                 <span className="hero-line block">devient un simple scan.</span>
               </span>
             </h1>
-            <p className="hero-fade mt-6 max-w-xl text-[0.95rem] leading-relaxed text-white/85 sm:text-base">
+            <p className="hero-fade mt-6 max-w-xl text-[0.95rem] leading-relaxed text-white/90 sm:text-base">
               REKOLLECTE remplace le registre papier des bureaux, restaurants, hôtels et accès chantier : le visiteur
               scanne, remplit, signe. Sans compte, même hors-ligne.
             </p>
@@ -219,8 +169,7 @@ export default function Landing() {
               <Link href="/connexion" className="lp-glass lp-glass--primary">Se connecter <ArrowUpRight size={14} /></Link>
               <Link href="/#comment-ca-marche" className="lp-glass">Voir comment ça marche <ArrowDownRight size={14} /></Link>
             </div>
-            <div className="hero-fade [&_button]:!bg-white/90 [&_button]:!text-[#12231a]"><PwaInstallButton /></div>
-            <p className="hero-fade mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] font-bold text-white/75">
+            <p className="hero-fade mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] font-bold text-white/85">
               <span className="inline-flex items-center gap-1.5"><CheckMark size={12} /> Hors-ligne</span>
               <span className="inline-flex items-center gap-1.5"><CheckMark size={12} /> Sans carte bancaire</span>
               <span className="inline-flex items-center gap-1.5"><CheckMark size={12} /> Prêt en 2 minutes</span>
@@ -236,38 +185,11 @@ export default function Landing() {
             <WifiSlash size={22} weight="bold" className="text-[#d6e7a8]" />
             <div><p className="text-xs font-bold leading-none">Hors-ligne</p><p className="mt-1 text-[10px] leading-none text-white/75">3 visites en attente de synchro</p></div>
           </div>
-
-          <div className="lp-hills absolute inset-x-0 bottom-0 z-0 h-[34%] sm:h-[38%]">
-            <Hills className="h-full" />
-          </div>
         </div>
       </section>
 
-      {/* ——— Aperçu produit (affiches des deux niveaux), qui chevauche le bas du hero ——— */}
-      <section className="relative z-10 -mt-24 px-4 sm:-mt-40 sm:px-6" aria-label="Aperçu du produit">
-        <div className="mx-auto flex max-w-[36rem] flex-col items-center">
-          <div className="lp-shot w-full rounded-[1.75rem] border border-border bg-surface p-2 shadow-[0_40px_80px_-30px_rgb(var(--c-ink)/0.5)]" data-skew>
-            <div className="relative aspect-square overflow-hidden rounded-[1.3rem] bg-canvas">
-              {SHOTS.map((img, i) => (
-                <Image
-                  key={img.src}
-                  loader={cloudinaryLoader}
-                  src={img.src}
-                  alt={img.alt}
-                  width={img.w}
-                  height={img.h}
-                  sizes="(max-width: 640px) 92vw, 576px"
-                  priority={i === 0}
-                  aria-hidden={shot !== i}
-                  className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ease-out ${shot === i ? "opacity-100" : "opacity-0"}`}
-                />
-              ))}
-            </div>
-          </div>
-          <div className="mt-6" data-reveal><LevelTabs value={shot} onChange={setShot} /></div>
-          <p className="mt-4 text-center text-[11px] font-bold text-ink-soft" data-reveal>Une prise en main immédiate. Un accueil qui reste fluide.</p>
-        </div>
-      </section>
+      {/* ——— Aperçu produit : effet Profondeur (section épinglée, zoom, texte de fond, carte flottante) ——— */}
+      <DepthShowcase />
 
       {/* ——— Pensé pour (bande défilante) ——— */}
       <section className="py-14 sm:py-16" aria-label="Secteurs">
@@ -349,7 +271,6 @@ export default function Landing() {
         />
         <div className="mt-14 space-y-5">
           {FEATURE_ROWS.map((row, i) => {
-            const Panel = ROW_PANELS[i]!;
             const flip = i % 2 === 1;
             return (
               <article key={row.id} className="lp-row grid gap-3 rounded-[1.75rem] border border-border bg-surface p-3 lg:grid-cols-2">
@@ -367,10 +288,12 @@ export default function Landing() {
                     <Link href={row.cta.href} className="lp-btn">{row.cta.label} <ArrowUpRight size={14} /></Link>
                   </div>
                 </div>
-                <div className={`grid place-items-center rounded-[1.25rem] bg-ink/[0.05] p-4 sm:p-8 ${flip ? "lg:order-1" : ""}`}>
-                  <div className="w-full max-w-md" data-speed={flip ? "0.94" : "1.06"} data-reveal={flip ? "left" : "right"}>
-                    <Panel />
-                  </div>
+                <div
+                  className={`relative aspect-square overflow-hidden rounded-[1.25rem] bg-ink/[0.05] ${flip ? "lg:order-1" : ""}`}
+                  data-reveal={flip ? "left" : "right"}
+                  data-skew
+                >
+                  <CloudImage src={row.image.src} alt={row.image.alt} fill sizes="(max-width: 1023px) 92vw, 572px" className="object-cover" />
                 </div>
               </article>
             );
@@ -426,38 +349,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ——— En images (galerie défilante, une bande par niveau) ——— */}
-      <section className="py-14 sm:py-24" aria-label="En images">
-        <div className="px-4">
-          <SectionHead label="En images" title={<>Du cahier au dashboard,<br />en un coup d&apos;œil.</>} lead="REKOLLECTE et REKOLLECTE+ sur le terrain : accueil, hors-ligne, accès et suivi." />
-        </div>
-        <div className="mt-12 space-y-10">
-          {GALLERY.map((group, gi) => (
-            <div key={group.name}>
-              <div className="mx-auto mb-4 max-w-[1280px] px-5 sm:px-8" data-reveal><Label>{group.name}</Label></div>
-              <Marquee duration={gi === 0 ? 120 : 100} reverse={gi === 1}>
-                {[...group.items, ...group.items].map((img, i) => {
-                  const ratio = img.w / img.h;
-                  return (
-                    <div key={`${img.src}-${i}`} className="shrink-0 overflow-hidden rounded-2xl border border-border bg-surface shadow-[0_18px_40px_-24px_rgb(var(--c-ink)/0.4)]">
-                      <Image
-                        loader={cloudinaryLoader}
-                        src={img.src}
-                        alt={img.alt}
-                        width={img.w}
-                        height={img.h}
-                        sizes={`(max-width: 640px) ${Math.round(240 * ratio)}px, ${Math.round(320 * ratio)}px`}
-                        className="h-60 w-auto max-w-none sm:h-80"
-                      />
-                    </div>
-                  );
-                })}
-              </Marquee>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* ——— FAQ ——— */}
       <section id="faq" className="mx-auto w-full max-w-[1180px] px-4 py-14 sm:px-6 sm:py-20">
         <div className="grid gap-10 rounded-[1.75rem] border border-border bg-surface p-6 sm:p-10 lg:grid-cols-[0.8fr_1.2fr] lg:p-14" data-reveal>
@@ -494,23 +385,36 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ——— CTA final ——— */}
+      {/* ——— CTA final : texte au-dessus, affiche REKOLLECTE+ en fond (PC paysage / mobile portrait) ——— */}
       <section className="px-3 pb-16 pt-6 sm:px-5 sm:pb-24">
-        <div className="relative isolate mx-auto flex max-w-[1180px] flex-col items-center overflow-hidden rounded-[1.75rem] px-6 pb-44 pt-16 text-center text-white sm:rounded-[2.25rem] sm:pb-52 sm:pt-20" data-reveal>
-          <div className="lp-hero-bg absolute inset-0 -z-20" aria-hidden="true" />
-          <div className="absolute left-1/2 top-0 -z-10 h-40 w-[28rem] -translate-x-1/2 rounded-full bg-white/20 blur-3xl" aria-hidden="true" />
-          <Label light>Prêt à ranger le cahier ?</Label>
-          <h2 className="mt-5 max-w-xl text-balance text-[clamp(2rem,4.8vw,3.4rem)] font-bold leading-[1.06] tracking-[-0.03em]">
-            Ton registre numérique, prêt en quelques secondes.
-          </h2>
-          <p className="mt-4 max-w-md text-sm leading-relaxed text-white/85">
-            Connecte-toi avec Google : ton espace, ton QR et ton premier formulaire sont prêts tout de suite.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Link href="/connexion" className="lp-glass lp-glass--primary">Se connecter <ArrowUpRight size={14} /></Link>
-            <Link href="/aide" className="lp-glass">Lire l&apos;aide</Link>
+        <div className="mx-auto max-w-[1180px] overflow-hidden rounded-[1.75rem] bg-[#f1fcf6] text-[#12231a] sm:rounded-[2.25rem]" data-reveal>
+          <div className="flex flex-col items-center px-6 pb-6 pt-14 text-center sm:pt-20">
+            <span className="lp-label lp-label--fixed">Prêt à ranger le cahier ?</span>
+            <h2 className="mt-5 max-w-xl text-balance text-[clamp(2rem,4.8vw,3.4rem)] font-bold leading-[1.06] tracking-[-0.03em]">
+              Ton registre numérique, prêt en quelques secondes.
+            </h2>
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-[#12231a]/70">
+              Connecte-toi avec Google : ton espace, ton QR et ton premier formulaire sont prêts tout de suite.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <Link href="/connexion" className="lp-btn-dark">Se connecter <ArrowUpRight size={14} /></Link>
+              <Link href="/aide" className="lp-btn-ghost">Lire l&apos;aide</Link>
+            </div>
           </div>
-          <div className="lp-hills absolute inset-x-0 bottom-0 -z-10 h-[42%]"><Hills className="h-full" /></div>
+          <div className="relative aspect-[940/1672] w-full [mask-image:linear-gradient(180deg,transparent,#000_7%)] md:aspect-[1672/941]">
+            <ArtImage desktop={CTA_BG.desktop} mobile={CTA_BG.mobile} desktopSizes="1180px" />
+            {/* Le bouton dessiné dans l'affiche devient cliquable (zones calées sur chaque version). */}
+            <Link
+              href="/connexion"
+              aria-label="Accéder à votre espace REKOLLECTE+"
+              className="absolute left-[15.2%] top-[79.6%] h-[5.6%] w-[69.4%] rounded-full transition-shadow hover:shadow-[0_0_0_3px_rgba(31,133,89,0.4)] focus-visible:shadow-[0_0_0_3px_rgba(31,133,89,0.7)] focus-visible:outline-none md:hidden"
+            />
+            <Link
+              href="/connexion"
+              aria-label="Accéder à votre espace REKOLLECTE+"
+              className="absolute left-[32.5%] top-[82%] hidden h-[8.4%] w-[35.5%] rounded-full transition-shadow hover:shadow-[0_0_0_3px_rgba(31,133,89,0.4)] focus-visible:shadow-[0_0_0_3px_rgba(31,133,89,0.7)] focus-visible:outline-none md:block"
+            />
+          </div>
         </div>
       </section>
     </div>

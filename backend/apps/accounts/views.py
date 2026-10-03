@@ -1,3 +1,6 @@
+from datetime import timedelta
+
+from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 from rest_framework import generics, status, throttling
@@ -6,7 +9,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 from apps.common.permissions import IsBoss, IsBossOrGerant
 from apps.common.responses import error_response
@@ -70,9 +73,20 @@ class CookieTokenRefreshView(APIView):
     """Renouvelle l'access token a partir du refresh token lu dans le cookie httpOnly
     (jamais depuis le corps de la requete). Distinguer 401 (cookie mort -> logout
     legitime) de toute autre erreur reste la responsabilite du frontend
-    (skill jwt-auth-resilience) ; ce endpoint ne renvoie que du 200 ou du 401."""
+    (skill jwt-auth-resilience) ; ce endpoint ne renvoie que du 200 ou du 401.
+
+    Rotation a chaque appel, avec une fenetre de grace : un refresh token deja tourne
+    depuis moins de REFRESH_ROTATION_LEEWAY_SECONDS est rejoue sans erreur (access token
+    seul, cookie intact). Deux contextes qui rafraichissent en meme temps (onglets,
+    PWA + navigateur, redemarrage a froid du serveur) ne s'invalident donc plus."""
 
     permission_classes = [AllowAny]
+
+    @staticmethod
+    def _reject():
+        response = error_response("Session invalide, reconnecte-toi.", status.HTTP_401_UNAUTHORIZED)
+        clear_refresh_cookie(response)
+        return response
 
     def post(self, request):
         raw_token = request.COOKIES.get("qr_refresh_token")
@@ -81,25 +95,32 @@ class CookieTokenRefreshView(APIView):
         try:
             with transaction.atomic():
                 refresh = RefreshToken(raw_token)
+                # Le verrou de ligne sérialise les appels simultanés : le second attend que le
+                # premier ait validé sa rotation, puis tombe dans la fenêtre de grâce ci-dessous.
                 session = (
                     RefreshSession.objects.select_for_update()
                     .select_related("user")
-                    .filter(jti=str(refresh["jti"]), revoked_at__isnull=True)
+                    .filter(jti=str(refresh["jti"]))
                     .first()
                 )
-                if not session or not session.user.is_active or session.expires_at <= timezone.now():
-                    response = error_response("Session invalide, reconnecte-toi.", status.HTTP_401_UNAUTHORIZED)
-                    clear_refresh_cookie(response)
-                    return response
-                session.revoked_at = timezone.now()
-                session.last_used_at = timezone.now()
-                session.save(update_fields=["revoked_at", "last_used_at"])
+                now = timezone.now()
+                if not session or not session.user.is_active or session.expires_at <= now:
+                    return self._reject()
+                if session.revoked_at is not None:
+                    # Déjà révoquée : seule une rotation récente est rejouable. Une déconnexion ou
+                    # une révocation manuelle (rotated_at vide) ne l'est jamais.
+                    leeway = timedelta(seconds=settings.REFRESH_ROTATION_LEEWAY_SECONDS)
+                    if session.rotated_at is None or now - session.rotated_at > leeway:
+                        return self._reject()
+                    return Response({"access": str(AccessToken.for_user(session.user))})
+                session.revoked_at = now
+                session.rotated_at = now
+                session.last_used_at = now
+                session.save(update_fields=["revoked_at", "rotated_at", "last_used_at"])
                 next_refresh = RefreshToken.for_user(session.user)
                 register_refresh_session(session.user, next_refresh, request)
         except TokenError:
-            response = error_response("Session invalide, reconnecte-toi.", status.HTTP_401_UNAUTHORIZED)
-            clear_refresh_cookie(response)
-            return response
+            return self._reject()
         response = Response({"access": str(next_refresh.access_token)})
         set_refresh_cookie(response, next_refresh)
         return response

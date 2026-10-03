@@ -270,3 +270,24 @@ h1, h2, h3, h4 {
   .lp-fade-up { animation: none; }
   .lp-why-grid { transition: none; }
 }
+
+/* ——— Landing : fonds photo (hero) et carte CTA claire ——— */
+/* Dégradé sombre sur la photo : garde le texte blanc lisible, la tablette reste visible en bas. */
+.lp-hero-scrim {
+  background: linear-gradient(180deg, rgb(8 36 24 / 0.82) 0%, rgb(8 36 24 / 0.72) 62%, rgb(8 36 24 / 0.3) 85%, rgb(8 36 24 / 0.1) 100%);
+}
+@media (max-width: 767px) {
+  .lp-hero-scrim { background: linear-gradient(180deg, rgb(8 36 24 / 0.82) 0%, rgb(8 36 24 / 0.72) 70%, rgb(8 36 24 / 0.25) 90%, rgb(8 36 24 / 0.08) 100%); }
+}
+/* Carte CTA : îlot clair (les affiches sont claires), identique en thème sombre. */
+.lp-label--fixed { color: #12231a; }
+.lp-label--fixed::before { background: #1f8559; }
+.lp-btn-dark, .lp-btn-ghost {
+  display: inline-flex; align-items: center; gap: 0.6rem; border-radius: 999px; padding: 0.9rem 1.5rem;
+  font-size: 0.8rem; font-weight: 700; line-height: 1;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s ease, box-shadow 0.25s ease;
+}
+.lp-btn-dark { background: #12231a; color: #fff; box-shadow: 0 14px 28px -12px rgb(18 35 26 / 0.6); }
+.lp-btn-dark:hover { transform: translateY(-2px); background: #1b3a29; }
+.lp-btn-ghost { background: rgb(255 255 255 / 0.75); color: #12231a; border: 1px solid rgb(18 35 26 / 0.18); }
+.lp-btn-ghost:hover { transform: translateY(-2px); background: #fff; }
