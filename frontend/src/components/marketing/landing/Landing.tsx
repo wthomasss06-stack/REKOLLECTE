@@ -10,6 +10,7 @@ import { ChartBar, CheckCircle, ClipboardText, QrCode, WifiSlash } from "@phosph
 
 import { ArrowDownRight, ArrowUpRight, CheckMark } from "@/components/icons";
 import Logo from "@/components/Logo";
+import { cloudinaryLoader } from "@/lib/cloudinary";
 import Hills from "@/components/marketing/landing/Hills";
 import {
   ChartPanel, MiniDash, MiniOffline, MiniScan, MiniSectors, ReservationsPanel, RolesPanel, VisitorsPanel,
@@ -250,6 +251,7 @@ export default function Landing() {
               {SHOTS.map((img, i) => (
                 <Image
                   key={img.src}
+                  loader={cloudinaryLoader}
                   src={img.src}
                   alt={img.alt}
                   width={img.w}
@@ -439,6 +441,7 @@ export default function Landing() {
                   return (
                     <div key={`${img.src}-${i}`} className="shrink-0 overflow-hidden rounded-2xl border border-border bg-surface shadow-[0_18px_40px_-24px_rgb(var(--c-ink)/0.4)]">
                       <Image
+                        loader={cloudinaryLoader}
                         src={img.src}
                         alt={img.alt}
                         width={img.w}
