@@ -6,6 +6,7 @@ import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Too
 import Loader from "@/components/Loader";
 import CheckInsTable from "@/components/CheckInsTable";
 import { apiClient } from "@/lib/api";
+import { normalizeApiError } from "@/lib/errors";
 import { exportAllToCSV } from "@/lib/exportCsv";
 import type { CheckInRecord, CheckInStats, FormField, Organization, PaginatedResponse, UserProfile } from "@/types";
 
