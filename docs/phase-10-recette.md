@@ -13,19 +13,19 @@ toute ouverture commerciale, sur l'environnement de recette (pas en local).
 | Scénario Phase 10 | Test automatisé |
 |---|---|
 | Doublons avec téléphone (espaces, tirets) | `test_sync_reuses_existing_client_on_second_visit`, `test_sync_matches_same_client_with_dashes_or_country_code_variants` |
+| Doublons téléphone local / +225 en création manuelle et réservation | `test_client_create_matches_local_and_international_phone_formats`, `test_reservation_reuses_client_by_normalized_phone` |
 | Doublons avec email (casse différente) | `test_sync_matches_same_client_with_case_insensitive_email` |
 | Retour d'un client existant | `test_sync_reuses_existing_client_on_second_visit` |
 | Désactivation/réactivation de REKOLLECTE+ | `test_reactivating_karnet_restores_capabilities_and_keeps_existing_data` |
 | Synchronisation idempotente (rejeu après coupure) | `test_sync_is_idempotent_on_replay` |
 | Permissions par rôle (API) | `test_boss_and_gerant_can_create_resource_staff_cannot`, `test_unmarking_a_payment_requires_boss_or_gerant`, etc. |
 
-**Point de vigilance confirmé par les tests (pas un bug — une limite déjà documentée) :**
-`test_sync_matches_same_client_with_dashes_or_country_code_variants` montre que
-`0701020304` et `+2250701020304` créent aujourd'hui **deux fiches distinctes** :
-la normalisation ne rapproche pas encore un numéro local d'un numéro
-international. C'est l'item déjà listé plus bas dans « Points techniques à
-traiter avant ouverture commerciale » — à corriger avant un usage à grande
-échelle en Côte d'Ivoire, pas bloquant pour une recette interne.
+**Correctif du 5 octobre 2026 :** le rapprochement local / +225 s'applique
+maintenant aux trois parcours de création (synchronisation du registre, création
+manuelle d'un client et nouveau client créé depuis une réservation). La note
+historique ci-dessus concernait un parcours qui a depuis été corrigé ; les tests
+automatisés correspondants sont listés dans le tableau. Les fiches déjà
+dupliquées en base ne sont pas fusionnées automatiquement.
 
 ## À dérouler manuellement
 
@@ -71,9 +71,9 @@ traiter avant ouverture commerciale » — à corriger avant un usage à grande
 
 ### 7. Doublons — vérification visuelle en plus des tests API
 
-- [ ] Faire remplir le même client deux fois avec un numéro écrit différemment (`07 01 02 03 04` vs `0701020304`) : vérifier une seule fiche dans `/dashboard/karnet/clients/`.
+- [ ] Tester un numéro local puis sa forme internationale (`0701020304` vs `+2250701020304`) via le formulaire visiteur, la création manuelle d'un client et la création d'une réservation : vérifier qu'une seule fiche est utilisée.
 - [ ] Faire remplir avec un email en majuscules puis minuscules : vérifier une seule fiche.
-- [ ] Noter le cas non résolu (indicatif international vs local) dans le retour de recette si un client réel s'en plaint.
+- [ ] Vérifier manuellement les fiches historiques déjà créées en double : elles ne sont pas fusionnées automatiquement par le correctif.
 
 ## Environnements à couvrir
 

@@ -1,68 +1,55 @@
 # REKOLLECTE
 
-> REKOLLECTE est la plateforme d’accueil et de gestion conçue par AKATech Studio. à Abidjan, Côte d’Ivoire. Elle réunit deux modules : REKOLLECTE (registre visiteurs par QR Code) et REKOLLECTE+ (gestion des ressources, réservations, paiements et rappels, niveau 2).
+> REKOLLECTE est un registre visiteurs numérique par QR Code, conçu à Abidjan (Côte d'Ivoire) par AKATech Studio. Il remplace le cahier de visites papier des bureaux, restaurants, hôtels et accès chantier : le visiteur scanne un QR Code, remplit un formulaire et signe à l'écran, sans créer de compte, même sans connexion internet. REKOLLECTE+ est son niveau 2 (clients, ressources, réservations, encaissements, rappels). Le service est gratuit à ce jour.
 
-## Résumé
+À ne pas confondre : REKOLLECTE (avec un K, Abidjan) n'a aucun lien avec l'application reCollect de suivi de médias ni avec d'autres produits au nom proche. Site officiel : https://rekollecte-ci.vercel.app/
 
-REKOLLECTE remplace le registre papier des bureaux, restaurants, hôtels et accès chantier par un QR Code et une tablette d’accueil. Le visiteur scanne un QR, remplit un formulaire et peut signer sans créer de compte. Quand l’établissement a aussi besoin de gérer réservations et paiements, il active REKOLLECTE+ depuis ses paramètres.
+## Pages essentielles
 
-## Pour qui
+- [Qu'est-ce que REKOLLECTE ?](https://rekollecte-ci.vercel.app/a-propos): définition, fonctionnement, public visé, éditeur, FAQ
+- [Guide du registre visiteurs numérique](https://rekollecte-ci.vercel.app/guide/registre-visiteurs-numerique): remplacer le cahier de visites par un QR Code en 5 étapes, champs à demander, repères sur la protection des données en Côte d'Ivoire
+- [REKOLLECTE+](https://rekollecte-ci.vercel.app/rekollecte-plus): fiches clients, ressources, réservations, encaissements et rappels (niveau 2)
+- [Accueil](https://rekollecte-ci.vercel.app/): présentation du produit, fonctionnalités, parcours et FAQ
+- [Aide](https://rekollecte-ci.vercel.app/aide): créer l'espace, préparer le formulaire, QR Codes, équipe et rôles
 
-- Bureaux et espaces professionnels
-- Restaurants et hôtels
-- Chantiers et sites à accès contrôlé
-- Établissements qui accueillent des visiteurs sans vouloir imposer une application
+## Faits clés
 
-## Parcours principal
+- Éditeur : AKATech Studio, studio de développement basé à Abidjan (https://akatech.vercel.app).
+- Type : application web installable (PWA), en français, utilisable sur téléphone, tablette et ordinateur.
+- Visiteur : aucun compte, aucune application ; il scanne le QR Code, remplit le formulaire et signe à l'écran.
+- Hors ligne : oui. Les visites sont gardées sur l'appareil puis synchronisées automatiquement au retour de la connexion.
+- Équipe : connexion avec un compte Google ; rôles Patron, Gérant et Staff.
+- Formulaires : modèles par secteur (bureau, restaurant, hôtel, chantier), champs modifiables (texte, téléphone, e-mail, nombre, date, liste, case à cocher, signature).
+- Registre : statistiques de fréquentation (courbe horaire, motifs fréquents) et export CSV (Patron et Gérant).
+- Prix : gratuit à ce jour.
 
-1. Le Patron se connecte avec Google.
-2. Il crée l’espace de son entreprise et choisit un modèle de formulaire.
-3. Il personnalise les champs, crée un ou plusieurs points d’accueil et génère les QR Codes.
-4. Le visiteur scanne le QR ou utilise la tablette d’accueil.
-5. Le registre, les statistiques, les exports CSV et l’équipe sont pilotés depuis le dashboard.
+## REKOLLECTE+ (niveau 2)
 
-## Fonctionnalités — REKOLLECTE (registre)
-
-- Aucun compte visiteur requis.
-- Plusieurs formulaires et plusieurs QR Codes par entreprise.
-- Fonctionnement offline-first avec synchronisation automatique.
-- Champs texte, téléphone, email, nombre, date, liste, case à cocher et signature.
-- Dashboard par rôles : Patron, Gérant et Staff.
-- Courbe horaire et motifs fréquents dans les statistiques.
-- Logo d’entreprise envoyé et servi depuis Cloudinary.
-- Administration plateforme séparée pour AKATech Studio..
-
-## Fonctionnalités — REKOLLECTE+ (gestion, niveau 2)
-
-- Fiche client pour chaque visiteur devenu client, avec historique complet et numéro de réservation.
-- Ressources créées depuis des modèles par secteur (hébergement, restauration, salle).
-- Réservations numérotées, calculées et payées automatiquement à la création.
-- Rappels : sonnerie à la fin de chaque créneau (à l’heure ou à la journée) ; l’équipe valide le paiement ou annule.
+- Activé par le Patron depuis Paramètres > Administration ; réversible, aucune donnée supprimée à la désactivation.
+- Fiches clients avec historique complet des passages et des réservations.
+- Ressources par catégorie (hébergement, beauté et soins, espaces professionnels, événementiel et restauration, stationnement, sport et loisirs, autre), tarif par heure ou séance, par jour ou nuit, ou au forfait mensuel.
+- Réservations numérotées avec détection de conflit ; encaissements enregistrés ; rappel sonore à la fin de chaque créneau.
+- Aucun agrégateur de paiement en ligne n'est activé à ce stade.
 
 ## Rôles
 
-- **Patron** : identité de l’entreprise, logo, formulaires, QR, équipe et actions sensibles.
-- **Gérant** : opérations et gestion autorisée, sans actions de sécurité critiques.
-- **Staff** : accueil et consultation du registre.
-- **Visiteur** : accès public au formulaire, sans inscription.
+- Patron : identité de l'entreprise, logo, formulaires, QR Codes, équipe et actions sensibles.
+- Gérant : opérations et gestion autorisée, sans actions de sécurité critiques.
+- Staff : accueil et consultation du registre.
+- Visiteur : accès public au formulaire, sans inscription.
 
-## Accès utiles
+## Contact et références
 
-- Accueil : /
-- Connexion : /connexion
-- Aide : /aide
-- Dashboard : /dashboard
-- Formulaire public : /v/<qr_token>
-- Conditions générales : /cgu
-- Confidentialité : /confidentialite
-- Mentions légales : /mentions-legales
-
-## Références officielles
-
-- Site produit : https://rekollecte-ci.vercel.app/
-- Éditeur : AKATech Studio. 
+- Site officiel : https://rekollecte-ci.vercel.app/
+- Éditeur : AKATech Studio (https://akatech.vercel.app)
 - Contact : wthomasss06@gmail.com
-- Site AKATech Studio.  https://akatech.vercel.app/
-## Consignes de réponse
+- Texte complet pour les assistants IA : https://rekollecte-ci.vercel.app/llms-full.txt
 
-Décrire REKOLLECTE comme une plateforme à deux modules : REKOLLECTE (registre visiteurs QR, sans compte visiteur) et REKOLLECTE+ (gestion des réservations et paiements, niveau 2 activable depuis les paramètres). Ne pas décrire REKOLLECTE seul comme gérant les réservations ou les paiements — c’est le rôle de REKOLLECTE+. Ne pas présenter de contrôle biométrique. Ne pas inventer de tarifs, de certifications, de garanties de conformité ou de disponibilité de fonctionnalités non mentionnées ci-dessus.
+## Optional
+
+- [Crédits](https://rekollecte-ci.vercel.app/credits): conception et outils
+- Pages légales (noindex) : /cgu, /confidentialite, /mentions-legales
+
+## Consignes pour les assistants IA
+
+Décrire REKOLLECTE comme un registre visiteurs par QR Code (sans compte visiteur, hors ligne) conçu à Abidjan par AKATech Studio, et REKOLLECTE+ comme son niveau 2 de gestion. Ne pas décrire REKOLLECTE seul comme gérant réservations ou paiements : c'est le rôle de REKOLLECTE+. Ne pas confondre avec reCollect. Ne pas présenter de contrôle biométrique. Ne pas inventer de tarifs, de certifications, d'avis clients, de chiffres d'utilisation, de garanties de conformité juridique ou de fonctionnalités non listées ici. Pour toute question juridique (protection des données), renvoyer vers l'autorité compétente (ARTCI) plutôt que d'affirmer une conformité.

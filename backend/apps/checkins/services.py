@@ -4,13 +4,13 @@ Quand REKOLLECTE+ est actif, une visite valide alimente automatiquement une fich
 client. Le check-in reste toujours la source historique du passage.
 """
 from dataclasses import dataclass, field
-import re
 import unicodedata
 
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 
 from apps.karnet.models import Client
+from apps.karnet.services import find_or_create_client as get_or_create_client, normalize_phone as canonicalize_phone
 from apps.organizations.models import Organization
 
 from .models import AccessPoint, CheckIn, FormTemplate
@@ -92,43 +92,7 @@ def normalize_email(value: object) -> str:
 
 
 def normalize_phone(value: object) -> str:
-    """Ramène un numéro à une forme stable pour la détection de doublon.
-
-    Spécifique à la Côte d'Ivoire : un numéro écrit localement (10 chiffres,
-    ex. `0701020304`) et le même numéro écrit avec l'indicatif international
-    (`+225`/`00225` suivi des 10 chiffres) sont ramenés à la **même** clé
-    locale à 10 chiffres — sinon deux saisies du même client créent deux
-    fiches distinctes (point technique identifié dans le rapport de fusion,
-    confirmé par `test_sync_matches_same_client_with_dashes_or_country_code_variants`).
-    Les numéros hors Côte d'Ivoire gardent le comportement d'origine (chiffres
-    bruts, `+` conservé si saisi ainsi) : on ne devine pas leur plan de
-    numérotation national."""
-    raw = _as_text(value)
-    if not raw:
-        return ""
-    digits = re.sub(r"\D", "", raw)
-    if not digits:
-        return ""
-
-    local_ci = _as_ivorian_local_number(digits)
-    if local_ci:
-        return local_ci
-
-    return f"+{digits}" if raw.lstrip().startswith("+") else digits
-
-
-def _as_ivorian_local_number(digits: str) -> str | None:
-    """Renvoie la forme locale à 10 chiffres (ex. `0701020304`) si `digits`
-    correspond à un numéro ivoirien saisi localement ou avec son indicatif
-    international, sinon `None`."""
-    if len(digits) == 10 and digits[0] == "0":
-        return digits
-    for prefix in ("00225", "225"):
-        if digits.startswith(prefix) and len(digits) == len(prefix) + 10:
-            remainder = digits[len(prefix):]
-            if remainder[0] == "0":
-                return remainder
-    return None
+    return canonicalize_phone(value)
 
 
 def _field_identity_role(field: dict) -> str | None:
@@ -181,35 +145,13 @@ def find_or_create_client(organization: Organization, identity: dict[str, str]) 
     if not full_name:
         return None, None
 
-    client = None
-    if email:
-        client = Client.objects.filter(organization=organization, email__iexact=email).first()
-    if not client and phone:
-        candidates = Client.objects.filter(organization=organization).exclude(phone="")
-        client = next((item for item in candidates if normalize_phone(item.phone) == phone), None)
-
-    if client:
-        changed_fields = []
-        if not client.full_name and full_name:
-            client.full_name = full_name
-            changed_fields.append("full_name")
-        if not client.email and email:
-            client.email = email
-            changed_fields.append("email")
-        if not client.phone and phone:
-            client.phone = phone
-            changed_fields.append("phone")
-        if changed_fields:
-            client.save(update_fields=changed_fields)
-        return client, "matched"
-
-    client = Client.objects.create(
-        organization=organization,
+    client, created = get_or_create_client(
+        organization,
         full_name=full_name,
-        phone=phone,
         email=email,
+        phone=phone,
     )
-    return client, "created"
+    return client, "created" if created else "matched"
 
 
 def _client_for_existing_checkin(key: str) -> tuple[str | None, str | None]:

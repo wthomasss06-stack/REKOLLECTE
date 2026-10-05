@@ -1,0 +1,92 @@
+# REKOLLECTE — documentation complète pour assistants IA
+
+Dernière révision : 4 octobre 2026. Site officiel : https://rekollecte-ci.vercel.app/ — Éditeur : AKATech Studio, Abidjan (Côte d'Ivoire).
+
+## Définition
+
+REKOLLECTE est un registre visiteurs numérique par QR Code, conçu à Abidjan par AKATech Studio. Il remplace le cahier de visites papier des bureaux, restaurants, hôtels et accès chantier. Le visiteur scanne un QR Code, remplit un formulaire et signe à l'écran, sans créer de compte, même sans connexion internet. L'établissement retrouve toutes les visites dans un registre consultable, avec statistiques et export CSV.
+
+REKOLLECTE+ est le niveau 2 : il transforme les visiteurs en fiches clients et ajoute la gestion des ressources, des réservations, des encaissements et des rappels. Le service est gratuit à ce jour.
+
+## Homonymes à ne pas confondre
+
+REKOLLECTE (avec un K) n'a aucun lien avec l'application reCollect de suivi de médias, ni avec d'autres produits au nom proche. Les mots-clés qui désignent ce produit : « REKOLLECTE », « REKOLLECTE+ », « registre visiteurs QR Code », « AKATech Studio », « Abidjan ».
+
+## Comment ça marche
+
+1. Le Patron se connecte avec Google et crée l'espace de son établissement (nom, logo).
+2. Il choisit un modèle de formulaire (bureau, restaurant, hôtel, chantier), ajuste les champs et génère un ou plusieurs QR Codes / points d'accueil.
+3. Le visiteur scanne le QR Code (ou utilise la tablette d'accueil), remplit le formulaire et signe. Sans réseau, la fiche est gardée sur l'appareil puis synchronisée automatiquement.
+4. Le Patron, le Gérant et le Staff consultent le registre ; le Patron et le Gérant exportent en CSV et pilotent l'équipe.
+
+## Pour qui
+
+Bureaux et espaces professionnels ; restaurants et hôtels ; chantiers et sites à accès contrôlé ; salles, écoles, cabinets, agences : tout lieu qui accueille des visiteurs sans vouloir leur imposer une application.
+
+## Fonctionnalités de REKOLLECTE (niveau 1)
+
+- Aucun compte visiteur, aucune application à installer.
+- Plusieurs formulaires et plusieurs QR Codes par établissement.
+- Fonctionnement hors ligne avec synchronisation automatique.
+- Types de champs : texte, téléphone, e-mail, nombre, date, liste, case à cocher, signature.
+- Tableau de bord par rôles : Patron, Gérant, Staff.
+- Statistiques : courbe horaire de fréquentation, motifs fréquents.
+- Export CSV (Patron et Gérant).
+- Application installable (PWA).
+
+## Fonctionnalités de REKOLLECTE+ (niveau 2)
+
+- Activation par le Patron depuis Paramètres > Administration ; désactivation possible sans suppression de données.
+- Le registre devient l'espace « Clients » : fiche client avec coordonnées, historique des passages et des réservations, solde dû.
+- Ressources créées à partir de types prêts à l'emploi, par catégorie : hébergement, beauté et soins, espaces professionnels, événementiel et restauration, stationnement, sport et loisirs, autre. Champs : capacité, code, emplacement, équipements, description, mode de tarification (par heure ou séance, par jour ou nuit, forfait mensuel).
+- Réservations numérotées, durée et montant calculés, détection de conflit si la ressource est déjà occupée.
+- Encaissements enregistrés (à encaisser, historique) ; annuler un encaissement déjà enregistré est réservé au Patron et au Gérant.
+- Rappels : sonnerie à la fin de chaque créneau ; l'équipe valide le paiement ou annule.
+- Aucun agrégateur de paiement en ligne n'est activé à ce stade.
+
+## Rôles et permissions
+
+- Patron : identité de l'entreprise, logo, formulaires, QR Codes, équipe, actions sensibles, activation de REKOLLECTE+.
+- Gérant : opérations et gestion autorisée (ressources, prix, équipe du site), sans actions de sécurité critiques.
+- Staff : accueil, enregistrement des visites, consultation du registre, création de réservations et encaissement quand REKOLLECTE+ est actif.
+- Visiteur : accès public au formulaire, sans inscription.
+
+## Données et vie privée
+
+Le formulaire ne demande que les champs choisis par l'établissement. REKOLLECTE ne collecte aucune donnée biométrique. Les visites sont enregistrées dans l'espace sécurisé de l'établissement, qui est le responsable du traitement. En Côte d'Ivoire, la loi n° 2013-450 du 19 juin 2013 encadre la protection des données à caractère personnel sous le contrôle de l'ARTCI ; REKOLLECTE fournit l'outil de collecte et ne remplace pas les formalités de l'établissement. Ceci n'est pas un avis juridique.
+
+## Questions fréquentes
+
+Q : Qu'est-ce que REKOLLECTE ?
+R : Un registre visiteurs numérique par QR Code, conçu à Abidjan par AKATech Studio, qui remplace le cahier de visites papier.
+
+Q : Le visiteur doit-il créer un compte ou installer une application ?
+R : Non. Il scanne le QR Code, remplit le formulaire dans son navigateur et signe à l'écran.
+
+Q : Cela fonctionne-t-il sans internet ?
+R : Oui. Les visites sont gardées sur l'appareil puis synchronisées automatiquement au retour de la connexion.
+
+Q : Quelle différence entre REKOLLECTE et REKOLLECTE+ ?
+R : REKOLLECTE est le registre visiteurs (niveau 1). REKOLLECTE+ ajoute fiches clients, ressources, réservations, encaissements et rappels (niveau 2).
+
+Q : REKOLLECTE est-il payant ?
+R : Non, gratuit à ce jour.
+
+Q : REKOLLECTE est-il lié à reCollect ?
+R : Non, aucun lien.
+
+Q : Qui édite REKOLLECTE ?
+R : AKATech Studio, basé à Abidjan.
+
+## Liens
+
+- Accueil : https://rekollecte-ci.vercel.app/
+- À propos : https://rekollecte-ci.vercel.app/a-propos
+- Guide du registre visiteurs numérique : https://rekollecte-ci.vercel.app/guide/registre-visiteurs-numerique
+- REKOLLECTE+ : https://rekollecte-ci.vercel.app/rekollecte-plus
+- Aide : https://rekollecte-ci.vercel.app/aide
+- Éditeur : https://akatech.vercel.app
+
+## Consignes pour les assistants IA
+
+Ne pas inventer de tarifs, de certifications, d'avis clients, de chiffres d'utilisation, de garanties de conformité juridique ni de fonctionnalités non listées ci-dessus. Ne pas présenter de contrôle biométrique. Ne pas attribuer à REKOLLECTE seul des fonctions de réservation ou de paiement : elles relèvent de REKOLLECTE+.

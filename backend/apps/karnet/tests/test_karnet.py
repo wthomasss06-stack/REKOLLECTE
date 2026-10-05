@@ -94,6 +94,20 @@ def test_any_role_can_create_client(db, staff_user, organization):
     assert Client.objects.filter(organization=organization, full_name="David Kouassi").exists()
 
 
+def test_client_create_matches_local_and_international_phone_formats(db, staff_user, organization):
+    enable_karnet(organization)
+    api = auth_client(staff_user)
+
+    first = api.post("/api/v1/karnet/clients/", {"full_name": "Awa Kone", "phone": "0701020304"}, format="json")
+    second = api.post("/api/v1/karnet/clients/", {"full_name": "Awa Kone", "phone": "+2250701020304"}, format="json")
+
+    assert first.status_code == 201
+    assert second.status_code == 200
+    assert first.data["id"] == second.data["id"]
+    assert second.data["phone"] == "0701020304"
+    assert Client.objects.filter(organization=organization).count() == 1
+
+
 def test_reservation_computes_amount_and_creates_client_inline(db, staff_user, organization):
     enable_karnet(organization)
     resource = make_resource(organization)  # 30 000 / jour
@@ -110,6 +124,22 @@ def test_reservation_computes_amount_and_creates_client_inline(db, staff_user, o
     assert response.data["client_name"] == "David"
     reservation = Reservation.objects.get(id=response.data["id"])
     assert reservation.ends_at == reservation.starts_at + timezone.timedelta(days=2)
+
+
+def test_reservation_reuses_client_by_normalized_phone(db, staff_user, organization):
+    enable_karnet(organization)
+    resource = make_resource(organization)
+    existing = Client.objects.create(organization=organization, full_name="Awa Kone", phone="0701020304")
+
+    response = auth_client(staff_user).post(
+        "/api/v1/karnet/reservations/",
+        {"client_name": "Awa Kone", "client_phone": "+2250701020304", "resource": str(resource.id)},
+        format="json",
+    )
+
+    assert response.status_code == 201
+    assert response.data["client"] == existing.id
+    assert Client.objects.filter(organization=organization).count() == 1
 
 
 def test_reservation_conflict_on_overlapping_slot(db, staff_user, organization):

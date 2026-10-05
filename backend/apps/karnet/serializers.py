@@ -13,6 +13,11 @@ class ClientSerializer(serializers.ModelSerializer):
     def validate_full_name(self, value):
         return value.strip()
 
+    def validate_phone(self, value):
+        from .services import normalize_phone
+
+        return normalize_phone(value)
+
 
 class ClientDetailSerializer(ClientSerializer):
     """Fiche client complète (phase 7) et ligne de la liste REKOLLECTE+ : ajoute les

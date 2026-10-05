@@ -42,15 +42,21 @@ const nextConfig = {
     return [{ source: "/api/v1/:path*", destination: `${backendApiBase}/api/v1/:path*` }];
   },
   async headers() {
-    return [{
-      source: "/(.*)",
-      headers: [
-        { key: "Content-Security-Policy", value: contentSecurityPolicy },
-        { key: "X-Content-Type-Options", value: "nosniff" },
-        { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-        { key: "Permissions-Policy", value: "camera=(self), microphone=(), geolocation=()" },
-      ],
-    }];
+    const noindex = [{ key: "X-Robots-Tag", value: "noindex, nofollow" }];
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "Content-Security-Policy", value: contentSecurityPolicy },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(self), microphone=(), geolocation=()" },
+        ],
+      },
+      // Pages sans valeur de recherche (connexion, onboarding, formulaire visiteur par QR, espaces connectés) :
+      // jamais dans l'index, même si un lien externe les expose.
+      ...["/connexion/:path*", "/onboarding/:path*", "/v/:path*", "/dashboard/:path*", "/admin/:path*"].map((source) => ({ source, headers: noindex })),
+    ];
   },
 };
 

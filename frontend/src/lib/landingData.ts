@@ -1,8 +1,11 @@
-import { SITE_URL } from "@/lib/site";
+import { faqPage } from "@/lib/jsonld";
+import { IDS, PUBLISHER, SITE_NAME, SITE_URL } from "@/lib/site";
 
 /** Données éditoriales de la landing — une seule source pour l'affichage et le JSON-LD. */
 
 export const FAQS = [
+  { question: "Qu’est-ce que REKOLLECTE ?", answer: "REKOLLECTE est un registre visiteurs numérique par QR Code, conçu à Abidjan par AKATech Studio. Il remplace le cahier de visites papier des bureaux, restaurants, hôtels et accès chantier : le visiteur scanne un QR Code, remplit un formulaire et signe à l’écran, sans créer de compte, même sans connexion internet." },
+  { question: "Quelle différence entre REKOLLECTE et REKOLLECTE+ ?", answer: "REKOLLECTE est le registre visiteurs (niveau 1). REKOLLECTE+ est le niveau 2, activable depuis les paramètres : les visiteurs deviennent des fiches clients et l’établissement gère en plus ses ressources (chambre, table, salle…), ses réservations, ses encaissements et ses rappels de fin de créneau." },
   { question: "Le visiteur doit-il créer un compte ?", answer: "Non. Il scanne simplement le QR Code, remplit le formulaire depuis son téléphone ou la tablette d’accueil, puis signe. Aucune application ni inscription n’est nécessaire." },
   { question: "Est-ce que REKOLLECTE fonctionne sans connexion ?", answer: "Oui. Le formulaire continue d’enregistrer les visites hors-ligne sur l’appareil. Les données se synchronisent automatiquement dès que la connexion revient." },
   { question: "Puis-je adapter le formulaire à mon activité ?", answer: "Oui. Tu peux choisir les champs utiles à ton établissement — bureau, restaurant, hôtel, chantier ou autre — puis les modifier à tout moment depuis les paramètres." },
@@ -11,49 +14,84 @@ export const FAQS = [
   { question: "Combien de temps faut-il pour commencer ?", answer: "Quelques minutes suffisent. Connecte-toi avec Google, renseigne ton établissement, choisis ton formulaire et affiche le QR Code à l’accueil. Tu peux compléter la configuration plus tard." },
 ];
 
-// Organisation ombrelle (REKOLLECTE) + ses deux produits, en @graph pour que Google
-// relie les deux SoftwareApplication à la même entité sans les dupliquer. Le schéma
-// FAQPage est dérivé de FAQS : une seule source de vérité, jamais désynchronisée du
-// texte affiché dans la page.
+const FEATURES_BASE = [
+  "Registre visiteurs par QR Code",
+  "Aucun compte requis pour le visiteur",
+  "Signature à l’écran",
+  "Fonctionne hors ligne avec synchronisation automatique",
+  "Formulaires adaptés au secteur (bureau, restaurant, hôtel, chantier)",
+  "Rôles Patron, Gérant et Staff",
+  "Export CSV et statistiques de fréquentation",
+];
+
+const FEATURES_PLUS = [
+  "Fiches clients avec historique complet",
+  "Ressources par catégorie (hébergement, espaces, restauration, événementiel…)",
+  "Réservations numérotées avec détection de conflit",
+  "Enregistrement des encaissements",
+  "Rappels de fin de créneau",
+];
+
+const FREE = { "@type": "Offer", price: "0", priceCurrency: "XOF", availability: "https://schema.org/OnlineOnly" };
+const AREA = { "@type": "Country", name: "Côte d’Ivoire" };
+
+// Graphe relié par @id (éditeur -> site -> applications) : Google et les moteurs de réponse comprennent
+// qu'il s'agit d'UNE entité « REKOLLECTE » éditée par AKATech Studio, distincte des homonymes (ex. reCollect).
+// Aucune note, aucun avis ni aucune distinction inventée : uniquement des faits vérifiables sur le produit.
 export const JSON_LD = {
   "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "Organization",
-      "@id": `${SITE_URL}/#organization`,
-      name: "REKOLLECTE",
+      "@id": IDS.publisher,
+      name: PUBLISHER.name,
+      url: PUBLISHER.url,
+      logo: { "@type": "ImageObject", url: `${SITE_URL}${PUBLISHER.logo}` },
+      address: { "@type": "PostalAddress", addressLocality: "Abidjan", addressCountry: "CI" },
+      areaServed: AREA,
+    },
+    {
+      "@type": "WebSite",
+      "@id": IDS.website,
       url: SITE_URL,
-      logo: `${SITE_URL}/icons/icon-512.png`,
+      name: SITE_NAME,
+      alternateName: ["REKOLLECTE+", "REKOLLECTE registre visiteurs"],
+      inLanguage: "fr",
+      publisher: { "@id": IDS.publisher },
     },
     {
       "@type": "SoftwareApplication",
-      "@id": `${SITE_URL}/#rekollecte`,
-      name: "REKOLLECTE",
+      "@id": IDS.app,
+      name: SITE_NAME,
+      alternateName: "REKOLLECTE registre visiteurs QR Code",
+      url: SITE_URL,
       applicationCategory: "BusinessApplication",
-      operatingSystem: "Web",
-      description: "Registre visiteurs numérique par QR Code à Abidjan, sans compte pour le visiteur, fonctionnant hors ligne.",
-      provider: { "@id": `${SITE_URL}/#organization` },
-      isPartOf: { "@id": `${SITE_URL}/#organization` },
+      operatingSystem: "Web (application installable PWA)",
+      inLanguage: "fr",
+      description: "REKOLLECTE est un registre visiteurs numérique par QR Code, conçu à Abidjan : le visiteur scanne, remplit et signe sans compte, même hors ligne.",
+      featureList: FEATURES_BASE,
+      isAccessibleForFree: true,
+      offers: FREE,
+      areaServed: AREA,
+      publisher: { "@id": IDS.publisher },
     },
     {
       "@type": "SoftwareApplication",
-      "@id": `${SITE_URL}/#rekollecte-plus`,
+      "@id": IDS.appPlus,
       name: "REKOLLECTE+",
+      url: `${SITE_URL}/rekollecte-plus`,
       applicationCategory: "BusinessApplication",
-      operatingSystem: "Web",
-      description: "Gestion des clients, ressources, réservations, paiements et rappels — niveau 2 de REKOLLECTE, activable depuis les paramètres.",
-      provider: { "@id": `${SITE_URL}/#organization` },
-      isPartOf: { "@id": `${SITE_URL}/#organization` },
+      operatingSystem: "Web (application installable PWA)",
+      inLanguage: "fr",
+      description: "REKOLLECTE+ est le niveau 2 de REKOLLECTE : fiches clients, ressources, réservations, encaissements et rappels, activable depuis les paramètres.",
+      featureList: FEATURES_PLUS,
+      isAccessibleForFree: true,
+      offers: FREE,
+      areaServed: AREA,
+      isPartOf: { "@id": IDS.app },
+      publisher: { "@id": IDS.publisher },
     },
-    {
-      "@type": "FAQPage",
-      "@id": `${SITE_URL}/#faq`,
-      mainEntity: FAQS.map((faq) => ({
-        "@type": "Question",
-        name: faq.question,
-        acceptedAnswer: { "@type": "Answer", text: faq.answer },
-      })),
-    },
+    faqPage(`${SITE_URL}/#faq`, FAQS),
   ],
 };
 

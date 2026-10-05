@@ -11,6 +11,7 @@ from apps.common.responses import error_response
 
 from .models import Client, Reservation, Resource
 from .permissions import HasKarnetEnabled
+from .services import find_or_create_client
 from .serializers import (
     ClientDetailSerializer,
     ClientSerializer,
@@ -38,8 +39,15 @@ class ClientListView(APIView):
     def post(self, request):
         serializer = ClientSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        client = serializer.save(organization=request.user.organization)
-        return Response(ClientSerializer(client).data, status=status.HTTP_201_CREATED)
+        client, created = find_or_create_client(
+            request.user.organization,
+            full_name=serializer.validated_data.get("full_name", ""),
+            phone=serializer.validated_data.get("phone", ""),
+            email=serializer.validated_data.get("email", ""),
+            note=serializer.validated_data.get("note", ""),
+        )
+        response_status = status.HTTP_201_CREATED if created else status.HTTP_200_OK
+        return Response(ClientSerializer(client).data, status=response_status)
 
 
 class ClientDetailView(APIView):
@@ -176,7 +184,11 @@ class ReservationListView(APIView):
             if not client:
                 return error_response("Client introuvable.", status.HTTP_404_NOT_FOUND)
         else:
-            client = Client.objects.create(organization=organization, full_name=data["client_name"].strip(), phone=data.get("client_phone", "").strip())
+            client, _ = find_or_create_client(
+                organization,
+                full_name=data["client_name"],
+                phone=data.get("client_phone", ""),
+            )
 
         quantity = data["quantity"]
         starts_at = data.get("starts_at") or timezone.now()

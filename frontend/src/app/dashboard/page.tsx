@@ -25,6 +25,8 @@ export default function RegistrePage() {
   const [stats, setStats] = useState<CheckInStats | null>(null);
   const [user, setUser] = useState<UserProfile | null>(null);
   const [state, setState] = useState<ViewState>("loading");
+  const [loadError, setLoadError] = useState("");
+  const [sessionExpired, setSessionExpired] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [exporting, setExporting] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
@@ -41,7 +43,13 @@ export default function RegistrePage() {
         apiClient.get<UserProfile>("/auth/me/"),
       ]);
       setSchema(tpl.data.fields_schema); setRecords(chk.data.results); setTotalCount(chk.data.count); setOrgName(org.data.name); setKarnetEnabled(Boolean(org.data.capabilities?.karnet)); setStats(summary.data); setUser(me.data); setAvatarFailed(false); setLastUpdated(new Date()); setState("ready");
-    } catch { if (initial) setState("error"); }
+    } catch (error) {
+      if (!initial) return;
+      const normalized = normalizeApiError(error);
+      setLoadError(normalized.message);
+      setSessionExpired(normalized.code === "auth");
+      setState("error");
+    }
   }, [page, pageSize]);
 
   useEffect(() => {
@@ -70,7 +78,7 @@ export default function RegistrePage() {
   };
 
   if (state === "loading") return <Loader fullScreen={false} />;
-  if (state === "error") return <div className="flex flex-col items-start gap-3"><p className="text-ink-soft">Impossible de charger le registre.</p><button onClick={() => { firstLoad.current = true; void load(true); }} className="rounded-full bg-cta px-4 py-2.5 text-sm font-medium text-white">Réessayer</button></div>;
+  if (state === "error") return <div role="alert" className="flex max-w-xl flex-col items-start gap-3 rounded-xl border border-border bg-surface p-5"><h1 className="font-semibold text-ink">Impossible de charger le registre</h1><p className="text-sm text-ink-soft">{loadError}</p><div className="flex flex-wrap gap-3">{sessionExpired && <a href="/" className="rounded-full bg-cta px-4 py-2.5 text-sm font-medium text-white">Retour à la connexion</a>}<button onClick={() => { firstLoad.current = true; void load(true); }} className="rounded-full border border-border px-4 py-2.5 text-sm font-medium text-ink">Réessayer</button></div></div>;
 
   return <div className="space-y-6">
     <div className="flex flex-wrap items-start justify-between gap-4"><div><h1 className="text-2xl font-bold text-ink">{karnetEnabled ? "Clients" : "Registre"}</h1><p className="text-sm text-ink-soft">{stats?.total ?? totalCount} {karnetEnabled ? "client" : "visiteur"}{(stats?.total ?? totalCount) > 1 ? "s" : ""} · {karnetEnabled ? "les passages alimentent automatiquement les fiches clients" : "actualisation automatique toutes les 30 secondes"}{lastUpdated ? ` · ${lastUpdated.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}` : ""}</p></div><div className="flex flex-wrap items-center justify-end gap-3"><div className="flex max-w-full items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2"><div className="grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-full bg-canvas text-xs font-bold text-ink">{user?.avatar_url && !avatarFailed ? <img src={user.avatar_url} alt={`Photo de ${user.full_name || user.email}`} className="h-full w-full object-cover" referrerPolicy="no-referrer" onError={() => setAvatarFailed(true)} /> : (user?.full_name || user?.email || "?").slice(0, 1).toUpperCase()}</div><div className="min-w-0"><p className="max-w-[150px] truncate text-xs font-semibold text-ink">{user?.full_name || user?.email}</p><p className="text-[11px] text-ink-soft">{user?.role === "BOSS" ? "Patron" : user?.role === "GERANT" ? "Gérant" : "Staff"}</p></div></div>{canExport && <button onClick={() => void handleExport()} disabled={totalCount === 0 || exporting} className="rounded-full bg-cta px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50">{exporting ? "Export en cours…" : "Exporter en CSV"}</button>}</div></div>
