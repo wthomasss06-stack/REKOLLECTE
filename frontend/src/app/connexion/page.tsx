@@ -5,10 +5,13 @@ import Link from "next/link";
 import { GoogleLogin } from "@react-oauth/google";
 
 import Logo from "@/components/Logo";
+import SocialButtons, { enabledProviders, useAuthErrorFromUrl } from "@/components/auth/SocialButtons";
 import { useGoogleAuthLogin } from "@/hooks/useAuth";
 
 export default function LoginPage() {
   const { login, error, loading } = useGoogleAuthLogin();
+  const urlError = useAuthErrorFromUrl();
+  const providers = enabledProviders();
 
   return (
     <>
@@ -56,7 +59,7 @@ export default function LoginPage() {
                 Se connecter
               </h1>
               <p className="mt-2 text-sm text-ink-soft">
-                Réservé au patron et à son équipe — un compte Google suffit.
+                Réservé au patron et à son équipe — un compte Google{providers.includes("facebook") || providers.includes("apple") ? ", Facebook ou Apple" : ""} suffit.
               </p>
             </div>
 
@@ -73,12 +76,14 @@ export default function LoginPage() {
                 />
               </div>
 
+              <SocialButtons />
+
               {loading && <p className="text-sm text-ink-soft animate-pulse">Connexion en cours…</p>}
-              {error && <p className="text-sm text-error-text font-medium">{error}</p>}
+              {(error || urlError) && <p className="text-sm text-error-text font-medium">{error || urlError}</p>}
             </div>
 
             <p className="text-xs text-ink-soft/90 leading-relaxed max-w-xs mx-auto">
-              En continuant avec Google, tu acceptes nos{" "}
+              En continuant, tu acceptes nos{" "}
               <Link href="/cgu" className="underline underline-offset-2 hover:text-ink">
                 CGU
               </Link>{" "}

@@ -1,7 +1,7 @@
 {
   "name": "REKOLLECTE — registre digital",
   "short_name": "REKOLLECTE",
-  "description": "Registre visiteurs digital sans contact, sans compte pour le visiteur",
+  "description": "Registre visiteurs par QR Code, sans compte. REKOLLECTE+ : clients, ressources et réservations.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#eeeee2",

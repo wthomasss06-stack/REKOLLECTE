@@ -19,12 +19,15 @@ from .models import AuditEvent, RefreshSession, StaffInvitation, User
 from .serializers import AuditEventSerializer, GoogleAuthSerializer, InviteStaffSerializer, StaffInvitationSerializer, UserProfileUpdateSerializer, UserSerializer
 from .services import (
     ROLE_CAPS,
+    EmailRequiredError,
+    IdentityConflictError,
     InvalidGoogleTokenError,
+    ProviderProfile,
     RevokedAccessError,
     count_role_usage,
     create_staff_invitation,
     register_refresh_session,
-    resolve_or_create_user,
+    resolve_login,
     revoke_refresh_session,
     verify_google_credential,
 )
@@ -47,8 +50,20 @@ class GoogleAuthView(APIView):
         except InvalidGoogleTokenError:
             return error_response("Jeton Google invalide ou expiré. Reconnecte-toi.", status.HTTP_401_UNAUTHORIZED)
 
+        profile = ProviderProfile(
+            provider="google",
+            subject=str(google_profile["sub"]),
+            email=str(google_profile.get("email") or ""),
+            email_verified=bool(google_profile.get("email_verified")),
+            name=str(google_profile.get("name") or ""),
+            picture=str(google_profile.get("picture") or ""),
+        )
         try:
-            user, created = resolve_or_create_user(google_profile)
+            user, created = resolve_login(profile)
+        except EmailRequiredError:
+            return error_response("Ton compte Google n’a pas d’e-mail vérifié. Utilise un autre compte.", status.HTTP_400_BAD_REQUEST)
+        except IdentityConflictError:
+            return error_response("Ce compte Google est déjà lié à un autre espace.", status.HTTP_409_CONFLICT)
         except RevokedAccessError as exc:
             return Response({"error": {"message": str(exc), "code": "access_revoked", "retryable": False}}, status=status.HTTP_403_FORBIDDEN)
         if not user.is_active:

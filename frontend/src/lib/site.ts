@@ -6,6 +6,9 @@
 // (recommandé pour la marque) sans toucher au code : robots, sitemap, canoniques et JSON-LD suivent.
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://rekollecte-ci.vercel.app").replace(/\/+$/, "");
 export const SITE_NAME = "REKOLLECTE";
+// Description unique (snippet Google, Open Graph, Twitter) : valeur proposée, puis passage à REKOLLECTE+.
+export const SITE_DESCRIPTION =
+  "Gérez vos visiteurs avec un simple QR Code, sans compte ni cahier. Passez à REKOLLECTE+ pour gérer clients, ressources et réservations.";
 export const OG_IMAGE = { url: "/og/rekollecte-og.jpg", width: 1200, height: 630, alt: "REKOLLECTE : le registre visiteurs par QR Code, sans compte, même hors ligne" } as const;
 export const PUBLISHER = { name: "AKATech Studio", url: "https://akatech.vercel.app", logo: "/akatech-studio-logo.webp" } as const;
 

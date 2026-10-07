@@ -158,6 +158,18 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True
 
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
+
+# --- Connexion Facebook / Apple (voir GUIDE_CONNEXION_FACEBOOK_APPLE.md) ----------------
+OAUTH_STATE_COOKIE = "qr_oauth_state"
+FACEBOOK_APP_ID = os.environ.get("FACEBOOK_APP_ID", "")
+FACEBOOK_APP_SECRET = os.environ.get("FACEBOOK_APP_SECRET", "")
+FACEBOOK_GRAPH_VERSION = os.environ.get("FACEBOOK_GRAPH_VERSION", "v25.0")
+# Meta ne fournit pas de champ « email_verified » : voir apps/accounts/oauth.py.
+FACEBOOK_EMAIL_TRUSTED = os.environ.get("FACEBOOK_EMAIL_TRUSTED", "true").lower() == "true"
+APPLE_SERVICES_ID = os.environ.get("APPLE_SERVICES_ID", "")  # l'identifiant du « Services ID », pas le Bundle ID
+APPLE_TEAM_ID = os.environ.get("APPLE_TEAM_ID", "")
+APPLE_KEY_ID = os.environ.get("APPLE_KEY_ID", "")
+APPLE_PRIVATE_KEY = os.environ.get("APPLE_PRIVATE_KEY", "")  # contenu du .p8, retours à la ligne écrits \n
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:3000")
 PLATFORM_ADMIN_EMAIL = os.environ.get("PLATFORM_ADMIN_EMAIL", "")
 PLATFORM_ADMIN_PASSWORD = os.environ.get("PLATFORM_ADMIN_PASSWORD", "")

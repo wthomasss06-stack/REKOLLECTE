@@ -13,6 +13,7 @@ const ALL_TABS = [
   { href: "/dashboard/parametres/qr-code", label: "QR Code", staffCanSee: true, bossOnly: false },
   { href: "/dashboard/parametres/equipe", label: "Équipe", staffCanSee: false, bossOnly: false },
   { href: "/dashboard/parametres/entreprise", label: "Entreprise", staffCanSee: true, bossOnly: false },
+  { href: "/dashboard/parametres/connexion", label: "Connexion", staffCanSee: true, bossOnly: false },
   { href: "/dashboard/parametres/administration", label: "Administration", staffCanSee: false, bossOnly: true },
 ];
 

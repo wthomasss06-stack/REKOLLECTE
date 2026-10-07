@@ -136,3 +136,38 @@ class RefreshSession(models.Model):
             models.Index(fields=["user", "revoked_at"]),
             models.Index(fields=["expires_at"]),
         ]
+
+
+class AuthIdentity(models.Model):
+    """Une façon de se connecter (Google, Facebook, Apple) rattachée à UN seul compte.
+
+    C'est ce qui évite les doublons : le compte (User) est la personne, l'identité n'est
+    qu'une clé d'entrée. Le couple (provider, subject) est l'identifiant STABLE du
+    fournisseur (jamais l'e-mail, qui peut changer ou être masqué).
+    """
+
+    class Provider(models.TextChoices):
+        GOOGLE = "google", "Google"
+        FACEBOOK = "facebook", "Facebook"
+        APPLE = "apple", "Apple"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="identities")
+    provider = models.CharField(max_length=20, choices=Provider.choices)
+    subject = models.CharField(max_length=255)
+    email = models.EmailField(blank=True)  # e-mail vu chez le fournisseur (information)
+    email_verified = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_login_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            # Une identité fournisseur n'appartient qu'à un seul compte...
+            models.UniqueConstraint(fields=["provider", "subject"], name="uniq_authidentity_provider_subject"),
+            # ...et un compte n'a qu'une identité par fournisseur.
+            models.UniqueConstraint(fields=["user", "provider"], name="uniq_authidentity_user_provider"),
+        ]
+
+    def __str__(self):
+        return f"{self.provider}:{self.subject} -> {self.user_id}"
+
