@@ -10,6 +10,7 @@ import Modal from "@/components/ui/Modal";
 import { useAuthContext } from "@/context/AuthContext";
 import { apiClient } from "@/lib/api";
 import { normalizeApiError } from "@/lib/errors";
+import { notifyKarnetChanged } from "@/lib/karnet";
 import { RESOURCE_CATEGORIES, RESOURCE_PRESETS, type ResourcePreset } from "@/lib/resourcePresets";
 import type { KarnetResource, KarnetResourceBillingUnit, KarnetResourceCategory } from "@/types";
 
@@ -118,6 +119,7 @@ export default function ResourceBuilder({ autoOpenCreate = false }: Props) {
         billing_unit: preset.billing_unit, capacity: preset.capacity ?? null, equipment: preset.equipment || "",
       });
       setResources((current) => [...current, response.data]);
+      notifyKarnetChanged();
       setCreateOpen(false);
       setEditing(response.data);
       setEditDraft(toEditDraft(response.data));
@@ -150,6 +152,7 @@ export default function ResourceBuilder({ autoOpenCreate = false }: Props) {
         equipment: editDraft.equipment.trim(), duration_label: editDraft.duration_label.trim(),
         is_active: editDraft.is_active,
       });
+      notifyKarnetChanged();
       setResources((current) => current.map((r) => (r.id === response.data.id ? response.data : r)));
       setEditing(null);
     } catch (err) {
@@ -163,6 +166,7 @@ export default function ResourceBuilder({ autoOpenCreate = false }: Props) {
     setDeletingId(resource.id);
     try {
       const response = await apiClient.delete<KarnetResource | undefined>(`/karnet/resources/${resource.id}/`);
+      notifyKarnetChanged();
       if (response.status === 200 && response.data) {
         setResources((current) => current.map((r) => (r.id === resource.id ? response.data! : r))); // désactivée (historique protégé)
       } else {

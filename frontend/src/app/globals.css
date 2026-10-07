@@ -291,3 +291,12 @@ h1, h2, h3, h4 {
 .lp-btn-dark:hover { transform: translateY(-2px); background: #1b3a29; }
 .lp-btn-ghost { background: rgb(255 255 255 / 0.75); color: #12231a; border: 1px solid rgb(18 35 26 / 0.18); }
 .lp-btn-ghost:hover { transform: translateY(-2px); background: #fff; }
+
+/* ——— REKOLLECTE+ : cibles tactiles >= 44 px ———
+   Tablette d'accueil et téléphone : champs, listes et boutons ne descendent jamais sous 44 px de haut.
+   Appliqué par la classe .touch-comfort (layout karnet) ; sur souris, la densité d'origine est conservée. */
+@media (pointer: coarse), (max-width: 767px) {
+  .touch-comfort :is(button, select, textarea, summary, [role="tab"], input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="range"])) { min-height: 44px; }
+  .touch-comfort button[aria-label] { min-width: 44px; }
+  .touch-comfort input[type="checkbox"], .touch-comfort input[type="radio"] { width: 1.375rem; height: 1.375rem; }
+}

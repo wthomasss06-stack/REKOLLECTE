@@ -3,6 +3,7 @@ from django.urls import path
 from .views import (
     ClientDetailView,
     ClientListView,
+    KarnetSummaryView,
     ReservationDetailView,
     ReservationListView,
     ResourceDetailView,
@@ -10,6 +11,7 @@ from .views import (
 )
 
 urlpatterns = [
+    path("summary/", KarnetSummaryView.as_view(), name="karnet-summary"),
     path("clients/", ClientListView.as_view(), name="karnet-clients"),
     path("clients/<uuid:pk>/", ClientDetailView.as_view(), name="karnet-client-detail"),
     path("resources/", ResourceListView.as_view(), name="karnet-resources"),

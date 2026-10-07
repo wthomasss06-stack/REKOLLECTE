@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 import Loader from "@/components/Loader";
+import GettingStarted, { GuideProvider } from "@/components/karnet/GettingStarted";
+import { ReminderProvider } from "@/components/karnet/ReminderAlarm";
 import { useAuthContext } from "@/context/AuthContext";
 
 const TABS = [
@@ -31,30 +33,36 @@ export default function KarnetLayout({ children }: { children: React.ReactNode }
   if (loading || !karnetEnabled) return <Loader fullScreen={false} />;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-ink">REKOLLECTE+</h1>
-        <p className="mt-1 text-sm text-ink-soft">Les ressources, réservations, paiements et rappels de ton établissement.</p>
-      </div>
-      <div className="flex gap-1 overflow-x-auto border-b border-border">
-        {TABS.map((tab) => (
-          <Link
-            key={tab.href}
-            href={tab.href}
-            className={`whitespace-nowrap border-b-2 px-4 py-2.5 text-sm font-medium transition ${
-              (tab.exact ? pathname === tab.href : pathname.startsWith(tab.href)) ? "border-cta text-ink" : "border-transparent text-ink-soft hover:text-ink"
-            }`}
-          >
-            {tab.label}
-          </Link>
-        ))}
-        {/* Le journal reste unique et deja construit dans Administration : on y renvoie
-            plutot que de dupliquer un second historique specifique a REKOLLECTE+. */}
-        <Link href="/dashboard/parametres/administration" className="whitespace-nowrap border-b-2 border-transparent px-4 py-2.5 text-sm font-medium text-ink-soft hover:text-ink">
-          Audit
-        </Link>
-      </div>
-      {children}
-    </div>
+    <GuideProvider>
+      <ReminderProvider>
+        {/* touch-comfort : champs et boutons >= 44 px sur tablette/téléphone (voir globals.css) */}
+        <div className="touch-comfort space-y-6">
+          <div>
+            <h1 className="text-2xl font-bold text-ink">REKOLLECTE+</h1>
+            <p className="mt-1 text-sm text-ink-soft">Les ressources, réservations, paiements et rappels de ton établissement.</p>
+          </div>
+          <GettingStarted variant={pathname === "/dashboard/karnet" ? "full" : "compact"} />
+          <div className="flex gap-1 overflow-x-auto border-b border-border">
+            {TABS.map((tab) => (
+              <Link
+                key={tab.href}
+                href={tab.href}
+                className={`inline-flex min-h-[44px] items-center whitespace-nowrap border-b-2 px-4 text-sm font-medium transition ${
+                  (tab.exact ? pathname === tab.href : pathname.startsWith(tab.href)) ? "border-cta text-ink" : "border-transparent text-ink-soft hover:text-ink"
+                }`}
+              >
+                {tab.label}
+              </Link>
+            ))}
+            {/* Le journal reste unique et deja construit dans Administration : on y renvoie
+                plutot que de dupliquer un second historique specifique a REKOLLECTE+. */}
+            <Link href="/dashboard/parametres/administration" className="inline-flex min-h-[44px] items-center whitespace-nowrap border-b-2 border-transparent px-4 text-sm font-medium text-ink-soft hover:text-ink">
+              Audit
+            </Link>
+          </div>
+          {children}
+        </div>
+      </ReminderProvider>
+    </GuideProvider>
   );
 }

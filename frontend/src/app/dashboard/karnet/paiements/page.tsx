@@ -4,13 +4,15 @@ import { useEffect, useState } from "react";
 import { CreditCard, X } from "@phosphor-icons/react";
 
 import Loader from "@/components/Loader";
+import { useDialog } from "@/components/ui/DialogProvider";
 import { useAuthContext } from "@/context/AuthContext";
 import { apiClient } from "@/lib/api";
-import { formatDateTime, formatXOF, STATUS_LABELS, STATUS_STYLES } from "@/lib/karnet";
+import { formatDateTime, formatXOF, notifyKarnetChanged, STATUS_LABELS, STATUS_STYLES } from "@/lib/karnet";
 import type { KarnetReservation } from "@/types";
 
 export default function KarnetPaiementsPage() {
   const { user } = useAuthContext();
+  const { confirm } = useDialog();
   // Phase 9 — règle métier : encaisser reste ouvert à toute l'équipe, mais
   // annuler un encaissement déjà enregistré est réservé à Patron/Gérant
   // (l'API renvoie 403 sinon ; ce contrôle d'affichage évite juste de proposer
@@ -34,23 +36,33 @@ export default function KarnetPaiementsPage() {
 
   const markPaid = async (id: string) => {
     setMarkingId(id);
+    setError("");
     try {
       await apiClient.patch(`/karnet/reservations/${id}/`, { is_paid: true });
+      notifyKarnetChanged();
       load();
+    } catch {
+      setError("Impossible d’enregistrer cet encaissement. Réessaie.");
     } finally {
       setMarkingId(null);
     }
   };
 
-  const unmarkPaid = async (id: string) => {
-    setMarkingId(id);
-    try {
-      await apiClient.patch(`/karnet/reservations/${id}/`, { is_paid: false });
+  // Annuler un encaissement remet la réservation « à encaisser » : on demande confirmation (avant : un tap suffisait).
+  const unmarkPaid = async (r: KarnetReservation) => {
+    const done = await confirm({
+      tone: "danger",
+      title: "Annuler cet encaissement ?",
+      message: `${r.client_name} · ${r.resource_name} (${formatXOF(r.total_amount)}) repasse dans « À encaisser ».`,
+      confirmLabel: "Oui, annuler l’encaissement",
+      cancelLabel: "Non, le garder",
+      runningLabel: "Annulation…",
+      run: () => apiClient.patch(`/karnet/reservations/${r.id}/`, { is_paid: false }),
+      errorTitle: "Impossible d’annuler cet encaissement",
+    });
+    if (done) {
+      notifyKarnetChanged();
       load();
-    } catch {
-      setError("Impossible d’annuler cet encaissement.");
-    } finally {
-      setMarkingId(null);
     }
   };
 
@@ -62,7 +74,7 @@ export default function KarnetPaiementsPage() {
 
   return (
     <div className="space-y-6">
-      {error && <p className="text-sm text-error-text">{error}</p>}
+      {error && <p role="alert" className="text-sm text-error-text">{error}</p>}
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="rounded-xl border border-border bg-surface p-4">
@@ -89,8 +101,8 @@ export default function KarnetPaiementsPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="font-semibold text-ink">{formatXOF(r.total_amount)}</span>
-                  <button onClick={() => markPaid(r.id)} disabled={markingId === r.id} className="flex items-center gap-1.5 rounded-lg bg-cta px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60">
-                    <CreditCard size={14} weight="bold" /> {markingId === r.id ? "…" : "Marquer payé"}
+                  <button onClick={() => markPaid(r.id)} disabled={markingId === r.id} className="flex min-h-[44px] items-center gap-1.5 rounded-lg bg-cta px-4 text-sm font-semibold text-white disabled:opacity-60">
+                    <CreditCard size={16} weight="bold" /> {markingId === r.id ? "…" : "Marquer payé"}
                   </button>
                 </div>
               </div>
@@ -114,12 +126,12 @@ export default function KarnetPaiementsPage() {
                   <span className="font-semibold text-ink">{formatXOF(r.total_amount)}</span>
                   {canUnmark && (
                     <button
-                      onClick={() => unmarkPaid(r.id)}
+                      onClick={() => unmarkPaid(r)}
                       disabled={markingId === r.id}
                       title="Annuler cet encaissement"
-                      className="flex items-center gap-1 rounded-lg border border-border px-2 py-1 text-xs font-medium text-ink-soft transition hover:border-error-text hover:text-error-text disabled:opacity-60"
+                      className="flex min-h-[44px] items-center gap-1.5 rounded-lg border border-border px-4 text-sm font-medium text-ink-soft transition hover:border-error-text hover:text-error-text disabled:opacity-60"
                     >
-                      <X size={12} weight="bold" /> Annuler
+                      <X size={14} weight="bold" /> Annuler l’encaissement
                     </button>
                   )}
                 </div>

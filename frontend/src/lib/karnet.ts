@@ -28,3 +28,24 @@ export const STATUS_STYLES: Record<KarnetReservationStatus, string> = {
 export function formatDateTime(iso: string): string {
   return new Date(iso).toLocaleString("fr-FR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
 }
+
+/** Compteurs du guide « Premiers pas » (GET /karnet/summary/). */
+export interface KarnetSummary {
+  resources: number;
+  clients: number;
+  reservations: number;
+  paid_reservations: number;
+}
+
+const KARNET_CHANGED = "karnet:changed";
+
+/** À appeler après toute création/modification (ressource, client, réservation, paiement) :
+ * le guide « Premiers pas » et la bannière de rappels se rafraîchissent sans recharger la page. */
+export function notifyKarnetChanged(): void {
+  if (typeof window !== "undefined") window.dispatchEvent(new Event(KARNET_CHANGED));
+}
+
+export function onKarnetChanged(handler: () => void): () => void {
+  window.addEventListener(KARNET_CHANGED, handler);
+  return () => window.removeEventListener(KARNET_CHANGED, handler);
+}

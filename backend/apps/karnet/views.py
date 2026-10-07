@@ -11,7 +11,7 @@ from apps.common.responses import error_response
 
 from .models import Client, Reservation, Resource
 from .permissions import HasKarnetEnabled
-from .services import find_or_create_client
+from .services import find_matching_client, find_or_create_client, search_clients
 from .serializers import (
     ClientDetailSerializer,
     ClientSerializer,
@@ -31,9 +31,7 @@ class ClientListView(APIView):
 
     def get(self, request):
         clients = Client.objects.filter(organization=request.user.organization).with_activity()
-        search = request.query_params.get("search")
-        if search:
-            clients = clients.filter(full_name__icontains=search)
+        clients = search_clients(clients, request.query_params.get("search", ""))
         return Response(ClientDetailSerializer(clients, many=True).data)
 
     def post(self, request):
@@ -72,6 +70,22 @@ class ClientDetailView(APIView):
             return error_response("Client introuvable.", status.HTTP_404_NOT_FOUND)
         serializer = ClientSerializer(client, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
+        # Modifier un numéro ou un e-mail ne doit pas créer un doublon : si une AUTRE fiche porte
+        # déjà ce téléphone (sous n'importe quel format) ou cet e-mail, on refuse et on la désigne.
+        duplicate = find_matching_client(
+            client.organization,
+            phone=serializer.validated_data.get("phone", ""),
+            email=serializer.validated_data.get("email", ""),
+            exclude_id=client.id,
+        )
+        if duplicate:
+            return Response(
+                {
+                    "error": {"message": f"{duplicate.full_name} a déjà ce téléphone ou cet e-mail.", "code": "client_duplicate", "retryable": False},
+                    "existing_client": {"id": str(duplicate.id), "full_name": duplicate.full_name},
+                },
+                status=status.HTTP_409_CONFLICT,
+            )
         serializer.save()
         return Response(serializer.data)
 
@@ -256,3 +270,20 @@ class ReservationDetailView(APIView):
             extra["paid_at"] = timezone.now()
         serializer.save(**extra)
         return Response(ReservationSerializer(reservation).data)
+
+
+class KarnetSummaryView(APIView):
+    """GET /karnet/summary/ — quatre compteurs pour le guide « Premiers pas » (une requête au
+    lieu de charger trois listes complètes juste pour savoir si elles sont vides)."""
+
+    permission_classes = [IsAuthenticated, IsOrgMember, HasKarnetEnabled]
+
+    def get(self, request):
+        organization = request.user.organization
+        reservations = Reservation.objects.filter(organization=organization).exclude(status=Reservation.Status.ANNULEE)
+        return Response({
+            "resources": Resource.objects.filter(organization=organization, is_active=True).count(),
+            "clients": Client.objects.filter(organization=organization).count(),
+            "reservations": reservations.count(),
+            "paid_reservations": reservations.filter(is_paid=True).count(),
+        })
