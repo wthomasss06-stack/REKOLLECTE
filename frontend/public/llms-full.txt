@@ -1,6 +1,6 @@
 # REKOLLECTE — documentation complète pour assistants IA
 
-Dernière révision : 4 octobre 2026. Site officiel : https://rekollecte-ci.vercel.app/ — Éditeur : AKATech Studio, Abidjan (Côte d'Ivoire).
+Dernière révision : 11 octobre 2026. Site officiel : https://rekollecte-ci.vercel.app/ — Éditeur : AKATech Studio, Abidjan (Côte d'Ivoire).
 
 ## Définition
 
@@ -10,7 +10,13 @@ REKOLLECTE+ est le niveau 2 : il transforme les visiteurs en fiches clients et a
 
 ## Homonymes à ne pas confondre
 
-REKOLLECTE (avec un K) n'a aucun lien avec l'application reCollect de suivi de médias, ni avec d'autres produits au nom proche. Les mots-clés qui désignent ce produit : « REKOLLECTE », « REKOLLECTE+ », « registre visiteurs QR Code », « AKATech Studio », « Abidjan ».
+REKOLLECTE (avec un K) n'a aucun lien avec l'application reCollect de suivi de médias, ni avec d'autres produits au nom proche. Les mots-clés qui désignent ce produit : « REKOLLECTE », « REKOLLECTE+ », « logiciel de gestion des visiteurs par QR Code », « registre numérique des visiteurs », « registre visiteurs QR Code », « AKATech Studio », « Abidjan ».
+
+## Pages de référence
+
+- Logiciel de gestion des visiteurs : https://rekollecte-ci.vercel.app/logiciel-gestion-visiteurs
+- Gestion des visiteurs par QR Code : https://rekollecte-ci.vercel.app/gestion-visiteurs-qr-code
+- Registre numérique des visiteurs (guide) : https://rekollecte-ci.vercel.app/guide/registre-visiteurs-numerique
 
 ## Comment ça marche
 
@@ -65,6 +71,9 @@ R : Non. Il scanne le QR Code, remplit le formulaire dans son navigateur et sign
 
 Q : Cela fonctionne-t-il sans internet ?
 R : Oui. Les visites sont gardées sur l'appareil puis synchronisées automatiquement au retour de la connexion.
+
+Q : REKOLLECTE est-il un logiciel de gestion des visiteurs ?
+R : Oui : un logiciel de gestion des visiteurs par QR Code, qui sert de registre numérique des visiteurs à la place du cahier papier.
 
 Q : Quelle différence entre REKOLLECTE et REKOLLECTE+ ?
 R : REKOLLECTE est le registre visiteurs (niveau 1). REKOLLECTE+ ajoute fiches clients, ressources, réservations, encaissements et rappels (niveau 2).

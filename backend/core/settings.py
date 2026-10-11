@@ -223,7 +223,17 @@ X_FRAME_OPTIONS = "DENY"
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "formatters": {"structured": {"format": "%(asctime)s %(levelname)s %(name)s %(message)s request_id=%(request_id)s path=%(path)s status=%(status)s duration_ms=%(duration_ms)s"}},
-    "handlers": {"console": {"class": "logging.StreamHandler", "formatter": "structured"}},
-    "loggers": {"qr_register.request": {"handlers": ["console"], "level": "INFO", "propagate": False}},
+    "formatters": {
+        "structured": {"format": "%(asctime)s %(levelname)s %(name)s %(message)s request_id=%(request_id)s path=%(path)s status=%(status)s duration_ms=%(duration_ms)s"},
+        "plain": {"format": "%(asctime)s %(levelname)s %(name)s %(message)s"},
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "structured"},
+        "console_plain": {"class": "logging.StreamHandler", "formatter": "plain"},
+    },
+    "loggers": {
+        "qr_register.request": {"handlers": ["console"], "level": "INFO", "propagate": False},
+        # Connexion Facebook/Apple : cause réelle d'un échec « provider » (jamais de secret dans les messages).
+        "qr_register.oauth": {"handlers": ["console_plain"], "level": "INFO", "propagate": False},
+    },
 }

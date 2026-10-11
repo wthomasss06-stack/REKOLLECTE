@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-import Loader from "@/components/Loader";
+import { DashboardShellSkeleton } from "@/components/ui/Skeleton";
 import { useAuthContext } from "@/context/AuthContext";
 import { readSessionCache } from "@/lib/sessionStore";
 
@@ -25,5 +25,5 @@ export default function OAuthCallbackPage() {
       .catch(() => router.replace("/connexion?auth_error=session"));
   }, [restoreSession, router]);
 
-  return <Loader fullScreen />;
+  return <DashboardShellSkeleton label="Connexion en cours…" />;
 }

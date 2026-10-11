@@ -16,15 +16,15 @@ const sans = Chelsea_Market({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: "REKOLLECTE | Registre visiteurs QR Code & gestion d’établissement", template: "%s — REKOLLECTE" },
+  title: { default: "REKOLLECTE | Logiciel de gestion des visiteurs par QR Code", template: "%s — REKOLLECTE" },
   description: SITE_DESCRIPTION,
-  keywords: ["registre visiteurs numérique", "QR Code accueil", "registre digital", "cahier de visite digital", "tablette accueil", "visiteurs sans compte", "gestion d’établissement", "logiciel de réservation", "logiciel gestion hôtel", "REKOLLECTE", "REKOLLECTE+", "Abidjan", "Côte d’Ivoire"],
+  keywords: ["logiciel de gestion des visiteurs", "registre numérique des visiteurs", "gestion des visiteurs par QR code", "logiciel de gestion de l’accueil", "formulaire d’accueil numérique", "registre de visite en ligne", "logiciel de suivi des visiteurs", "gestion des visiteurs en entreprise", "registre visiteurs Côte d’Ivoire", "cahier de visite digital", "visiteurs sans compte", "REKOLLECTE", "REKOLLECTE+", "Abidjan"],
   applicationName: "REKOLLECTE",
   authors: [{ name: "AKATech Studio", url: "https://akatech.vercel.app" }],
   publisher: "AKATech Studio",
   category: "business",
-  openGraph: { type: "website", locale: "fr_FR", siteName: "REKOLLECTE", title: "REKOLLECTE | Registre visiteurs QR Code & gestion d’établissement", description: SITE_DESCRIPTION, url: SITE_URL, images: [OG_IMAGE] },
-  twitter: { card: "summary_large_image", title: "REKOLLECTE | Registre visiteurs & gestion d’établissement", description: SITE_DESCRIPTION, images: [OG_IMAGE.url] },
+  openGraph: { type: "website", locale: "fr_FR", siteName: "REKOLLECTE", title: "REKOLLECTE | Logiciel de gestion des visiteurs par QR Code", description: SITE_DESCRIPTION, url: SITE_URL, images: [OG_IMAGE] },
+  twitter: { card: "summary_large_image", title: "REKOLLECTE | Logiciel de gestion des visiteurs par QR Code", description: SITE_DESCRIPTION, images: [OG_IMAGE.url] },
   manifest: "/manifest.json",
   icons: {
     icon: [

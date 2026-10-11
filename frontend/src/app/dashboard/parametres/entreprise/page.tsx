@@ -1,10 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import CloudinaryImageUploader from "@/components/CloudinaryImageUploader";
 import { useDialog } from "@/components/ui/DialogProvider";
 import Loader from "@/components/Loader";
+import AutoRetry from "@/components/ui/AutoRetry";
 import { apiClient } from "@/lib/api";
 import type { Organization, UserProfile } from "@/types";
 
@@ -19,7 +20,9 @@ export default function EntreprisePage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => { Promise.all([apiClient.get<UserProfile>("/auth/me/"), apiClient.get<Organization>("/org/me/")]).then(([u, o]) => { setUser(u.data); setOrg(o.data); setName(o.data.name); setLogo(o.data.logo_url || ""); }).catch(() => setError("Impossible de charger les réglages.")); }, []);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const load = useCallback(() => { setLoadFailed(false); Promise.all([apiClient.get<UserProfile>("/auth/me/"), apiClient.get<Organization>("/org/me/")]).then(([u, o]) => { setUser(u.data); setOrg(o.data); setName(o.data.name); setLogo(o.data.logo_url || ""); }).catch(() => setLoadFailed(true)); }, []);
+  useEffect(() => { load(); }, [load]);
 
   const save = async (event: React.FormEvent) => {
     event.preventDefault(); setBusy(true); setError("");
@@ -46,7 +49,7 @@ export default function EntreprisePage() {
     if (ok && action !== "suspend") router.push("/");
   };
 
-  if (!user || !org) return error ? <p className="text-sm text-error-text">{error}</p> : <Loader fullScreen={false} />;
+  if (!user || !org) return loadFailed ? <AutoRetry variant="form" onRetry={load} label="Chargement des réglages…" /> : <Loader fullScreen={false} variant="form" label="Chargement des réglages…" />;
   const boss = user.role === "BOSS";
   return <div className="max-w-2xl space-y-6"><div><h2 className="font-heading text-xl font-bold text-ink">Entreprise</h2><p className="mt-1 text-sm text-ink-soft">Identité de l’établissement et actions liées à ton compte.</p></div><form onSubmit={save} className="space-y-5 rounded-2xl border border-border bg-surface p-5"><div><label className="mb-1.5 block text-sm font-medium text-ink">Nom de l’entreprise</label><input disabled={!boss} value={name} onChange={(e) => setName(e.target.value)} className="w-full rounded-lg border border-border bg-canvas px-3 py-3 text-sm text-ink disabled:opacity-60" /></div><CloudinaryImageUploader value={logo} onChange={setLogo} disabled={!boss} />{boss ? <button disabled={busy} className="rounded-full bg-cta px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{saved ? "Enregistré" : busy ? "Enregistrement…" : "Enregistrer les changements"}</button> : <p className="rounded-lg bg-canvas p-3 text-xs text-ink-soft">Seul le patron peut changer le nom et le logo de l’entreprise.</p>}</form><section className="rounded-2xl border border-border bg-surface p-5"><h3 className="font-semibold text-ink">Zone sensible</h3><p className="mt-1 text-sm text-ink-soft">Ces actions sont irréversibles ou coupent l’accès de l’équipe.</p><div className="mt-4 flex flex-wrap gap-3">{boss && <><button onClick={() => void lifecycle("suspend")} className="rounded-full border border-border px-4 py-2.5 text-sm text-ink">Suspendre l’entreprise</button><button onClick={() => void lifecycle("delete")} className="rounded-full border border-error-text px-4 py-2.5 text-sm text-error-text">Supprimer l’entreprise</button></>}{!boss && <button onClick={() => void lifecycle("leave")} className="rounded-full border border-error-text px-4 py-2.5 text-sm text-error-text">Quitter et désactiver mon compte</button>}</div></section>{error && <p className="text-sm text-error-text">{error}</p>}</div>;
 }

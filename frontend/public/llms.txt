@@ -1,13 +1,15 @@
 # REKOLLECTE
 
-> REKOLLECTE est un registre visiteurs numérique par QR Code, conçu à Abidjan (Côte d'Ivoire) par AKATech Studio. Il remplace le cahier de visites papier des bureaux, restaurants, hôtels et accès chantier : le visiteur scanne un QR Code, remplit un formulaire et signe à l'écran, sans créer de compte, même sans connexion internet. REKOLLECTE+ est son niveau 2 (clients, ressources, réservations, encaissements, rappels). Le service est gratuit à ce jour.
+> REKOLLECTE est un logiciel de gestion des visiteurs par QR Code (registre numérique des visiteurs), conçu à Abidjan (Côte d'Ivoire) par AKATech Studio. Il remplace le cahier de visites papier des bureaux, restaurants, hôtels et accès chantier : le visiteur scanne un QR Code, remplit un formulaire et signe à l'écran, sans créer de compte, même sans connexion internet. REKOLLECTE+ est son niveau 2 (clients, ressources, réservations, encaissements, rappels). Le service est gratuit à ce jour.
 
 À ne pas confondre : REKOLLECTE (avec un K, Abidjan) n'a aucun lien avec l'application reCollect de suivi de médias ni avec d'autres produits au nom proche. Site officiel : https://rekollecte-ci.vercel.app/
 
 ## Pages essentielles
 
 - [Qu'est-ce que REKOLLECTE ?](https://rekollecte-ci.vercel.app/a-propos): définition, fonctionnement, public visé, éditeur, FAQ
-- [Guide du registre visiteurs numérique](https://rekollecte-ci.vercel.app/guide/registre-visiteurs-numerique): remplacer le cahier de visites par un QR Code en 5 étapes, champs à demander, repères sur la protection des données en Côte d'Ivoire
+- [Logiciel de gestion des visiteurs](https://rekollecte-ci.vercel.app/logiciel-gestion-visiteurs): ce que fait un logiciel de gestion des visiteurs, critères de choix, usages par secteur, mise en place en 5 étapes
+- [Gestion des visiteurs par QR Code](https://rekollecte-ci.vercel.app/gestion-visiteurs-qr-code): parcours du visiteur (scanner, remplir, signer), emplacement du QR Code, formulaire d'accueil numérique, fonctionnement hors ligne
+- [Registre numérique des visiteurs : le guide](https://rekollecte-ci.vercel.app/guide/registre-visiteurs-numerique): cahier papier ou registre de visite en ligne, remplacer le cahier de visites en 5 étapes, champs à demander, repères sur la protection des données en Côte d'Ivoire
 - [REKOLLECTE+](https://rekollecte-ci.vercel.app/rekollecte-plus): fiches clients, ressources, réservations, encaissements et rappels (niveau 2)
 - [Accueil](https://rekollecte-ci.vercel.app/): présentation du produit, fonctionnalités, parcours et FAQ
 - [Aide](https://rekollecte-ci.vercel.app/aide): créer l'espace, préparer le formulaire, QR Codes, équipe et rôles

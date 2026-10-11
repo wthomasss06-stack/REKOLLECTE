@@ -1,6 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import ServerWakeBanner from "@/components/ServerWakeBanner";
 import WebVitals from "@/components/WebVitals";
 import { DialogProvider } from "@/components/ui/DialogProvider";
 import { AuthProvider } from "@/context/AuthContext";
@@ -30,5 +31,5 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  return <GoogleOAuthProvider clientId={clientId}><AuthProvider><WebVitals /><DialogProvider>{children}</DialogProvider></AuthProvider></GoogleOAuthProvider>;
+  return <GoogleOAuthProvider clientId={clientId}><AuthProvider><WebVitals /><ServerWakeBanner /><DialogProvider>{children}</DialogProvider></AuthProvider></GoogleOAuthProvider>;
 }

@@ -101,6 +101,31 @@ h1, h2, h3, h4 {
   @apply font-bold text-mk-ink;
 }
 
+.prose-legal ol {
+  @apply mt-3 list-decimal space-y-2 pl-5;
+}
+
+/* Tableaux comparatifs des pages de référencement : défilement horizontal sur mobile, jamais de scroll de page. */
+.prose-legal .table-wrap {
+  @apply mt-4 overflow-x-auto rounded-xl border border-border;
+}
+
+.prose-legal table {
+  @apply w-full min-w-[34rem] border-collapse text-left text-sm;
+}
+
+.prose-legal th {
+  @apply border-b border-border bg-surface px-3 py-2.5 font-bold text-mk-ink;
+}
+
+.prose-legal td {
+  @apply border-b border-border px-3 py-2.5 align-top;
+}
+
+.prose-legal tr:last-child td {
+  @apply border-b-0;
+}
+
 .prose-legal .legal-warning {
   @apply mt-10 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-200;
 }
@@ -162,6 +187,20 @@ h1, h2, h3, h4 {
 .qr-staggered-menu__footer { margin: auto 20px 0; border-top: 1px solid rgb(var(--c-ink) / 0.1); padding: 20px 0 max(24px, env(safe-area-inset-bottom)); color: rgb(var(--c-ink-soft)); font-size: 12px; line-height: 1.5; }
 @media (min-width: 768px) { .qr-staggered-menu, .qr-staggered-trigger { display: none; } }
 @media (prefers-reduced-motion: reduce) { .qr-staggered-menu { transition: none; } }
+
+/* Squelettes de chargement (components/ui/Skeleton.tsx) : bloc teinté + reflet qui balaye. */
+/* Dans @layer components : les utilitaires Tailwind (absolute, rounded-full…) gardent la priorité sur ce style de base. */
+@layer components {
+  .qr-skeleton { position: relative; overflow: hidden; border-radius: 10px; background: rgb(var(--c-ink) / 0.07); }
+  .qr-skeleton::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgb(var(--c-ink) / 0.07), transparent); animation: qr-shimmer 1.5s ease-in-out infinite; }
+}
+@keyframes qr-shimmer { to { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) { .qr-skeleton::after { animation: none; } }
+
+/* Pastille « le serveur se réveille » : n'apparaît qu'après 0,5 s pour éviter tout clignotement. */
+.qr-wake-pill { animation: qr-wake-in 0.3s ease-out 0.5s both; }
+@keyframes qr-wake-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .qr-wake-pill { animation: none; } }
 
 /* Loader de connexion plein écran. */
 .qr-login-loader { position: fixed; inset: 0; z-index: 100; display: flex; min-height: 100dvh; flex-direction: column; justify-content: flex-end; background: rgb(var(--c-canvas)); padding: 24px; color: rgb(var(--c-ink)); }

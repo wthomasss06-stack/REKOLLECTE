@@ -8,7 +8,7 @@ import PwaInstallButton from "./PwaInstallButton";
 
 const COLUMNS: { title: string; links: [string, string][] }[] = [
   { title: "Produit", links: [["Fonctionnalités", "/#fonctionnalites"], ["Comment ça marche", "/#comment-ca-marche"], ["REKOLLECTE+", "/rekollecte-plus"], ["Se connecter", "/connexion"]] },
-  { title: "Ressources", links: [["Aide", "/aide"], ["Guide du registre numérique", "/guide/registre-visiteurs-numerique"], ["À propos", "/a-propos"], ["Crédits", "/credits"]] },
+  { title: "Ressources", links: [["Logiciel de gestion des visiteurs", "/logiciel-gestion-visiteurs"], ["Gestion des visiteurs par QR Code", "/gestion-visiteurs-qr-code"], ["Guide du registre numérique", "/guide/registre-visiteurs-numerique"], ["Aide", "/aide"], ["À propos", "/a-propos"], ["Crédits", "/credits"]] },
 ];
 
 const LEGAL: [string, string][] = [["Confidentialité", "/confidentialite"], ["CGU", "/cgu"], ["Mentions légales", "/mentions-legales"]];

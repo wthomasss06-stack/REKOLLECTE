@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 
 import Loader from "@/components/Loader";
+import AutoRetry from "@/components/ui/AutoRetry";
 import QRCodeManager from "@/components/QRCodeManager";
 import { apiClient } from "@/lib/api";
 import type { FormTemplate, Organization, UserProfile } from "@/types";
@@ -28,20 +29,8 @@ export default function QRCodePage() {
 
   useEffect(load, []);
 
-  if (state === "loading") return <Loader fullScreen={false} />;
-  if (state === "error" || !org) {
-    return (
-      <div className="flex flex-col items-start gap-3">
-        <p className="text-ink-soft">Impossible de charger le QR Code.</p>
-        <button
-          onClick={load}
-          className="rounded-full bg-cta px-4 py-2 text-sm font-medium text-white transition duration-200 ease-quiet hover:-translate-y-0.5 hover:bg-cta-hover"
-        >
-          Réessayer
-        </button>
-      </div>
-    );
-  }
+  if (state === "loading") return <Loader fullScreen={false} variant="qr" label="Chargement du QR Code…" />;
+  if (state === "error" || !org) return <AutoRetry variant="qr" onRetry={load} />;
 
   return (
     <div className="space-y-6">

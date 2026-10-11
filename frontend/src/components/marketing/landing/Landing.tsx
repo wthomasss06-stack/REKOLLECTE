@@ -162,8 +162,8 @@ export default function Landing() {
               </span>
             </h1>
             <p className="hero-fade mt-6 max-w-xl text-[0.95rem] leading-relaxed text-white/90 sm:text-base">
-              REKOLLECTE remplace le registre papier des bureaux, restaurants, hôtels et accès chantier : le visiteur
-              scanne, remplit, signe. Sans compte, même hors-ligne.
+              REKOLLECTE est le logiciel de gestion des visiteurs par QR Code qui remplace le registre papier des bureaux,
+              restaurants, hôtels et accès chantier : le visiteur scanne, remplit, signe. Sans compte, même hors-ligne.
             </p>
             <div className="hero-fade mt-8 flex flex-wrap items-center justify-center gap-3">
               <Link href="/connexion" className="lp-glass lp-glass--primary">Se connecter <ArrowUpRight size={14} /></Link>
@@ -383,6 +383,25 @@ export default function Landing() {
             })}
           </div>
         </div>
+      </section>
+
+      {/* ——— Pour aller plus loin : maillage interne vers les pages de référencement ——— */}
+      <section aria-labelledby="ressources-titre" className="mx-auto w-full max-w-[1180px] px-4 pb-6 sm:px-6">
+        <h2 id="ressources-titre" className="text-xl font-bold tracking-[-0.02em] text-ink sm:text-2xl">Pour aller plus loin</h2>
+        <ul className="mt-5 grid gap-3 md:grid-cols-3">
+          {[
+            { href: "/logiciel-gestion-visiteurs", title: "Logiciel de gestion des visiteurs", text: "Les critères pour bien choisir son outil et le mettre en place." },
+            { href: "/gestion-visiteurs-qr-code", title: "Gestion des visiteurs par QR Code", text: "Scanner, remplir, signer : le parcours du visiteur, même hors ligne." },
+            { href: "/guide/registre-visiteurs-numerique", title: "Registre numérique des visiteurs", text: "Le guide pour remplacer le cahier de visites papier." },
+          ].map((item) => (
+            <li key={item.href}>
+              <Link href={item.href} className="block h-full rounded-2xl border border-border bg-surface p-5 transition hover:border-ink/40">
+                <span className="flex items-center justify-between gap-3 text-sm font-bold text-ink">{item.title} <ArrowUpRight size={14} aria-hidden="true" /></span>
+                <span className="mt-2 block text-sm leading-relaxed text-ink-soft">{item.text}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </section>
 
       {/* ——— CTA final : texte au-dessus, affiche REKOLLECTE+ en fond (PC paysage / mobile portrait) ——— */}

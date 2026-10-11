@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 import InviteStaff from "@/components/dashboard/InviteStaff";
 import Loader from "@/components/Loader";
+import AutoRetry from "@/components/ui/AutoRetry";
 import { useDialog } from "@/components/ui/DialogProvider";
 import PermissionMatrixModal from "@/components/dashboard/PermissionMatrixModal";
 import OrgChart from "@/components/dashboard/OrgChart";
@@ -47,10 +48,8 @@ export default function EquipePage() {
     });
   };
 
-  if (state === "loading") return <Loader fullScreen={false} />;
-  if (state === "error" || !user || !team) {
-    return <div className="flex flex-col items-start gap-3"><p className="text-ink-soft">Impossible de charger cette page.</p><button onClick={load} className="rounded-full bg-cta px-4 py-2 text-sm font-medium text-cta-ink">Réessayer</button></div>;
-  }
+  if (state === "loading") return <Loader fullScreen={false} variant="list" label="Chargement de l’équipe…" />;
+  if (state === "error" || !user || !team) return <AutoRetry variant="list" onRetry={load} label="Chargement de l’équipe…" />;
 
   const isBoss = user.role === "BOSS";
   return (

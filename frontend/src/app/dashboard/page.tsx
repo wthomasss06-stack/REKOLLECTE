@@ -4,6 +4,7 @@ import { ChartLineUp, Clock, TrendUp, UsersThree } from "@phosphor-icons/react";
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import Loader from "@/components/Loader";
+import AutoRetry from "@/components/ui/AutoRetry";
 import CheckInsTable from "@/components/CheckInsTable";
 import { apiClient } from "@/lib/api";
 import { normalizeApiError } from "@/lib/errors";
@@ -78,8 +79,11 @@ export default function RegistrePage() {
     try { await exportAllToCSV(orgName); } finally { setExporting(false); }
   };
 
-  if (state === "loading") return <Loader fullScreen={false} />;
-  if (state === "error") return <div role="alert" className="flex max-w-xl flex-col items-start gap-3 rounded-xl border border-border bg-surface p-5"><h1 className="font-semibold text-ink">Impossible de charger le registre</h1><p className="text-sm text-ink-soft">{loadError}</p><div className="flex flex-wrap gap-3">{sessionExpired && <a href="/" className="rounded-full bg-cta px-4 py-2.5 text-sm font-medium text-white">Retour à la connexion</a>}<button onClick={() => { firstLoad.current = true; void load(true); }} className="rounded-full border border-border px-4 py-2.5 text-sm font-medium text-ink">Réessayer</button></div></div>;
+  if (state === "loading") return <Loader fullScreen={false} variant="registre" label="Chargement du registre…" />;
+  // Session réellement morte : on explique et on renvoie vers la connexion. Toute autre panne (serveur qui dort, réseau,
+  // erreur passagère) : la page reste en squelette et se relance toute seule, sans bouton « Réessayer ».
+  if (state === "error" && sessionExpired) return <div role="alert" className="flex max-w-xl flex-col items-start gap-3 rounded-xl border border-border bg-surface p-5"><h1 className="font-semibold text-ink">Ta session a expiré</h1><p className="text-sm text-ink-soft">{loadError}</p><a href="/connexion" className="rounded-full bg-cta px-4 py-2.5 text-sm font-medium text-white">Retour à la connexion</a></div>;
+  if (state === "error") return <AutoRetry variant="registre" onRetry={() => { firstLoad.current = true; void load(true); }} />;
 
   return <div className="space-y-6">
     <div className="flex flex-wrap items-start justify-between gap-4"><div><h1 className="text-2xl font-bold text-ink">{karnetEnabled ? "Clients" : "Registre"}</h1><p className="text-sm text-ink-soft">{stats?.total ?? totalCount} {karnetEnabled ? "client" : "visiteur"}{(stats?.total ?? totalCount) > 1 ? "s" : ""} · {karnetEnabled ? "les passages alimentent automatiquement les fiches clients" : "actualisation automatique toutes les 30 secondes"}{lastUpdated ? ` · ${lastUpdated.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}` : ""}</p></div><div className="flex flex-wrap items-center justify-end gap-3"><div className="flex max-w-full items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2"><div className="grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-full bg-canvas text-xs font-bold text-ink">{user?.avatar_url && !avatarFailed ? <img src={user.avatar_url} alt={`Photo de ${user.full_name || user.email}`} className="h-full w-full object-cover" referrerPolicy="no-referrer" onError={() => setAvatarFailed(true)} /> : (user?.full_name || user?.email || "?").slice(0, 1).toUpperCase()}</div><div className="min-w-0"><p className="max-w-[150px] truncate text-xs font-semibold text-ink">{user?.full_name || user?.email}</p><p className="text-[11px] text-ink-soft">{user?.role === "BOSS" ? "Patron" : user?.role === "GERANT" ? "Gérant" : "Staff"}</p></div></div>{canExport && <button onClick={() => void handleExport()} disabled={totalCount === 0 || exporting} className="rounded-full bg-cta px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50">{exporting ? "Export en cours…" : "Exporter en CSV"}</button>}</div></div>

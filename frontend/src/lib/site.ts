@@ -8,13 +8,16 @@ export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://rekollecte
 export const SITE_NAME = "REKOLLECTE";
 // Description unique (snippet Google, Open Graph, Twitter) : valeur proposée, puis passage à REKOLLECTE+.
 export const SITE_DESCRIPTION =
-  "Gérez vos visiteurs avec un simple QR Code, sans compte ni cahier. Passez à REKOLLECTE+ pour gérer clients, ressources et réservations.";
+  "Logiciel de gestion des visiteurs par QR Code : registre numérique sans compte pour le visiteur, même hors ligne. Gratuit à ce jour, conçu à Abidjan.";
 export const OG_IMAGE = { url: "/og/rekollecte-og.jpg", width: 1200, height: 630, alt: "REKOLLECTE : le registre visiteurs par QR Code, sans compte, même hors ligne" } as const;
 export const PUBLISHER = { name: "AKATech Studio", url: "https://akatech.vercel.app", logo: "/akatech-studio-logo.webp" } as const;
 
 // Date de dernière révision éditoriale des pages de contenu (signal de fraîcheur, à mettre à jour avec le contenu).
 export const CONTENT_UPDATED_ISO = "2026-10-04";
 export const CONTENT_UPDATED_LABEL = "4 octobre 2026";
+// Révision des pages de référencement (accueil, guide du registre numérique, pages « logiciel » et « QR Code »).
+export const SEO_UPDATED_ISO = "2026-10-11";
+export const SEO_UPDATED_LABEL = "11 octobre 2026";
 
 // Identifiants JSON-LD stables : relient les entités entre elles (éditeur, site, applications) sur toutes les pages.
 export const IDS = {

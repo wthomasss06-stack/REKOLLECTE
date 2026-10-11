@@ -1,10 +1,12 @@
 """Connexion / liaison Facebook et Apple : démarrage puis retour (callback) côté serveur."""
 import hmac
+import logging
 import secrets
 from urllib.parse import urlencode
 
 from django.conf import settings
 from django.core import signing
+from django.core.cache import cache
 from django.http import HttpResponseRedirect
 from rest_framework import throttling
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -25,6 +27,8 @@ from .services import (
     unlink_identity,
 )
 
+logger = logging.getLogger("qr_register.oauth")
+
 PROVIDERS = {"facebook", "apple"}
 
 
@@ -39,6 +43,10 @@ def provider_enabled(provider: str) -> bool:
 
 STATE_SALT = "oauth-state"
 STATE_MAX_AGE = 600  # 10 minutes pour terminer la connexion chez le fournisseur
+# Le code d'autorisation d'un fournisseur est à usage unique. Si le navigateur rejoue le même retour (double tap sur
+# « Continuer » chez Facebook, navigation en double), le 2e échange échouerait en « provider » alors que le 1er a réussi
+# et que sa réponse a été abandonnée par le navigateur. On mémorise donc brièvement l'issue d'un retour réussi.
+REPLAY_WINDOW = 120
 
 
 def _frontend(path: str, **params) -> str:
@@ -134,13 +142,24 @@ class OAuthCallbackView(APIView):
         if params.get("error") or not params.get("code"):
             return _fail("cancelled", mode, clear=True)  # l'utilisateur a refusé chez le fournisseur
 
+        # Même retour rejoué (même `state` + même cookie nonce, déjà traité avec succès il y a moins de 2 min) : on rejoue l'issue.
+        done = cache.get(self._done_key(provider, payload))
+        if done:
+            replayed = User.objects.filter(id=done.get("uid"), is_active=True).first()
+            if replayed is not None:
+                logger.info("oauth %s: retour rejoué, issue précédente reprise (mode=%s)", provider, mode)
+                return self._success(request, replayed, bool(done.get("created")), mode, provider, payload)
+
         # 2. le serveur échange le code et relit l'identité chez le fournisseur.
         try:
             if provider == "facebook":
                 profile = oauth.facebook_profile(str(params["code"]))
             else:
                 profile = oauth.apple_profile(str(params["code"]), payload["n"], str(params.get("user", "")))
-        except oauth.OAuthError:
+        except oauth.OAuthError as exc:
+            # La cause réelle (code déjà utilisé, URI de redirection différente, secret erroné, version Graph…) n'est
+            # visible nulle part ailleurs : le navigateur ne reçoit que « provider ». Le message ne contient jamais de secret.
+            logger.warning("oauth %s: échange refusé (mode=%s): %s", provider, mode, exc)
             return _fail("provider", mode, clear=True)
 
         # 3. résolution anti-doublon (ou liaison si l'utilisateur était connecté).
@@ -160,6 +179,15 @@ class OAuthCallbackView(APIView):
         if not user.is_active:
             return _fail("access_revoked", mode, clear=True)
 
+        cache.set(self._done_key(provider, payload), {"uid": str(user.id), "created": created}, REPLAY_WINDOW)
+        return self._success(request, user, created, mode, provider, payload)
+
+    @staticmethod
+    def _done_key(provider: str, payload: dict) -> str:
+        return f"oauth-done:{provider}:{payload.get('n')}"
+
+    @staticmethod
+    def _success(request, user: User, created: bool, mode: str, provider: str, payload: dict):
         if mode == "link":
             if user.organization_id:
                 AuditEvent.objects.create(organization=user.organization, actor=user, action="auth.identity_linked",

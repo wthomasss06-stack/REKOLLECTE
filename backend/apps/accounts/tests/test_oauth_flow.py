@@ -272,3 +272,71 @@ def test_unconfigured_provider_is_disabled_everywhere(settings, db):
     assert APIClient().get("/api/v1/auth/facebook/start/").status_code == 404
     assert APIClient().get("/api/v1/auth/facebook/callback/", {"state": "x", "code": "y"}).status_code == 404
     assert APIClient().get("/api/v1/auth/apple/start/").status_code == 302  # Apple, lui, est configuré
+
+
+# ------------------------------------------------- Retour rejoué (double tap, navigation en double)
+
+def test_duplicate_callback_replays_the_first_outcome_instead_of_failing_on_a_consumed_code(db):
+    """Facebook ne délivre un code qu'une fois : si le navigateur rejoue le retour pendant que le 1er est en vol,
+    le 2e échange échoue. La personne doit tout de même arriver connectée, pas voir « provider »."""
+    from apps.accounts.oauth import OAuthError
+
+    client = APIClient()
+    _, state = start(client, "facebook")
+    nonce = client.cookies["qr_oauth_state"].value
+    with patch("apps.accounts.oauth.facebook_profile", return_value=fb()):
+        first = client.get("/api/v1/auth/facebook/callback/", {"state": state, "code": "abc"})
+    assert where(first) == ("/connexion/callback", {"new": "1"})
+
+    client.cookies["qr_oauth_state"] = nonce  # le 2e retour est parti avant que le 1er n'ait supprimé le cookie
+    with patch("apps.accounts.oauth.facebook_profile", side_effect=OAuthError("invalid_grant")) as exchange:
+        second = client.get("/api/v1/auth/facebook/callback/", {"state": state, "code": "abc"})
+
+    exchange.assert_not_called()  # on ne rééchange pas un code déjà consommé
+    assert where(second) == ("/connexion/callback", {"new": "1"})  # même issue que le 1er retour
+    assert second.cookies["qr_refresh_token"].value and User.objects.count() == 1
+
+
+def test_replay_does_not_resurrect_an_account_deactivated_in_between(db):
+    from apps.accounts.oauth import OAuthError
+
+    client = APIClient()
+    _, state = start(client, "facebook")
+    nonce = client.cookies["qr_oauth_state"].value
+    with patch("apps.accounts.oauth.facebook_profile", return_value=fb()):
+        client.get("/api/v1/auth/facebook/callback/", {"state": state, "code": "abc"})
+    User.objects.update(is_active=False)
+
+    client.cookies["qr_oauth_state"] = nonce
+    with patch("apps.accounts.oauth.facebook_profile", side_effect=OAuthError("invalid_grant")):
+        second = client.get("/api/v1/auth/facebook/callback/", {"state": state, "code": "abc"})
+
+    assert where(second)[1] == {"auth_error": "provider"} and "qr_refresh_token" not in second.cookies
+
+
+def test_provider_failure_is_logged_with_its_real_cause_and_no_secret(db, caplog, monkeypatch):
+    import logging
+
+    from apps.accounts.oauth import OAuthError
+
+    monkeypatch.setattr(logging.getLogger("qr_register.oauth"), "propagate", True)  # caplog écoute la racine
+    client = APIClient()
+    _, state = start(client, "facebook")
+    with caplog.at_level(logging.WARNING, logger="qr_register.oauth"), \
+            patch("apps.accounts.oauth.facebook_profile", side_effect=OAuthError("{'message': 'This authorization code has been used.'}")):
+        response = client.get("/api/v1/auth/facebook/callback/", {"state": state, "code": "abc"})
+
+    assert where(response)[1] == {"auth_error": "provider"}
+    assert "authorization code has been used" in caplog.text and "secret" not in caplog.text and "abc" not in caplog.text
+
+
+def test_network_errors_never_leak_the_client_secret_into_the_error_message():
+    import requests
+
+    from apps.accounts import oauth
+
+    leaky = requests.ConnectionError("HTTPSConnectionPool: /oauth/access_token?client_secret=secret&code=abc")
+    with patch("apps.accounts.oauth.requests.get", side_effect=leaky), pytest.raises(oauth.OAuthError) as caught:
+        oauth.facebook_profile("abc")
+
+    assert "secret" not in str(caught.value) and "abc" not in str(caught.value) and "ConnectionError" in str(caught.value)

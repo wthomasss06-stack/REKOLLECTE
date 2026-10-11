@@ -76,8 +76,11 @@ def facebook_profile(code: str) -> ProviderProfile:
             "fields": "id,name,email,picture.type(large)",
             "access_token": token,
         }))
-    except (requests.RequestException, KeyError) as exc:
-        raise OAuthError(str(exc)) from exc
+    except requests.RequestException as exc:
+        # str(exc) contiendrait l'URL complète (donc client_secret et code) : on n'en garde que le type.
+        raise OAuthError(f"Facebook injoignable ({type(exc).__name__})") from exc
+    except KeyError as exc:
+        raise OAuthError(f"réponse Facebook incomplète (champ {exc})") from exc
 
     if not debug.get("is_valid") or str(debug.get("app_id")) != str(settings.FACEBOOK_APP_ID):
         raise OAuthError("jeton Facebook émis pour une autre application")
@@ -141,7 +144,7 @@ def apple_profile(code: str, nonce: str, user_json: str = "") -> ProviderProfile
             options={"require": ["exp", "iat", "iss", "aud", "sub"]},
         )
     except (requests.RequestException, KeyError, jwt.PyJWTError) as exc:
-        raise OAuthError(str(exc)) from exc
+        raise OAuthError(f"Apple : {type(exc).__name__}") from exc
 
     if claims.get("nonce") != nonce:
         raise OAuthError("nonce Apple invalide")

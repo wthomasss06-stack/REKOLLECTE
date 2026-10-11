@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import Loader from "@/components/Loader";
+import AutoRetry from "@/components/ui/AutoRetry";
 import FeedbackWidget from "@/components/FeedbackWidget";
 import { apiClient } from "@/lib/api";
 import type { UserProfile } from "@/types";
@@ -31,15 +32,8 @@ export default function ParametresLayout({ children }: { children: React.ReactNo
   };
   useEffect(loadRole, []);
 
-  if (failed) {
-    return (
-      <div className="space-y-3">
-        <p className="text-ink-soft">Impossible de charger les paramètres.</p>
-        <button onClick={loadRole} className="rounded-full bg-cta px-4 py-2.5 text-sm font-medium text-white">Réessayer</button>
-      </div>
-    );
-  }
-  if (!role) return <Loader fullScreen={false} />;
+  if (failed) return <AutoRetry variant="cards" onRetry={loadRole} label="Chargement des paramètres…" />;
+  if (!role) return <Loader fullScreen={false} variant="cards" label="Chargement des paramètres…" />;
 
   const tabs = ALL_TABS.filter((tab) => (role !== "STAFF" || tab.staffCanSee) && (!tab.bossOnly || role === "BOSS"));
 

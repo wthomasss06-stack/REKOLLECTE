@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import Loader from "@/components/Loader";
+import AutoRetry from "@/components/ui/AutoRetry";
 import { useDialog } from "@/components/ui/DialogProvider";
 import { useAuthContext } from "@/context/AuthContext";
 import { apiClient } from "@/lib/api";
@@ -63,16 +64,19 @@ export default function AdministrationPage() {
     if (activated && enabling) router.push("/dashboard/karnet/ressources?onboarding=1");
   };
 
-  useEffect(() => {
+  const loadAdmin = useCallback(() => {
+    setLoading(true);
+    setError("");
     Promise.all([apiClient.get<UserProfile>("/auth/me/"), apiClient.get<PaginatedResponse<AuditEvent>>("/auth/audit/")])
       .then(([me, audit]) => {
         setUser(me.data);
         setEvents(audit.data.results);
         setHasMoreEvents(Boolean(audit.data.next));
+        setLoading(false);
       })
-      .catch(() => setError("Impossible de charger le journal d’administration."))
-      .finally(() => setLoading(false));
+      .catch(() => { setError("Impossible de charger le journal d’administration."); setLoading(false); });
   }, []);
+  useEffect(() => { loadAdmin(); }, [loadAdmin]);
 
   const loadMoreEvents = async () => {
     if (!hasMoreEvents || loadingMore) return;
@@ -91,8 +95,9 @@ export default function AdministrationPage() {
     }
   };
 
-  if (loading) return <Loader fullScreen={false} />;
-  if (error || !user) return <p className="text-sm text-error-text">{error || "Accès refusé."}</p>;
+  if (loading) return <Loader fullScreen={false} variant="list" label="Chargement de l’administration…" />;
+  if (error) return <AutoRetry variant="list" onRetry={loadAdmin} label="Chargement de l’administration…" />;
+  if (!user) return <p className="text-sm text-error-text">Accès refusé.</p>;
   if (user.role !== "BOSS") return <p className="text-sm text-error-text">Cette section est réservée au patron.</p>;
 
   return (

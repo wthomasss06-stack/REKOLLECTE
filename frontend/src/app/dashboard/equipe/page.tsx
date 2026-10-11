@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 import InviteStaff from "@/components/dashboard/InviteStaff";
 import Loader from "@/components/Loader";
+import AutoRetry from "@/components/ui/AutoRetry";
 import PermissionMatrixModal from "@/components/dashboard/PermissionMatrixModal";
 import { apiClient } from "@/lib/api";
 import type { UserProfile } from "@/types";
@@ -26,20 +27,8 @@ export default function EquipePage() {
 
   useEffect(load, []);
 
-  if (state === "loading") return <Loader fullScreen={false} />;
-  if (state === "error" || !user) {
-    return (
-      <div className="flex flex-col items-start gap-3">
-        <p className="text-ink-soft">Impossible de charger cette page.</p>
-        <button
-          onClick={load}
-          className="rounded-full bg-cta px-4 py-2 text-sm font-medium text-cta-ink transition duration-200 ease-quiet hover:-translate-y-0.5 hover:bg-cta-hover"
-        >
-          Réessayer
-        </button>
-      </div>
-    );
-  }
+  if (state === "loading") return <Loader fullScreen={false} variant="list" />;
+  if (state === "error" || !user) return <AutoRetry variant="list" onRetry={load} />;
 
   return (
     <div className="space-y-6">

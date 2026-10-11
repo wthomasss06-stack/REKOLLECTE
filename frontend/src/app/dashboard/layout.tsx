@@ -3,10 +3,10 @@
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
-import Loader from "@/components/Loader";
 import ProductIdentity from "@/components/dashboard/ProductIdentity";
 import Sidebar from "@/components/dashboard/Sidebar";
 import { useDialog } from "@/components/ui/DialogProvider";
+import { DashboardShellSkeleton } from "@/components/ui/Skeleton";
 import { useAuthContext } from "@/context/AuthContext";
 import SyncStatusBadge from "@/components/SyncStatusBadge";
 import { firstNameOf } from "@/lib/greeting";
@@ -20,7 +20,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   useEffect(() => {
     if (loading) return;
     if (!isAuthenticated) {
-      router.push("/");
+      // Session morte (confirmée par le serveur) ou jamais ouverte : on envoie vers la connexion, qui explique pourquoi.
+      router.replace("/connexion");
       return;
     }
     // Le message d’accueil attend la fin de l’ancien onboarding, puis s’affiche une seule fois.
@@ -42,7 +43,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   }, [loading, isAuthenticated, router, pathname, alert]);
 
-  if (loading && !user) return <Loader />;
+  // L’app apparaît tout de suite en squelette pendant que la session se rétablit (ou que le serveur se réveille).
+  if (loading && !user) return <DashboardShellSkeleton />;
   if (!user) return null;
 
   const isLegacyOnboarding = pathname.startsWith("/dashboard/onboarding");
