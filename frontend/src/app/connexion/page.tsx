@@ -104,15 +104,13 @@ export default function LoginPage() {
 
   return (
     <>
-      {loading && (
+      {(loading || waking) && (
         <div className="qr-login-loader" role="status" aria-live="polite" aria-label="Connexion en cours">
           <div className="qr-login-loader__content">
             <div className="qr-login-loader__brand"><Logo size={52} /><span className="font-heading text-lg font-bold">REKOLLECTE</span></div>
             <div className="qr-login-loader__head"><span>Connexion sécurisée</span></div>
             <div className="qr-login-loader__track"><span /></div>
-            <p className="qr-login-loader__label">
-              {waking ? "Le serveur se réveille, encore quelques secondes. Ne ferme pas cette page." : "Connexion en cours… Préparation de ton espace."}
-            </p>
+            <p className="qr-login-loader__label">Préparation de ton espace…</p>
           </div>
         </div>
       )}
@@ -192,16 +190,9 @@ export default function LoginPage() {
                 </>
               )}
 
-              {waking ? (
-                <p role="status" className="flex items-start gap-2.5 rounded-xl bg-canvas p-3 text-xs leading-relaxed text-ink-soft">
-                  <span aria-hidden="true" className="mt-0.5 h-3.5 w-3.5 shrink-0 animate-spin rounded-full border-2 border-cta/25 border-t-cta" />
-                  <span>Le serveur se réveille (jusqu’à 30 secondes). Tu peux déjà te connecter : la connexion partira dès qu’il est prêt.</span>
-                </p>
-              ) : (
-                <p className="flex items-center justify-center gap-2 text-xs text-ink-soft">
-                  <LockKey size={14} weight="bold" aria-hidden="true" /> Connexion sécurisée, aucun mot de passe à retenir.
-                </p>
-              )}
+              <p className="flex items-center justify-center gap-2 text-xs text-ink-soft">
+                <LockKey size={14} weight="bold" aria-hidden="true" /> Connexion sécurisée, aucun mot de passe à retenir.
+              </p>
             </div>
 
             <p className="mt-5 text-balance text-center text-xs leading-relaxed text-ink-soft">
