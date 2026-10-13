@@ -1,7 +1,10 @@
+import uuid
 from datetime import timedelta
+from decimal import Decimal
 
+from django.db import transaction
 from django.utils import timezone
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -24,6 +27,18 @@ from .serializers import (
 
 def _as_bool(raw: str) -> bool:
     return raw.strip().lower() in ("1", "true", "vrai", "oui")
+
+
+def _uuid_param(raw: str, name: str) -> uuid.UUID:
+    """Identifiant passé en paramètre d'URL : valeur invalide → 400 clair (et non une 500 sur le filtre)."""
+    try:
+        return uuid.UUID(str(raw).strip())
+    except ValueError:
+        raise serializers.ValidationError({name: "Identifiant invalide."})
+
+
+# `max_digits=12, decimal_places=2` : au-delà, la base refuse l'écriture (500). On le refuse proprement avant.
+MAX_RESERVATION_AMOUNT = Decimal("9999999999.99")
 
 
 class ClientListView(APIView):
@@ -166,9 +181,9 @@ class ReservationListView(APIView):
         if params.get("status"):
             qs = qs.filter(status=params["status"])
         if params.get("resource"):
-            qs = qs.filter(resource_id=params["resource"])
+            qs = qs.filter(resource_id=_uuid_param(params["resource"], "resource"))
         if params.get("client"):
-            qs = qs.filter(client_id=params["client"])
+            qs = qs.filter(client_id=_uuid_param(params["client"], "client"))
         if params.get("is_paid"):
             qs = qs.filter(is_paid=_as_bool(params["is_paid"]))
         if params.get("has_slot") and _as_bool(params["has_slot"]):
@@ -189,48 +204,56 @@ class ReservationListView(APIView):
         data = serializer.validated_data
         organization = request.user.organization
 
-        resource = Resource.objects.filter(id=data["resource"], organization=organization, is_active=True).first()
-        if not resource:
-            return error_response("Ressource introuvable ou inactive.", status.HTTP_404_NOT_FOUND)
-
-        if data.get("client"):
-            client = Client.objects.filter(id=data["client"], organization=organization).first()
-            if not client:
-                return error_response("Client introuvable.", status.HTTP_404_NOT_FOUND)
-        else:
-            client, _ = find_or_create_client(
-                organization,
-                full_name=data["client_name"],
-                phone=data.get("client_phone", ""),
-            )
-
         quantity = data["quantity"]
         starts_at = data.get("starts_at") or timezone.now()
-        if resource.unit == Resource.Unit.HEURE:
-            ends_at = starts_at + timedelta(hours=quantity)
-        elif resource.unit == Resource.Unit.JOUR:
-            ends_at = starts_at + timedelta(days=quantity)
-        else:
-            ends_at = None
 
-        if ends_at is not None:
-            conflict = Reservation.objects.filter(
-                organization=organization, resource=resource, status=Reservation.Status.EN_COURS,
-                starts_at__lt=ends_at, ends_at__gt=starts_at,
-            ).exists()
-            if conflict:
-                return error_response("Cette ressource est déjà réservée sur ce créneau.", status.HTTP_409_CONFLICT)
+        # Verrou sur la ressource : sans lui, deux réservations simultanées du même créneau passaient toutes deux le
+        # contrôle de conflit (lecture puis écriture non atomiques) et créaient une double réservation.
+        with transaction.atomic():
+            resource = Resource.objects.select_for_update().filter(id=data["resource"], organization=organization, is_active=True).first()
+            if not resource:
+                return error_response("Ressource introuvable ou inactive.", status.HTTP_404_NOT_FOUND)
 
-        # On paie avant de consommer : l'encaissement est enregistré avec la
-        # réservation, l'équipe n'a plus à le marquer à la main. Le créneau de
-        # rappel (starts_at -> ends_at) existe dès cet instant : c'est la
-        # réservation elle-même qui apparaît dans Rappels à son échéance.
-        now = timezone.now()
-        reservation = Reservation.objects.create(
-            organization=organization, client=client, resource=resource, quantity=quantity,
-            unit_price=resource.price, total_amount=resource.price * quantity,
-            starts_at=starts_at, ends_at=ends_at, is_paid=True, paid_at=now, created_by=request.user,
-        )
+            total_amount = resource.price * quantity
+            if total_amount > MAX_RESERVATION_AMOUNT:
+                return error_response("Montant trop élevé : réduis la quantité.", status.HTTP_400_BAD_REQUEST)
+
+            if data.get("client"):
+                client = Client.objects.filter(id=data["client"], organization=organization).first()
+                if not client:
+                    return error_response("Client introuvable.", status.HTTP_404_NOT_FOUND)
+            else:
+                client, _ = find_or_create_client(
+                    organization,
+                    full_name=data["client_name"],
+                    phone=data.get("client_phone", ""),
+                )
+
+            if resource.unit == Resource.Unit.HEURE:
+                ends_at = starts_at + timedelta(hours=quantity)
+            elif resource.unit == Resource.Unit.JOUR:
+                ends_at = starts_at + timedelta(days=quantity)
+            else:
+                ends_at = None
+
+            if ends_at is not None:
+                conflict = Reservation.objects.filter(
+                    organization=organization, resource=resource, status=Reservation.Status.EN_COURS,
+                    starts_at__lt=ends_at, ends_at__gt=starts_at,
+                ).exists()
+                if conflict:
+                    return error_response("Cette ressource est déjà réservée sur ce créneau.", status.HTTP_409_CONFLICT)
+
+            # On paie avant de consommer : l'encaissement est enregistré avec la
+            # réservation, l'équipe n'a plus à le marquer à la main. Le créneau de
+            # rappel (starts_at -> ends_at) existe dès cet instant : c'est la
+            # réservation elle-même qui apparaît dans Rappels à son échéance.
+            now = timezone.now()
+            reservation = Reservation.objects.create(
+                organization=organization, client=client, resource=resource, quantity=quantity,
+                unit_price=resource.price, total_amount=total_amount,
+                starts_at=starts_at, ends_at=ends_at, is_paid=True, paid_at=now, created_by=request.user,
+            )
         return Response(ReservationSerializer(reservation).data, status=status.HTTP_201_CREATED)
 
 

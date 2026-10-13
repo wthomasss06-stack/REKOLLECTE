@@ -4,11 +4,11 @@ import axios from "axios";
 import { Buildings, ChatCircleDots, ChartLineUp, ShieldCheck, SignOut, Trash, UsersThree } from "@phosphor-icons/react";
 import { useDialog } from "@/components/ui/DialogProvider";
 import { apiClient } from "@/lib/api";
+import { API_BASE as API_URL } from "@/lib/apiBase";
 import { setAccessToken } from "@/lib/tokenStore";
 import { dayPartWish } from "@/lib/greeting";
 import type { PlatformAuditEvent, PlatformFeedback, PlatformMember, PlatformOrganization, PlatformOverview } from "@/types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 const ADMIN_SESSION_KEY = "platform_admin_session";
 
 type Tab = "overview" | "organizations" | "members" | "feedback" | "audit";

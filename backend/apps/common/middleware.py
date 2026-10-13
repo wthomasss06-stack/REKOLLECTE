@@ -1,10 +1,33 @@
 import logging
+import re
 import time
 import uuid
 
+from django.conf import settings
+from django.http import JsonResponse
 from django.utils.deprecation import MiddlewareMixin
 
 logger = logging.getLogger("qr_register.request")
+
+_REQUEST_ID_RE = re.compile(r"^[A-Za-z0-9._\-]{1,64}$")
+
+
+class RequestBodyLimitMiddleware(MiddlewareMixin):
+    """Refuse (413) un corps de requête API plus gros que `API_MAX_BODY_BYTES`, avant toute lecture.
+
+    Django ne plafonne pas le corps lu en flux par DRF : sur les endpoints publics anonymes (synchronisation,
+    OCR), un seul envoi géant suffisait à saturer la mémoire de l'instance."""
+
+    def process_request(self, request):
+        if not request.path.startswith("/api/"):
+            return None
+        try:
+            length = int(request.META.get("CONTENT_LENGTH") or 0)
+        except (TypeError, ValueError):
+            length = 0
+        if length > settings.API_MAX_BODY_BYTES:
+            return JsonResponse({"detail": "Requête trop volumineuse.", "code": "payload_too_large"}, status=413)
+        return None
 
 
 class ApiTrailingSlashMiddleware(MiddlewareMixin):
@@ -30,7 +53,9 @@ class RequestCorrelationMiddleware(MiddlewareMixin):
     """Ajoute un identifiant de requête et journalise méthode, route, statut et durée."""
 
     def process_request(self, request):
-        request.request_id = request.headers.get("X-Request-ID") or str(uuid.uuid4())
+        supplied = request.headers.get("X-Request-ID", "")
+        # L'identifiant fourni par le client finit dans les logs et dans l'en-tête de réponse : on n'accepte qu'un format sûr.
+        request.request_id = supplied if _REQUEST_ID_RE.match(supplied) else str(uuid.uuid4())
         request.request_started_at = time.monotonic()
 
     def process_response(self, request, response):

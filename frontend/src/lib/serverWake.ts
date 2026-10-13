@@ -5,6 +5,8 @@
 // qu'il réponde, et seulement ensuite on envoie les vraies requêtes. Tout le monde (client API,
 // refresh JWT, connexion Google, bandeau d'état) partage UNE seule boucle de sonde.
 
+import { isApiJsonResponse } from "@/lib/apiBase";
+
 // Même origine (rewrite Vercel) : les cookies de session restent first-party.
 const HEALTH_URL = "/api/v1/health/";
 const PROBE_TIMEOUT_MS = 10_000;
@@ -71,7 +73,8 @@ async function probeOnce(): Promise<boolean> {
   const timer = setTimeout(() => controller.abort(), PROBE_TIMEOUT_MS);
   try {
     const response = await fetch(HEALTH_URL, { method: "GET", cache: "no-store", credentials: "omit", signal: controller.signal });
-    return response.ok && (response.headers.get("content-type") || "").includes("json");
+    // 429 : l'API a répondu (limiteur de débit) — elle est donc bien réveillée.
+    return (response.ok || response.status === 429) && isApiJsonResponse(response);
   } catch {
     return false;
   } finally {

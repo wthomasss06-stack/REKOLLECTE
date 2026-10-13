@@ -1,3 +1,7 @@
+import json
+from datetime import timedelta
+
+from django.utils import timezone
 from rest_framework import serializers
 
 from .models import AccessPoint, CheckIn, FormTemplate
@@ -5,6 +9,15 @@ from .models import AccessPoint, CheckIn, FormTemplate
 ALLOWED_FIELD_TYPES = ("text", "phone", "email", "number", "date", "select", "checkbox", "signature", "photo", "document_scan")
 DOCUMENT_TYPES = ("cni", "passport", "free")
 DOCUMENT_EXTRACT_FIELDS = ("last_name", "first_names", "document_number", "birth_date", "nationality", "expiry_date")
+
+# Plafonds de l'endpoint de synchronisation (public, sans authentification). Les photos de pièces d'identité peuvent
+# peser quelques Mo en base64 : les limites laissent de la marge à l'usage légitime mais bornent l'abus.
+MAX_SCHEMA_FIELDS = 60
+MAX_SYNC_RESPONSES_KEYS = 120
+MAX_SYNC_RESPONSES_CHARS = 6_000_000
+MAX_SYNC_SIGNATURE_CHARS = 600_000
+# Tolérance sur l'horloge d'un appareil : au-delà, une date « dans le futur » est ramenée à maintenant.
+CLIENT_CLOCK_SKEW = timedelta(minutes=10)
 
 
 class FormFieldSchemaSerializer(serializers.Serializer):
@@ -17,7 +30,7 @@ class FormFieldSchemaSerializer(serializers.Serializer):
         required=False,
         allow_null=True,
     )
-    options = serializers.ListField(child=serializers.CharField(), required=False)
+    options = serializers.ListField(child=serializers.CharField(max_length=200), required=False, max_length=100)
     document_type = serializers.ChoiceField(choices=DOCUMENT_TYPES, required=False)
     extract_fields = serializers.ListField(child=serializers.ChoiceField(choices=DOCUMENT_EXTRACT_FIELDS), required=False)
     requires_agent_validation = serializers.BooleanField(required=False, default=True)
@@ -25,7 +38,7 @@ class FormFieldSchemaSerializer(serializers.Serializer):
 
 
 class FormTemplateSerializer(serializers.ModelSerializer):
-    fields_schema = FormFieldSchemaSerializer(many=True)
+    fields_schema = FormFieldSchemaSerializer(many=True, max_length=MAX_SCHEMA_FIELDS)
 
     class Meta:
         model = FormTemplate
@@ -39,7 +52,7 @@ class FormTemplateCreateSerializer(serializers.ModelSerializer):
         fields = ["title", "fields_schema", "is_active", "is_default"]
 
     def validate_fields_schema(self, value):
-        serializer = FormFieldSchemaSerializer(data=value, many=True)
+        serializer = FormFieldSchemaSerializer(data=value, many=True, max_length=MAX_SCHEMA_FIELDS)
         serializer.is_valid(raise_exception=True)
         return serializer.validated_data
 
@@ -94,5 +107,21 @@ class CheckInSyncItemSerializer(serializers.Serializer):
     idempotency_key = serializers.UUIDField()
     qr_token = serializers.CharField(max_length=64)
     responses = serializers.DictField()
-    signature_blob = serializers.CharField(required=False, allow_blank=True, default="")
+    signature_blob = serializers.CharField(required=False, allow_blank=True, default="", max_length=MAX_SYNC_SIGNATURE_CHARS)
     created_at_client = serializers.DateTimeField()
+
+    def validate_responses(self, value):
+        if len(value) > MAX_SYNC_RESPONSES_KEYS:
+            raise serializers.ValidationError("Trop de champs dans la fiche.")
+        try:
+            size = len(json.dumps(value, ensure_ascii=False))
+        except (TypeError, ValueError):
+            raise serializers.ValidationError("Réponses illisibles.")
+        if size > MAX_SYNC_RESPONSES_CHARS:
+            raise serializers.ValidationError("Fiche trop volumineuse.")
+        return value
+
+    def validate_created_at_client(self, value):
+        # Une tablette dont l'horloge avance ne doit pas ranger ses visites dans le futur (registre et statistiques faussés).
+        now = timezone.now()
+        return now if value > now + CLIENT_CLOCK_SKEW else value

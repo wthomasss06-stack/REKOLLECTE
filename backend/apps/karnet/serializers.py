@@ -1,3 +1,6 @@
+from datetime import timedelta
+
+from django.utils import timezone
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
@@ -102,8 +105,16 @@ class ReservationCreateSerializer(serializers.Serializer):
     client_name = serializers.CharField(max_length=255, required=False)
     client_phone = serializers.CharField(max_length=32, required=False, allow_blank=True, default="")
     resource = serializers.UUIDField()
-    quantity = serializers.IntegerField(min_value=1, default=1)
+    # 10 000 couvre tout usage réel (heures, jours, articles) ; au-delà, `timedelta` ou le montant débordaient (500).
+    quantity = serializers.IntegerField(min_value=1, max_value=10_000, default=1)
     starts_at = serializers.DateTimeField(required=False)
+
+    def validate_starts_at(self, value):
+        # Une réservation peut être saisie avec un peu de retard, mais pas à une date absurde (débordement de date).
+        now = timezone.now()
+        if value < now - timedelta(days=366) or value > now + timedelta(days=366 * 5):
+            raise serializers.ValidationError("Date de début hors de la plage autorisée.")
+        return value
 
     def validate(self, attrs):
         if not attrs.get("client") and not (attrs.get("client_name") or "").strip():

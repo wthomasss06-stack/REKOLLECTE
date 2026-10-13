@@ -5,6 +5,7 @@ import secrets
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
+from django.conf import settings
 from django.db import IntegrityError, transaction
 from django.utils import timezone as django_timezone
 from google.auth.transport import requests as google_requests
@@ -37,10 +38,13 @@ class RevokedAccessError(Exception):
 
 
 def verify_google_credential(credential: str) -> dict:
+    # Sans identifiant client configuré, google-auth NE VÉRIFIE PLUS l'audience : n'importe quel jeton Google
+    # valide (émis pour une autre application) ouvrirait alors un compte ici. On refuse plutôt que d'échouer ouvert.
+    client_id = (getattr(settings, "GOOGLE_CLIENT_ID", "") or os.environ.get("GOOGLE_CLIENT_ID", "")).strip()
+    if not client_id:
+        raise InvalidGoogleTokenError("Connexion Google non configurée sur le serveur (GOOGLE_CLIENT_ID manquant).")
     try:
-        return id_token.verify_oauth2_token(
-            credential, google_requests.Request(), os.environ.get("GOOGLE_CLIENT_ID")
-        )
+        return id_token.verify_oauth2_token(credential, google_requests.Request(), client_id)
     except ValueError as exc:
         raise InvalidGoogleTokenError(str(exc)) from exc
 
@@ -72,14 +76,15 @@ def resolve_or_create_user(google_profile: dict) -> tuple[User, bool]:
             existing.save(update_fields=updates)
         return existing, False
 
-    if StaffInvitation.objects.filter(email__iexact=email, revoked_at__isnull=False).exists():
-        raise RevokedAccessError("Vous ne faites plus partie du staff ou de la gestion de cet établissement.")
-
     invitation = (
-        StaffInvitation.objects.filter(email__iexact=email, accepted_at__isnull=True)
+        StaffInvitation.objects.filter(email__iexact=email, accepted_at__isnull=True, revoked_at__isnull=True)
         .order_by("-created_at")
         .first()
     )
+    # Une invitation en cours passe avant d'anciennes révocations : si le patron a invité à nouveau cette adresse,
+    # l'accès est volontaire. Sans invitation valide, une révocation passée continue de bloquer la création d'un espace.
+    if not invitation and StaffInvitation.objects.filter(email__iexact=email, revoked_at__isnull=False).exists():
+        raise RevokedAccessError("Vous ne faites plus partie du staff ou de la gestion de cet établissement.")
 
     if invitation:
         manager = invitation.invited_by if invitation.role == User.Role.STAFF and invitation.invited_by and invitation.invited_by.role == User.Role.GERANT else None
@@ -266,8 +271,13 @@ def create_staff_invitation(organization, email: str, invited_by: User, role: st
     )
 
 
-def register_refresh_session(user: User, refresh_token, request) -> RefreshSession:
-    """Enregistre uniquement le JTI du refresh JWT, jamais le token lui-même."""
+def register_refresh_session(user: User, refresh_token, request, *, audit: bool = True) -> RefreshSession:
+    """Enregistre uniquement le JTI du refresh JWT, jamais le token lui-même.
+
+    `audit=False` pour une simple rotation (renouvellement toutes les ~10 min d'usage) : seule une vraie
+    connexion écrit « auth.login » au journal, sinon le journal se remplit de faux événements."""
+    # Les sessions expirées de cet utilisateur ne servent plus à rien : on les purge au passage (table bornée).
+    RefreshSession.objects.filter(user=user, expires_at__lt=django_timezone.now()).delete()
     session = RefreshSession.objects.create(
         user=user,
         jti=str(refresh_token["jti"]),
@@ -275,7 +285,7 @@ def register_refresh_session(user: User, refresh_token, request) -> RefreshSessi
         ip_address=request.META.get("REMOTE_ADDR"),
         expires_at=datetime.fromtimestamp(int(refresh_token["exp"]), tz=timezone.utc),
     )
-    if user.organization_id:
+    if audit and user.organization_id:
         AuditEvent.objects.create(
             organization=user.organization,
             actor=user,

@@ -133,7 +133,7 @@ class CookieTokenRefreshView(APIView):
                 session.last_used_at = now
                 session.save(update_fields=["revoked_at", "rotated_at", "last_used_at"])
                 next_refresh = RefreshToken.for_user(session.user)
-                register_refresh_session(session.user, next_refresh, request)
+                register_refresh_session(session.user, next_refresh, request, audit=False)
         except TokenError:
             return self._reject()
         response = Response({"access": str(next_refresh.access_token)})
@@ -217,7 +217,8 @@ class InviteStaffView(APIView):
             invited_by=request.user,
             role=requested_role,
         )
-        invite_link = f"{request.build_absolute_uri('/')[:-1]}?invite={invitation.token}"
+        # Lien vers le FRONTEND (Vercel) : derrière le proxy Next.js, `build_absolute_uri` renvoie l'hôte de l'API (Render).
+        invite_link = f"{settings.FRONTEND_URL.rstrip('/')}/connexion?invite={invitation.token}"
         return Response(
             {"invite_link": invite_link, "email": invitation.email, "role": invitation.role},
             status=status.HTTP_201_CREATED,

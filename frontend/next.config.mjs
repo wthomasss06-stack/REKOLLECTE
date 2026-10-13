@@ -17,20 +17,25 @@ const apiOrigin = (() => {
   catch { return "https://r3s3ign3m3nt.onrender.com"; }
 })();
 
+// Le CDN jsDelivr n'est plus autorisé : il ne servait qu'à tesseract.js (OCR navigateur), remplacé par l'OCR serveur.
+// Chaque origine tierce autorisée en script est une porte d'entrée XSS de plus.
+// `next dev` évalue du code (source maps `eval`) : sans 'unsafe-eval' la CSP empêche toute hydratation en local.
+// Jamais en production.
+const devScriptSrc = process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : "";
 const contentSecurityPolicy = [
   "default-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
   "frame-ancestors 'none'",
   "form-action 'self'",
-  "script-src 'self' 'unsafe-inline' https://accounts.google.com https://cdn.jsdelivr.net",
+  `script-src 'self' 'unsafe-inline'${devScriptSrc} https://accounts.google.com`,
   "style-src 'self' 'unsafe-inline' https://accounts.google.com",
   "style-src-elem 'self' 'unsafe-inline' https://accounts.google.com",
   `img-src 'self' data: blob: https://res.cloudinary.com https://*.googleusercontent.com ${apiOrigin}`,
-  `connect-src 'self' ${apiOrigin} https://api.cloudinary.com https://res.cloudinary.com https://accounts.google.com https://www.googleapis.com https://*.googleusercontent.com https://cdn.jsdelivr.net`,
+  `connect-src 'self' ${apiOrigin} https://api.cloudinary.com https://res.cloudinary.com https://accounts.google.com https://www.googleapis.com https://*.googleusercontent.com`,
   "font-src 'self' data: https://fonts.googleapis.com https://fonts.gstatic.com",
   "frame-src https://accounts.google.com",
-  "worker-src 'self' blob: https://cdn.jsdelivr.net",
+  "worker-src 'self' blob:",
 ].join('; ');
 
 /** @type {import('next').NextConfig} */

@@ -1,11 +1,16 @@
 import csv
+import io
+import re
 import secrets
+import uuid
 from collections import Counter
+from datetime import datetime, time
 
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.http import StreamingHttpResponse
 from django.utils import timezone
-from rest_framework import generics, status, throttling
+from django.utils.dateparse import parse_date, parse_datetime
+from rest_framework import generics, serializers, status, throttling
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -18,25 +23,10 @@ from apps.organizations.models import Organization
 from .models import AccessPoint, CheckIn, FormTemplate
 from .ocr_utils import OCR_FIELDS, run_document_ocr
 from .serializers import AccessPointSerializer, AccessPointWriteSerializer, CheckInSerializer, CheckInSyncItemSerializer, FormTemplateCreateSerializer, FormTemplateSerializer, PublicFormSerializer
-from .services import sync_single_checkin
+from .services import default_template, resolve_target, sync_single_checkin
 
-
-def default_template(organization):
-    return organization.form_templates.filter(is_default=True).first() or organization.form_templates.filter(is_active=True).order_by("updated_at").first()
-
-
-def resolve_public_target(qr_token):
-    access_point = AccessPoint.objects.select_related("organization", "form_template").filter(secure_token=qr_token, is_active=True, organization__is_suspended=False).first()
-    if access_point:
-        # Le point créé automatiquement pour le QR général partage le token
-        # de l'organisation : il doit suivre le formulaire par défaut.
-        if access_point.secure_token == access_point.organization.qr_secure_token:
-            return access_point.organization, default_template(access_point.organization), access_point
-        return access_point.organization, access_point.form_template, access_point
-    organization = Organization.objects.filter(qr_secure_token=qr_token, is_suspended=False).first()
-    if not organization:
-        return None, None, None
-    return organization, default_template(organization), None
+# Une seule règle pour « quel formulaire sert ce QR » : celle de la synchronisation (services.resolve_target).
+resolve_public_target = resolve_target
 
 
 class FormTemplateView(APIView):
@@ -102,7 +92,19 @@ class FormTemplateDetailView(APIView):
             return Response(status=404)
         if request.user.organization.form_templates.count() <= 1:
             return error_response("Un établissement doit conserver au moins un formulaire.", status.HTTP_400_BAD_REQUEST)
-        template.delete()
+        with transaction.atomic():
+            # `AccessPoint.form_template` est en CASCADE : supprimer le formulaire supprimait AUSSI ses points d'accueil,
+            # donc leurs QR Codes déjà imprimés cessaient de fonctionner sans prévenir. On les rattache à un autre formulaire.
+            replacement = (
+                request.user.organization.form_templates.exclude(id=template.id).filter(is_default=True).first()
+                or request.user.organization.form_templates.exclude(id=template.id).filter(is_active=True).order_by("updated_at", "id").first()
+                or request.user.organization.form_templates.exclude(id=template.id).order_by("updated_at", "id").first()
+            )
+            AccessPoint.objects.filter(form_template=template).update(form_template=replacement)
+            if template.is_default and not replacement.is_default:
+                replacement.is_default = True
+                replacement.save(update_fields=["is_default"])
+            template.delete()
         return Response(status=204)
 
 
@@ -120,7 +122,13 @@ class AccessPointListView(APIView):
         form = FormTemplate.objects.filter(id=serializer.validated_data["form_template"].id, organization=request.user.organization).first()
         if not form:
             return error_response("Formulaire invalide pour cet établissement.", status.HTTP_400_BAD_REQUEST)
-        point = serializer.save(organization=request.user.organization, secure_token=secrets.token_urlsafe(24))
+        name = serializer.validated_data["name"].strip()
+        if request.user.organization.access_points.filter(name__iexact=name).exists():
+            return error_response("Un point d’accueil porte déjà ce nom.", status.HTTP_400_BAD_REQUEST)
+        try:
+            point = serializer.save(organization=request.user.organization, secure_token=secrets.token_urlsafe(24))
+        except IntegrityError:  # deux créations simultanées avec le même nom
+            return error_response("Un point d’accueil porte déjà ce nom.", status.HTTP_400_BAD_REQUEST)
         return Response(AccessPointSerializer(point).data, status=201)
 
 
@@ -137,7 +145,13 @@ class AccessPointDetailView(APIView):
         serializer.is_valid(raise_exception=True)
         if "form_template" in serializer.validated_data and serializer.validated_data["form_template"].organization_id != request.user.organization.id:
             return error_response("Formulaire invalide pour cet établissement.", status.HTTP_400_BAD_REQUEST)
-        serializer.save()
+        new_name = serializer.validated_data.get("name")
+        if new_name is not None and request.user.organization.access_points.filter(name__iexact=new_name.strip()).exclude(id=point.id).exists():
+            return error_response("Un point d’accueil porte déjà ce nom.", status.HTTP_400_BAD_REQUEST)
+        try:
+            serializer.save()
+        except IntegrityError:
+            return error_response("Un point d’accueil porte déjà ce nom.", status.HTTP_400_BAD_REQUEST)
         return Response(AccessPointSerializer(point).data)
 
     def delete(self, request, point_id):
@@ -179,6 +193,9 @@ class SyncCheckInsView(APIView):
             return error_response(f"Lot invalide (maximum {self.MAX_BATCH_SIZE} fiches par envoi).", status.HTTP_400_BAD_REQUEST)
         processed = []
         for raw in items:
+            if not isinstance(raw, dict):
+                processed.append({"idempotency_key": None, "status": "invalid", "errors": {"non_field_errors": ["Fiche illisible."]}})
+                continue
             serializer = CheckInSyncItemSerializer(data=raw)
             if not serializer.is_valid():
                 processed.append({"idempotency_key": raw.get("idempotency_key"), "status": "invalid", "errors": serializer.errors})
@@ -232,20 +249,46 @@ class CheckInPagination(PageNumberPagination):
     max_page_size = 50
 
 
+_DATE_ONLY_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def _query_datetime(raw: str, name: str, *, end_of_day: bool = False):
+    """Date ou date-heure ISO d'un paramètre d'URL → datetime aware. Valeur invalide : 400 clair (et non 500).
+
+    Une date seule (« 2026-05-10 ») couvre la journée entière : début de journée pour `from`, fin pour `to`."""
+    raw = (raw or "").strip()
+    try:
+        if _DATE_ONLY_RE.match(raw):
+            day = parse_date(raw)
+            parsed = datetime.combine(day, time.max if end_of_day else time.min) if day else None
+        else:
+            parsed = parse_datetime(raw)
+    except ValueError:
+        parsed = None
+    if parsed is None:
+        raise serializers.ValidationError({name: "Date invalide (format attendu : AAAA-MM-JJ ou AAAA-MM-JJTHH:MM)."})
+    return timezone.make_aware(parsed) if timezone.is_naive(parsed) else parsed
+
+
 class CheckInListView(generics.ListAPIView):
     serializer_class = CheckInSerializer
     permission_classes = [IsAuthenticated, IsOrgMember]
     pagination_class = CheckInPagination
 
     def get_queryset(self):
+        params = self.request.query_params
         queryset = CheckIn.objects.filter(organization=self.request.user.organization)
-        if self.request.query_params.get("from"):
-            queryset = queryset.filter(created_at_client__gte=self.request.query_params["from"])
-        if self.request.query_params.get("to"):
-            queryset = queryset.filter(created_at_client__lte=self.request.query_params["to"])
-        if self.request.query_params.get("client"):
+        if params.get("from"):
+            queryset = queryset.filter(created_at_client__gte=_query_datetime(params["from"], "from"))
+        if params.get("to"):
+            queryset = queryset.filter(created_at_client__lte=_query_datetime(params["to"], "to", end_of_day=True))
+        if params.get("client"):
             # Historique des passages d'une fiche client REKOLLECTE+ (phase 7).
-            queryset = queryset.filter(client_id=self.request.query_params["client"])
+            try:
+                client_id = uuid.UUID(params["client"])
+            except ValueError:
+                raise serializers.ValidationError({"client": "Identifiant client invalide."})
+            queryset = queryset.filter(client_id=client_id)
         return queryset
 
 
@@ -266,27 +309,82 @@ class CheckInStatsView(APIView):
         return Response({"total": len(checkins), "today": sum(1 for item in checkins if timezone.localtime(item.created_at_client).date() == today), "peak_hour": peak_hour, "hourly": [{"hour": hour, "count": hourly[hour]} for hour in range(24) if hourly[hour]], "frequent_reasons": [{"label": label, "count": count} for label, count in reasons.most_common(8)]})
 
 
+_FORMULA_PREFIXES = ("=", "+", "-", "@", "\t", "\r")
+_PLAIN_NUMBER_RE = re.compile(r"^[+\-]?[\d\s().\-]+$")
+
+
+def _csv_safe(value) -> str:
+    """Valeur de cellule CSV sans risque d'injection de formule.
+
+    Les réponses viennent de visiteurs anonymes : un nom saisi « =HYPERLINK(...) » s'exécuterait à l'ouverture du
+    fichier dans Excel/Sheets chez le patron. On préfixe d'une apostrophe, sauf pour les numéros (+225 01 02…),
+    qui ne contiennent aucune formule exploitable."""
+    if value is None:
+        return ""
+    if isinstance(value, bool):
+        return "Oui" if value else "Non"
+    if isinstance(value, (list, tuple)):
+        value = ", ".join(str(item) for item in value)
+    elif isinstance(value, dict):
+        value = ", ".join(f"{key}: {item}" for key, item in value.items())
+    text = str(value)
+    if text.startswith(_FORMULA_PREFIXES) and not _PLAIN_NUMBER_RE.match(text):
+        return "'" + text
+    return text
+
+
+def _document_summary(value) -> str:
+    """Pièce scannée : seulement les champs extraits validés — ni l'image (base64, plusieurs Mo) ni le texte OCR brut."""
+    if not isinstance(value, dict):
+        return ""
+    extracted = value.get("extracted")
+    if not isinstance(extracted, dict):
+        return ""
+    return ", ".join(f"{key}: {item}" for key, item in extracted.items() if item)
+
+
 class CheckInExportView(APIView):
     permission_classes = [IsAuthenticated, IsBossOrGerant]
 
     def get(self, request):
         organization = request.user.organization
-        templates = list(organization.form_templates.all())
-        fields = [field for template in templates for field in template.fields_schema]
+        # Colonnes dédupliquées par identifiant de champ : le même champ (« nom ») présent dans plusieurs formulaires
+        # produisait autant de colonnes, avec la valeur répétée.
+        columns: dict[str, dict] = {}
+        for template in organization.form_templates.all():
+            for field in template.fields_schema:
+                field_id = field.get("id")
+                if field_id and field_id not in columns:
+                    columns[field_id] = field
         queryset = CheckIn.objects.filter(organization=organization).iterator()
+
         def rows():
-            yield _csv_row(["Heure d'arrivée"] + [f["label"] for f in fields])
+            yield "\ufeff" + _csv_row(["Heure d'arrivée"] + [_csv_safe(f.get("label", f["id"])) for f in columns.values()])  # BOM : accents corrects dans Excel
             for checkin in queryset:
                 row = [checkin.created_at_client.strftime("%d/%m/%Y %H:%M")]
-                for field in fields:
-                    row.append("Signé" if field["type"] == "signature" and checkin.signature_blob else ("Oui" if field["type"] == "checkbox" and checkin.responses.get(field["id"]) else checkin.responses.get(field["id"], "")))
+                responses = checkin.responses if isinstance(checkin.responses, dict) else {}
+                for field_id, field in columns.items():
+                    kind = field.get("type")
+                    if kind == "signature":
+                        row.append("Signé" if checkin.signature_blob else "")
+                    elif kind == "photo":
+                        row.append("Fourni" if responses.get(field_id) else "")  # jamais d'image dans le CSV
+                    elif kind == "document_scan":
+                        row.append(_csv_safe(_document_summary(responses.get(field_id))))
+                    elif kind == "checkbox":
+                        row.append("Oui" if responses.get(field_id) else "")
+                    else:
+                        row.append(_csv_safe(responses.get(field_id, "")))
                 yield _csv_row(row)
+
         response = StreamingHttpResponse(rows(), content_type="text/csv; charset=utf-8")
         safe_name = "".join(c for c in organization.name if c.isalnum() or c in " -_").strip() or "etablissement"
         response["Content-Disposition"] = f'attachment; filename="registre_{safe_name}.csv"'
+        response["Cache-Control"] = "no-store"
         return response
 
 
 def _csv_row(values: list) -> str:
-    import io
-    buffer = io.StringIO(); csv.writer(buffer).writerow(values); return buffer.getvalue()
+    buffer = io.StringIO()
+    csv.writer(buffer).writerow(values)
+    return buffer.getvalue()

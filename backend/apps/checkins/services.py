@@ -41,10 +41,21 @@ def missing_required_fields(template: FormTemplate | None, responses: dict, sign
     missing = []
     for f in template.fields_schema:
         if f.get("required") and not (
-            bool(signature_blob) if f["type"] == "signature" else bool(responses.get(f["id"]))
+            bool(signature_blob) if f.get("type") == "signature" else bool(responses.get(f.get("id")))
         ):
-            missing.append(f["id"])
+            missing.append(f.get("id"))
     return missing
+
+
+def default_template(organization: Organization) -> FormTemplate | None:
+    """Formulaire servi par le QR général : le formulaire par défaut, sinon le plus ancien actif.
+
+    Source UNIQUE pour la page publique et la synchronisation : avant, les deux calculaient ce choix chacun de leur
+    côté (l'un trié, l'autre non) et pouvaient désigner deux formulaires différents quand aucun n'était « par défaut »."""
+    return (
+        organization.form_templates.filter(is_default=True).first()
+        or organization.form_templates.filter(is_active=True).order_by("updated_at", "id").first()
+    )
 
 
 def resolve_target(token):
@@ -54,21 +65,15 @@ def resolve_target(token):
         organization__is_suspended=False,
     ).first()
     if point:
+        # Le point créé automatiquement pour le QR général partage le token de l'organisation :
+        # il suit le formulaire par défaut.
         if point.secure_token == point.organization.qr_secure_token:
-            template = (
-                point.organization.form_templates.filter(is_default=True).first()
-                or point.organization.form_templates.filter(is_active=True).first()
-            )
-            return point.organization, template, point
+            return point.organization, default_template(point.organization), point
         return point.organization, point.form_template, point
     organization = Organization.objects.filter(qr_secure_token=token, is_suspended=False).first()
     if not organization:
         return None, None, None
-    template = (
-        organization.form_templates.filter(is_default=True).first()
-        or organization.form_templates.filter(is_active=True).first()
-    )
-    return organization, template, None
+    return organization, default_template(organization), None
 
 
 def _normalized_label(value: object) -> str:
@@ -154,8 +159,9 @@ def find_or_create_client(organization: Organization, identity: dict[str, str]) 
     return client, "created" if created else "matched"
 
 
-def _client_for_existing_checkin(key: str) -> tuple[str | None, str | None]:
-    existing = CheckIn.objects.select_related("client").filter(idempotency_key=key).first()
+def _client_for_existing_checkin(key: str, organization: Organization) -> tuple[str | None, str | None]:
+    # Limité à l'établissement du QR utilisé : une clé d'idempotence ne doit jamais révéler une fiche d'un autre.
+    existing = CheckIn.objects.select_related("client").filter(idempotency_key=key, organization=organization).first()
     if existing and existing.client_id:
         return str(existing.client_id), "matched"
     return None, None
@@ -198,5 +204,5 @@ def sync_single_checkin(item: dict) -> SyncOutcome:
             client_action=client_action,
         )
     except IntegrityError:
-        client_id, client_action = _client_for_existing_checkin(key)
+        client_id, client_action = _client_for_existing_checkin(key, organization)
         return SyncOutcome(key, "already_exists", client_id=client_id, client_action=client_action)

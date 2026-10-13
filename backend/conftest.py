@@ -1,6 +1,7 @@
 """Fixtures partagees entre toutes les apps (racine du projet pytest — auto-decouvert,
 pas besoin de les importer explicitement dans les fichiers de test)."""
 import pytest
+from django.core.cache import cache
 
 from apps.accounts.models import User
 from apps.checkins.models import FormTemplate
@@ -11,6 +12,15 @@ DEFAULT_SCHEMA = [
     {"id": "telephone", "type": "phone", "label": "Téléphone", "required": True},
     {"id": "signature", "type": "signature", "label": "Signature", "required": True},
 ]
+
+
+@pytest.fixture(autouse=True)
+def _clear_cache():
+    """Limiteurs de débit et rejeu OAuth vivent dans le cache (mémoire du process) : sans purge, l'état d'un test
+    (compteurs de requêtes) fuit dans les suivants et provoque des 429 aléatoires."""
+    cache.clear()
+    yield
+    cache.clear()
 
 
 @pytest.fixture

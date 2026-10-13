@@ -29,7 +29,7 @@ export default function VisitorForm({ schema, qrToken, orgName, logoUrl = "", vi
     return () => window.clearTimeout(timer);
   }, [status]);
 
-  if (status === "saved_offline") return <StatusScreen icon={<DeviceMobile size={40} className="text-ink-soft" />} title="Enregistré sur cet appareil" message={`Merci. Tes informations seront transmises à ${orgName} dès que le réseau sera disponible.`} />;
+  if (status === "saved_offline") return <StatusScreen icon={<DeviceMobile size={40} className="text-ink-soft" />} title="Enregistré sur cet appareil" message={`Merci. Tes informations seront transmises à ${orgName} dès que le réseau sera disponible. Garde cette page ouverte un instant.`} />;
   if (status === "synced") return <StatusScreen icon={<CloudCheck size={40} className="text-success-text" />} title="Merci, c’est enregistré" message={`Tu peux fermer cette page. Bienvenue chez ${orgName}.`} />;
 
   const handleSubmit = async (e: FormEvent) => { e.preventDefault(); const missing = schema.find((field) => field.required && (field.type === "signature" ? !signature : formData[field.id] === undefined || formData[field.id] === "")); if (missing) { setValidationError(`Le champ « ${missing.label} » est obligatoire.`); return; } setValidationError(""); await submitForm(formData, signature); };

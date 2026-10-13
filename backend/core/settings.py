@@ -15,8 +15,20 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-me-32-bytes-minimum")
-DEBUG = os.environ.get("DEBUG", "True") == "True"
-ALLOWED_HOSTS = [h.strip() for h in os.environ.get("ALLOWED_HOSTS", "*").split(",")]
+DEBUG = os.environ.get("DEBUG", "True").strip().lower() in {"true", "1", "yes"}
+ALLOWED_HOSTS = [h.strip() for h in os.environ.get("ALLOWED_HOSTS", "*").split(",") if h.strip()]
+
+# Garde-fou : Render définit RENDER=true. Un service Render qui tourne avec DEBUG=True (valeur par défaut quand la
+# variable n'est pas définie) affiche des pages d'erreur détaillées et n'active ni HTTPS forcé ni cookies sécurisés ;
+# avec ALLOWED_HOSTS="*" il accepte n'importe quel en-tête Host. On ne change pas le comportement (un déploiement
+# existant ne doit pas casser au redémarrage), mais l'avertissement est visible dans les logs de démarrage.
+if os.environ.get("RENDER"):
+    import warnings
+
+    if DEBUG:
+        warnings.warn("DEBUG=True sur Render : définir DEBUG=False dans les variables d'environnement.", RuntimeWarning, stacklevel=1)
+    if "*" in ALLOWED_HOSTS:
+        warnings.warn("ALLOWED_HOSTS='*' sur Render : définir le domaine exact de l'API.", RuntimeWarning, stacklevel=1)
 
 # Les validations bloquantes sont exécutées par `scripts/verify_production.py`.
 # Elles ne doivent pas s’exécuter à l’import pendant le build Render : certains
@@ -43,6 +55,7 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "apps.common.middleware.RequestCorrelationMiddleware",
+    "apps.common.middleware.RequestBodyLimitMiddleware",
     "apps.common.middleware.ApiTrailingSlashMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -79,6 +92,9 @@ DATABASES = {
     "default": dj_database_url.parse(
         os.environ.get("DATABASE_URL", f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
         conn_max_age=600,
+        # Neon coupe les connexions inactives : sans test de santé, la 1re requête après une pause tombait sur une
+        # connexion morte (« SSL connection has been closed unexpectedly » → 500) au lieu d'en rouvrir une.
+        conn_health_checks=True,
         ssl_require=os.environ.get("DATABASE_URL", "").startswith("postgres"),
     )
 }
@@ -119,7 +135,12 @@ REST_FRAMEWORK = {
         # Chaque appel fait tourner Tesseract côté serveur (CPU) — throttle
         # dédié, bien plus strict que les autres endpoints publics.
         "ocr": "6/min",
+        # Connexion de l'administration de la plateforme (compte le plus puissant).
+        "admin_login": "10/min",
     },
+    # Nombre de proxys de confiance devant l'API (Vercel + Render = 2) : sert à lire l'IP réelle dans X-Forwarded-For
+    # pour les limiteurs de débit. Non défini : l'en-tête entier sert de clé (comportement historique).
+    "NUM_PROXIES": int(os.environ["NUM_PROXIES"]) if os.environ.get("NUM_PROXIES", "").strip().isdigit() else None,
     "EXCEPTION_HANDLER": "apps.common.exceptions.standard_exception_handler",
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
@@ -140,6 +161,14 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": False,
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
+
+# Taille maximale d'un corps de requête API (octets). Les endpoints publics sont anonymes : sans plafond, un seul
+# POST géant remplit la mémoire de l'instance. Le plus gros usage légitime est l'image OCR (~8 M de caractères base64).
+API_MAX_BODY_BYTES = int(os.environ.get("API_MAX_BODY_BYTES", str(24 * 1024 * 1024)))
+# Documentation OpenAPI et admin Django : exposés seulement en développement (ou sur demande explicite).
+EXPOSE_API_DOCS = DEBUG or os.environ.get("EXPOSE_API_DOCS", "").strip().lower() in {"true", "1", "yes"}
+# Chemin de l'admin Django (vide = non monté). L'espace d'administration réel est celui de la plateforme (Next.js).
+DJANGO_ADMIN_URL = os.environ.get("DJANGO_ADMIN_URL", "admin/")
 
 REFRESH_COOKIE_NAME = "qr_refresh_token"
 REFRESH_COOKIE_PATH = "/api/v1/auth/"

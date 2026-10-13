@@ -13,6 +13,7 @@ from apps.common.permissions import IsBoss, IsOrgMember
 from apps.common.responses import error_response
 
 from .serializers import OrganizationKarnetUpdateSerializer, OrganizationSerializer, OrganizationUpdateSerializer
+from .services import delete_organization
 
 
 class MyOrganizationView(APIView):
@@ -93,7 +94,7 @@ class OrganizationLifecycleView(APIView):
         return Response(OrganizationSerializer(organization).data)
 
     def delete(self, request):
-        request.user.organization.delete()
+        delete_organization(request.user.organization)
         return Response(status=204)
 
 

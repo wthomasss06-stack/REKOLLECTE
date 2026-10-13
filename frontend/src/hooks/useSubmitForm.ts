@@ -3,12 +3,17 @@ import { useState } from "react";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 
-import { db } from "@/lib/db";
+import { API_BASE } from "@/lib/apiBase";
+import { db, markCheckInSynced, toSyncPayload, type OfflineCheckIn } from "@/lib/db";
 import { networkMonitor } from "@/lib/networkMonitor";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+import { waitForServer } from "@/lib/serverWake";
 
 type SubmitStatus = "idle" | "saving" | "saved_offline" | "synced";
+type ProcessedItem = { idempotency_key: string; status: string; message?: string };
+
+const RETRY_IN_MS = 10_000;
+// Appareil en ligne mais serveur muet (Render dort) : on le réveille et on renvoie dès qu'il répond, tant que la page reste ouverte.
+const WAKE_WAIT_MS = 90_000;
 
 /**
  * Endpoint public (pas d'auth) : on utilise axios brut, pas apiClient
@@ -20,38 +25,51 @@ export function useSubmitForm(qrToken: string) {
   const submitForm = async (responses: Record<string, unknown>, signatureBlob: string) => {
     setStatus("saving");
 
-    const checkin = {
+    const checkin: OfflineCheckIn = {
       idempotency_key: uuidv4(),
       qr_token: qrToken,
       responses,
       signature_blob: signatureBlob,
-    created_at_client: new Date().toISOString(),
-    sync_status: "pending" as const,
-    retry_count: 0,
-    next_retry_at: null,
-    last_error: null,
-  };
+      created_at_client: new Date().toISOString(),
+      sync_status: "pending",
+      retry_count: 0,
+      next_retry_at: null,
+      last_error: null,
+    };
 
     // Ecriture locale immediate : le visiteur ne doit jamais attendre le reseau.
     await db.checkins.add(checkin);
     window.dispatchEvent(new CustomEvent("qr:sync-updated"));
     setStatus("saved_offline");
 
-    if (await networkMonitor.check()) {
+    const retryLater = (message: string) => db.checkins.update(checkin.idempotency_key, {
+      retry_count: 1,
+      next_retry_at: new Date(Date.now() + RETRY_IN_MS).toISOString(),
+      last_attempt_at: new Date().toISOString(),
+      last_error: message,
+    });
+
+    const attemptSync = async () => {
       try {
-        const { data } = await axios.post<{ processed?: Array<{ idempotency_key: string; status: string; message?: string }> }>(`${API_URL}/checkins/sync/`, { checkins: [checkin] }, { timeout: 8000 });
-        const result = data.processed?.find((item) => item.idempotency_key === checkin.idempotency_key);
+        const { data } = await axios.post<{ processed?: ProcessedItem[] }>(`${API_BASE}/checkins/sync/`, { checkins: [toSyncPayload(checkin)] }, { timeout: 15_000 });
+        const result = Array.isArray(data?.processed) ? data.processed.find((item) => item.idempotency_key === checkin.idempotency_key) : undefined;
         if (result?.status === "created" || result?.status === "already_exists") {
-          await db.checkins.update(checkin.idempotency_key, { sync_status: "synced", synced_at: new Date().toISOString(), last_attempt_at: new Date().toISOString(), last_error: null });
+          await markCheckInSynced(checkin.idempotency_key);
           setStatus("synced");
         } else {
-          await db.checkins.update(checkin.idempotency_key, { sync_status: "pending", retry_count: 1, next_retry_at: new Date(Date.now() + 10_000).toISOString(), last_error: result?.message || "La réponse serveur n’a pas confirmé l’enregistrement." });
+          // Refus ou réponse inexploitable : la fiche reste en file, la synchronisation en arrière-plan prend le relais.
+          await retryLater(result?.message || "La réponse serveur n’a pas confirmé l’enregistrement.");
         }
-        window.dispatchEvent(new CustomEvent("qr:sync-updated"));
       } catch {
-        await db.checkins.update(checkin.idempotency_key, { retry_count: 1, next_retry_at: new Date(Date.now() + 10_000).toISOString(), last_error: "Réseau indisponible, nouvelle tentative automatique." });
-        window.dispatchEvent(new CustomEvent("qr:sync-updated"));
+        await retryLater("Réseau indisponible, nouvelle tentative automatique.");
       }
+      window.dispatchEvent(new CustomEvent("qr:sync-updated"));
+    };
+
+    if (await networkMonitor.check()) {
+      await attemptSync();
+    } else if (typeof navigator !== "undefined" && navigator.onLine !== false) {
+      void waitForServer({ maxMs: WAKE_WAIT_MS }).then((alive) => { if (alive) void attemptSync(); });
     }
   };
 

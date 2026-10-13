@@ -8,6 +8,11 @@ class HealthCheckView(APIView):
     """Sonde de disponibilite — verifie que l'API et la base de donnees repondent.
     Utilisee par le monitoring de la plateforme d'hebergement (Render/Railway)."""
     permission_classes = [AllowAny]
+    # Sonde appelée en boucle par le frontend (réveil du serveur, relance de la synchronisation) et par Render :
+    # ni authentification (un jeton périmé ne doit pas la faire échouer en 401) ni limiteur de débit (un 429 sur
+    # une IP partagée était pris pour « serveur éteint » et bloquait l'application jusqu'à 3 minutes).
+    authentication_classes = []
+    throttle_classes = []
 
     def get(self, request):
         try:
