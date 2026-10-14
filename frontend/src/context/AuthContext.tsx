@@ -190,7 +190,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { isNew: Boolean(data.is_new), name: nextUser.full_name || nextUser.email || "" };
     } catch (requestError) {
       if (axios.isAxiosError(requestError) && requestError.response?.data?.error?.message) setError(requestError.response.data.error.message);
-      else if (isGatewayFailure(requestError)) setError("Le serveur met du temps à répondre. Il se réveille : réessaie dans un instant.");
+      else if (isGatewayFailure(requestError)) setError("La connexion met plus de temps que prévu. Réessaie dans un instant.");
       else setError("Connexion impossible. Réessaie.");
       throw requestError;
     } finally {

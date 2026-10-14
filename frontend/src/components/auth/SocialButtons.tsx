@@ -11,6 +11,9 @@ export function enabledProviders(): string[] {
   return (process.env.NEXT_PUBLIC_AUTH_PROVIDERS || "google").split(",").map((p) => p.trim()).filter(Boolean);
 }
 
+/** Gabarit commun des boutons de connexion (Google, Facebook, Apple) : même hauteur, même forme, même police. */
+export const SOCIAL_BUTTON_BASE = "flex h-12 w-full items-center justify-center gap-3 rounded-full text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta";
+
 const MESSAGES: Record<string, string> = {
   state: "Ta tentative de connexion a expiré. Réessaie.",
   cancelled: "Connexion annulée.",
@@ -98,7 +101,7 @@ export default function SocialButtons({ disabled = false }: { disabled?: boolean
     setPending(provider);
   };
 
-  const base = "flex h-12 w-full items-center justify-center gap-3 rounded-full text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta";
+  const base = SOCIAL_BUTTON_BASE;
   const busy = (provider: string) => pending === provider;
   const inactive = (provider: string) => (pending && pending !== provider) || disabled;
 

@@ -8,10 +8,9 @@ import { ArrowLeft, CheckCircle, Info, LockKey, QrCode, ShieldCheck, WarningCirc
 
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
-import SocialButtons, { enabledProviders, useAuthNotice } from "@/components/auth/SocialButtons";
+import SocialButtons, { SOCIAL_BUTTON_BASE, enabledProviders, useAuthNotice } from "@/components/auth/SocialButtons";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useGoogleAuthLogin } from "@/hooks/useAuth";
-import { useServerWake } from "@/hooks/useServerWake";
 
 const POINTS = [
   { icon: QrCode, title: "Zéro compte pour le visiteur", body: "Il scanne, remplit et signe depuis son téléphone." },
@@ -20,12 +19,28 @@ const POINTS = [
 ];
 
 const GOOGLE_MIN_WIDTH = 200;
-const GOOGLE_MAX_WIDTH = 320;
+const GOOGLE_MAX_WIDTH = 400; // bornes imposées par Google (200 à 400 px)
+const GOOGLE_NATIVE_HEIGHT = 40; // hauteur du bouton Google en size="large"
+const BUTTON_HEIGHT = 48; // h-12 : hauteur de tous les boutons de connexion
 // Au-delà, on considère que le script Google n'a pas pu se charger (bloqueur, réseau coupé).
 const GOOGLE_LOAD_TIMEOUT_MS = 8_000;
 
-/** Emplacement du bouton Google : squelette tant que Google charge son bouton (aucun trou blanc, aucun saut de mise en page),
- * largeur calée sur la colonne (le bouton Google n'accepte que 200 à 400 px), message clair s'il ne s'affiche pas. */
+/** Logo « G » officiel en quatre couleurs. */
+function GoogleGlyph() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+      <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+    </svg>
+  );
+}
+
+/** Emplacement du bouton Google. Ce qu'on VOIT est un bouton au même gabarit que Facebook et Apple (SOCIAL_BUTTON_BASE) ;
+ * ce sur quoi on CLIQUE est le vrai bouton Google (iframe officielle, quasi transparente, étirée par-dessus à 48 px de haut).
+ * Le jeton Google est donc toujours émis par Google : le flux et le serveur ne changent pas.
+ * Squelette tant que Google charge son script (aucun trou, aucun saut de mise en page), message clair s'il ne s'affiche pas. */
 function GoogleSlot({ onCredential, onFailure, disabled }: { onCredential: (credential: string) => void; onFailure: () => void; disabled: boolean }) {
   const slotRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(GOOGLE_MAX_WIDTH);
@@ -56,12 +71,22 @@ function GoogleSlot({ onCredential, onFailure, disabled }: { onCredential: (cred
 
   return (
     <div className="w-full">
-      <div className="relative mx-auto h-11 w-full max-w-[320px]">
+      <div className="group relative h-12 w-full">
         {!ready && !unavailable && <Skeleton className="absolute inset-0 !rounded-full" />}
+        {/* Apparence : identique à Facebook / Apple. Survol et focus clavier viennent du conteneur (l'iframe est dedans). */}
+        <div
+          aria-hidden="true"
+          className={`${SOCIAL_BUTTON_BASE} pointer-events-none border border-border bg-white text-neutral-800 shadow-sm duration-300 group-hover:bg-neutral-100 group-focus-within:ring-2 group-focus-within:ring-cta group-focus-within:ring-offset-2 ${
+            ready ? (disabled ? "opacity-50" : "opacity-100") : unavailable ? "opacity-50" : "opacity-0"
+          }`}
+        >
+          <GoogleGlyph /> Continuer avec Google
+        </div>
+        {/* Vrai bouton Google : invisible, 40 px natifs étirés à 48 px pour couvrir exactement le bouton visible. */}
         <div
           ref={slotRef}
-          aria-hidden={!ready}
-          className={`flex h-11 w-full justify-center transition-opacity duration-300 ${ready ? "opacity-100" : "opacity-0"} ${disabled ? "pointer-events-none opacity-60" : ""}`}
+          className={`absolute left-0 top-0 z-10 w-full origin-top overflow-hidden opacity-[0.01] ${disabled ? "pointer-events-none" : ""}`}
+          style={{ height: GOOGLE_NATIVE_HEIGHT, transform: `scaleY(${BUTTON_HEIGHT / GOOGLE_NATIVE_HEIGHT})` }}
         >
           <GoogleLogin
             onSuccess={(res) => (res.credential ? onCredential(res.credential) : onFailure())}
@@ -87,11 +112,9 @@ function GoogleSlot({ onCredential, onFailure, disabled }: { onCredential: (cred
 export default function LoginPage() {
   const { login, error, loading } = useGoogleAuthLogin();
   const { notice, dismiss } = useAuthNotice();
-  const { status: serverStatus } = useServerWake();
   const [googleFailed, setGoogleFailed] = useState(false);
   const providers = enabledProviders();
   const hasSocial = providers.includes("facebook") || providers.includes("apple");
-  const waking = serverStatus === "waking";
 
   // Message affiché : erreur de connexion en cours > échec du bouton Google > code renvoyé par le serveur dans l'URL.
   const message = error
@@ -104,13 +127,13 @@ export default function LoginPage() {
 
   return (
     <>
-      {(loading || waking) && (
+      {loading && (
         <div className="qr-login-loader" role="status" aria-live="polite" aria-label="Connexion en cours">
           <div className="qr-login-loader__content">
             <div className="qr-login-loader__brand"><Logo size={52} /><span className="font-heading text-lg font-bold">REKOLLECTE</span></div>
             <div className="qr-login-loader__head"><span>Connexion sécurisée</span></div>
             <div className="qr-login-loader__track"><span /></div>
-            <p className="qr-login-loader__label">Préparation de ton espace…</p>
+            <p className="qr-login-loader__label">Connexion en cours… Préparation de ton espace.</p>
           </div>
         </div>
       )}

@@ -9,7 +9,7 @@ Décompresser **à la racine du projet** (les chemins `backend/…` et `frontend
 - Garde-fou conseillé : un ping externe (UptimeRobot / cron-job.org) sur `https://<ton-render>/api/v1/health/` toutes les 10 min empêche l'endormissement.
 
 ## 2. Page de connexion
-- Nouvelle mise en page (colonne marque, bouton Google avec squelette et largeur adaptée, Facebook/Apple anti double-clic, messages dismissibles, URL nettoyée de `?auth_error=` et `#_=_`).
+- Nouvelle mise en page (colonne marque, **trois boutons au même gabarit** : le bouton Google visible est un bouton Facebook/Apple-like, et le vrai bouton Google (invisible, étiré à 48 px) reçoit le clic — le jeton vient toujours de Google, le serveur ne change pas ; squelette de chargement, Facebook/Apple anti double-clic, **plus aucun message « le serveur se réveille » sur la page** (seule la ligne « Connexion sécurisée… » reste), messages dismissibles, URL nettoyée de `?auth_error=` et `#_=_`).
 - Backend OAuth : un retour Facebook/Apple rejoué (double tap) reprend l'issue du premier au lieu d'échouer en `provider` ; la cause réelle d'un échec est loguée (`qr_register.oauth`) sans secret. 4 tests ajoutés (25 verts dans `test_oauth_flow.py`).
 - Note : le cache de rejeu est le cache Django par défaut (mémoire du process). Avec plusieurs workers gunicorn il est best-effort.
 
@@ -26,3 +26,6 @@ Décompresser **à la racine du projet** (les chemins `backend/…` et `frontend
 - Check-list Render avant déploiement : `DEBUG=False`, `ALLOWED_HOSTS` explicite, `GOOGLE_CLIENT_ID`, `FRONTEND_URL`, `CORS_ALLOWED_ORIGINS`/`CSRF_TRUSTED_ORIGINS`, `NUM_PROXIES=2` (Vercel + Render). Lancer `python scripts/verify_production.py`.
 - À faire hors code : **faire tourner le secret API Cloudinary** et supprimer `frontend/hh` (secret en clair dans le dépôt).
 
+## 5. Documents
+- `ROADMAP.md` : état du projet, actions avant reprise, fonctionnalités à ajouter, consolidation.
+- `AUDIT.md` : détail de l'audit (corrigé / à décider).
