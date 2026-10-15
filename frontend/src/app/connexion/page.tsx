@@ -9,7 +9,6 @@ import { ArrowLeft, CheckCircle, Info, LockKey, QrCode, ShieldCheck, WarningCirc
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
 import SocialButtons, { SOCIAL_BUTTON_BASE, enabledProviders, useAuthNotice } from "@/components/auth/SocialButtons";
-import { Skeleton } from "@/components/ui/Skeleton";
 import { useGoogleAuthLogin } from "@/hooks/useAuth";
 
 const POINTS = [
@@ -72,7 +71,7 @@ function GoogleSlot({ onCredential, onFailure, disabled }: { onCredential: (cred
   return (
     <div className="w-full">
       <div className="group relative h-12 w-full">
-        {!ready && !unavailable && <Skeleton className="absolute inset-0 !rounded-full" />}
+        {!ready && !unavailable && <div aria-hidden="true" className="absolute inset-0 animate-pulse rounded-full bg-ink/10" />}
         {/* Apparence : identique à Facebook / Apple. Survol et focus clavier viennent du conteneur (l'iframe est dedans). */}
         <div
           aria-hidden="true"

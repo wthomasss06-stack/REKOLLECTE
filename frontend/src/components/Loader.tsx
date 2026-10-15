@@ -1,16 +1,19 @@
-import Logo from "./Logo";
-import { PageSkeleton, type SkeletonVariant } from "./ui/Skeleton";
+import Image from "next/image";
 
-/** Chargement de marque.
- * - `fullScreen` (défaut) : écran plein cadre avec le logo — pour les pages qui n'ont pas encore de mise en page (onboarding, formulaire visiteur).
- * - `fullScreen={false}` : dans l'espace connecté, un SQUELETTE de page (la mise en page apparaît tout de suite, les données s'y glissent)
- *   à la place d'un logo qui pulse. `variant` choisit la forme du squelette. */
-export default function Loader({ label = "Chargement...", fullScreen = true, variant = "default" }: { label?: string; fullScreen?: boolean; variant?: SkeletonVariant }) {
-  if (!fullScreen) return <PageSkeleton variant={variant} label={label} />;
+/** Chargement de marque REKOLLECTE : une pastille avec le logo qui respire, entourée d'un anneau qui tourne.
+ * - `fullScreen` (défaut) : écran plein cadre (ouverture de l'espace, retour de connexion, pages sans mise en page).
+ * - `fullScreen={false}` : dans l'espace connecté, le même visuel plus compact, centré dans la zone de contenu.
+ * Rend le même visuel quel que soit le motif de l'attente (session qui se rétablit, serveur qui se réveille, simple chargement) :
+ * on ne montre plus de message technique, seulement la marque et un libellé court. */
+export default function Loader({ label = "Chargement…", fullScreen = true }: { label?: string; fullScreen?: boolean }) {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-3" role="status" aria-live="polite">
-      <Logo size={96} className="animate-pulse" />
-      <p className="text-sm text-ink-soft">{label}</p>
+    <div className={`rk-loader ${fullScreen ? "rk-loader--screen" : "rk-loader--inline"}`} role="status" aria-live="polite" aria-label={label}>
+      <div className="rk-loader__orb">
+        <span className="rk-loader__ring" aria-hidden="true" />
+        <Image src="/brand/logo-mark.png" alt="" width={44} height={44} priority className="rk-loader__mark" />
+      </div>
+      {fullScreen && <strong className="rk-loader__name">REKOLLECTE</strong>}
+      <p className="rk-loader__label">{label}</p>
     </div>
   );
 }

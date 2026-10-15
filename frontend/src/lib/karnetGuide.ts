@@ -24,24 +24,24 @@ export function buildGuideSteps(summary: KarnetSummary | null, opts: { paymentsS
       {
         key: "resources", title: "Crée ta première ressource", done: hasResource, locked: false,
         hint: "Choisis un modèle (chambre, table, salle…), fixe son prix, puis active-la : tant qu’elle n’est pas active, elle ne peut pas être réservée.",
-        cta: opts.canManage ? "Ajouter une ressource" : "", href: "/dashboard/karnet/ressources?onboarding=1",
+        cta: opts.canManage ? "Ajouter une ressource" : "", href: "/dashboard/rekollecte?open=ressources&onboarding=1",
         lockedHint: opts.canManage ? undefined : "Un Patron ou un Gérant doit créer la première ressource.",
       },
       {
         key: "clients", title: "Ajoute ton premier client", done: hasClient, locked: false,
         hint: "Un visiteur enregistré à l’accueil devient client tout seul ; sinon ajoute-le à la main (nom et téléphone suffisent).",
-        cta: "Ajouter un client", href: "/dashboard/karnet?new=1",
+        cta: "Ajouter un client", href: "/dashboard/rekollecte?open=clients&new=1",
       },
       {
         key: "reservations", title: "Fais ta première réservation", done: hasReservation, locked: !hasResource || !hasClient,
         hint: "Choisis le client, la ressource et l’heure : la durée et le montant se calculent seuls.",
-        cta: "Créer une réservation", href: "/dashboard/karnet/reservations",
+        cta: "Créer une réservation", href: "/dashboard/rekollecte?open=reservations",
         lockedHint: "Disponible dès que tu as une ressource et un client.",
       },
       {
         key: "payments", title: "Contrôle ton premier encaissement", done: s.paid_reservations > 0 && opts.paymentsSeen, locked: !hasReservation,
         hint: "Chaque réservation est enregistrée comme payée dès sa création : retrouve-la dans Paiements, avec l’historique.",
-        cta: "Voir les paiements", href: "/dashboard/karnet/paiements",
+        cta: "Voir les paiements", href: "/dashboard/rekollecte?open=paiements",
         lockedHint: "Disponible après ta première réservation.",
       },
     ];

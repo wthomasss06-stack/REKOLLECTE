@@ -82,7 +82,7 @@ export default function ClientHistoryPanel({ clientId }: { clientId: string }) {
         </div>
         {canReserve && (
           <Link
-            href={`/dashboard/karnet/reservations?client=${client.id}`}
+            href={`/dashboard/rekollecte?open=reservations&client=${client.id}`}
             className="flex items-center gap-1.5 rounded-lg bg-cta px-4 py-2 text-sm font-semibold text-white"
           >
             <CalendarPlus size={16} weight="bold" /> Créer une réservation

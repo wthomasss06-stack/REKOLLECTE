@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import AccessPointDetailView, AccessPointListView, CheckInExportView, CheckInListView, CheckInStatsView, DocumentOcrView, FormTemplateDetailView, FormTemplateListView, FormTemplateView, PublicFormView, SyncCheckInsView
+from .views import AccessPointDetailView, AccessPointListView, CheckInAlertsView, CheckInExportView, CheckInListView, CheckInStatsView, DocumentOcrView, FormTemplateDetailView, FormTemplateListView, FormTemplateView, PublicFormView, SyncCheckInsView
 
 urlpatterns = [
     path("form-template/", FormTemplateView.as_view(), name="form-template"),
@@ -12,6 +12,7 @@ urlpatterns = [
     path("public/forms/<str:qr_token>/ocr/", DocumentOcrView.as_view(), name="public-form-ocr"),
     path("checkins/sync/", SyncCheckInsView.as_view(), name="checkins-sync"),
     path("checkins/", CheckInListView.as_view(), name="checkins-list"),
+    path("checkins/alerts/", CheckInAlertsView.as_view(), name="checkins-alerts"),
     path("checkins/stats/", CheckInStatsView.as_view(), name="checkins-stats"),
     path("checkins/export/", CheckInExportView.as_view(), name="checkins-export"),
 ]

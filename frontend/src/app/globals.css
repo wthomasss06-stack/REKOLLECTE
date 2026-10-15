@@ -77,31 +77,31 @@ h1, h2, h3, h4 {
   @apply font-sans font-bold;
 }
 
-.prose-legal h2 {
+.prose-legal h2:not(:where(.not-prose *)) {
   @apply mt-10 text-xl font-bold tracking-[-0.01em] text-mk-ink first:mt-0;
 }
 
-.prose-legal h3 {
+.prose-legal h3:not(:where(.not-prose *)) {
   @apply mt-6 text-base font-bold text-mk-ink;
 }
 
-.prose-legal p {
+.prose-legal p:not(:where(.not-prose *)) {
   @apply mt-3;
 }
 
-.prose-legal ul {
+.prose-legal ul:not(:where(.not-prose *)) {
   @apply mt-3 list-disc space-y-2 pl-5;
 }
 
-.prose-legal a {
+.prose-legal a:not(:where(.not-prose *)) {
   @apply underline underline-offset-4;
 }
 
-.prose-legal strong {
+.prose-legal strong:not(:where(.not-prose *)) {
   @apply font-bold text-mk-ink;
 }
 
-.prose-legal ol {
+.prose-legal ol:not(:where(.not-prose *)) {
   @apply mt-3 list-decimal space-y-2 pl-5;
 }
 
@@ -188,19 +188,29 @@ h1, h2, h3, h4 {
 @media (min-width: 768px) { .qr-staggered-menu, .qr-staggered-trigger { display: none; } }
 @media (prefers-reduced-motion: reduce) { .qr-staggered-menu { transition: none; } }
 
-/* Squelettes de chargement (components/ui/Skeleton.tsx) : bloc teinté + reflet qui balaye. */
-/* Dans @layer components : les utilitaires Tailwind (absolute, rounded-full…) gardent la priorité sur ce style de base. */
-@layer components {
-  .qr-skeleton { position: relative; overflow: hidden; border-radius: 10px; background: rgb(var(--c-ink) / 0.07); }
-  .qr-skeleton::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgb(var(--c-ink) / 0.07), transparent); animation: qr-shimmer 1.5s ease-in-out infinite; }
+/* Chargement de marque (components/Loader.tsx) : pastille + anneau qui tourne, sur tout l'espace connecté. */
+.rk-loader { position: relative; display: grid; place-content: center; justify-items: center; gap: 12px; padding: 32px 16px; text-align: center; color: rgb(var(--c-ink)); }
+.rk-loader--screen { min-height: 100vh; min-height: 100dvh; overflow: hidden; background: rgb(var(--c-canvas)); }
+.rk-loader--inline { min-height: 52vh; }
+.rk-loader__orb { position: relative; display: grid; place-items: center; width: 84px; height: 84px; }
+.rk-loader--inline .rk-loader__orb { width: 72px; height: 72px; }
+.rk-loader__ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgb(var(--c-cta) / 0.18); border-top-color: rgb(var(--c-cta)); border-right-color: rgb(var(--c-cta) / 0.55); }
+.rk-loader__mark { position: relative; z-index: 1; width: 44px; height: 44px; object-fit: contain; }
+.rk-loader--inline .rk-loader__mark { width: 38px; height: 38px; }
+.rk-loader__name { font-size: 1.05rem; letter-spacing: -0.02em; }
+.rk-loader__label { color: rgb(var(--c-ink-soft)); font-size: 0.9rem; }
+.rk-loader--screen::before, .rk-loader--screen::after { content: ""; position: absolute; z-index: 0; top: 50%; left: 50%; translate: -50% -50%; width: min(72vw, 720px); aspect-ratio: 1; border: 1px solid rgb(var(--c-cta) / 0.09); border-radius: 50%; pointer-events: none; }
+.rk-loader--screen::after { width: min(54vw, 520px); }
+.rk-loader > * { position: relative; z-index: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .rk-loader__ring { animation: rk-spin 1.35s linear infinite; }
+  .rk-loader__mark { animation: rk-breathe 1.8s ease-in-out infinite; }
+  .rk-loader--screen::before { animation: rk-halo 6s ease-in-out infinite alternate; }
+  .rk-loader--screen::after { animation: rk-halo 4.5s ease-in-out infinite alternate-reverse; }
 }
-@keyframes qr-shimmer { to { transform: translateX(100%); } }
-@media (prefers-reduced-motion: reduce) { .qr-skeleton::after { animation: none; } }
-
-/* Pastille « le serveur se réveille » : n'apparaît qu'après 0,5 s pour éviter tout clignotement. */
-.qr-wake-pill { animation: qr-wake-in 0.3s ease-out 0.5s both; }
-@keyframes qr-wake-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { .qr-wake-pill { animation: none; } }
+@keyframes rk-spin { to { transform: rotate(360deg); } }
+@keyframes rk-breathe { 50% { transform: scale(1.07); } }
+@keyframes rk-halo { to { transform: scale(1.08); opacity: 0.45; } }
 
 /* Loader de connexion plein écran. */
 .qr-login-loader { position: fixed; inset: 0; z-index: 100; display: flex; min-height: 100dvh; flex-direction: column; justify-content: flex-end; background: rgb(var(--c-canvas)); padding: 24px; color: rgb(var(--c-ink)); }
@@ -339,3 +349,40 @@ h1, h2, h3, h4 {
   .touch-comfort button[aria-label] { min-width: 44px; }
   .touch-comfort input[type="checkbox"], .touch-comfort input[type="radio"] { width: 1.375rem; height: 1.375rem; }
 }
+
+/* Lignes de réglages + fenêtre (components/ui/SettingsRows.tsx, SettingsModal.tsx) :
+   chaque rubrique est une ligne (icône, titre, description, chevron) qui ouvre une fenêtre ;
+   sur téléphone la fenêtre devient une feuille qui monte du bas de l'écran. */
+.rk-rows { display: grid; gap: 10px; }
+.rk-row { display: flex; width: 100%; align-items: center; gap: 14px; padding: 14px; border: 1px solid rgb(var(--c-border)); border-radius: 14px; background: rgb(var(--c-surface)); color: rgb(var(--c-ink)); font: inherit; text-align: left; text-decoration: none; cursor: pointer; transition: border-color 0.15s ease, background-color 0.15s ease; }
+.rk-row:hover { border-color: rgb(var(--c-cta)); }
+.rk-row:focus-visible { outline: 3px solid rgb(var(--c-cta) / 0.45); outline-offset: 2px; }
+.rk-row__icon { display: grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0; border-radius: 12px; background: rgb(var(--c-cta) / 0.1); color: rgb(var(--c-cta)); }
+.rk-row__meta { display: grid; gap: 2px; min-width: 0; flex: 1; }
+.rk-row__meta strong { font-size: 0.95rem; font-weight: 600; line-height: 1.3; }
+.rk-row__meta span { color: rgb(var(--c-ink-soft)); font-size: 0.85rem; line-height: 1.4; }
+.rk-row__chevron { flex-shrink: 0; color: rgb(var(--c-ink-soft)); }
+.rk-modal-backdrop { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; background: rgba(8, 19, 14, 0.58); animation: rk-fade-in 0.15s ease-out both; }
+.rk-modal { display: flex; width: min(100%, 760px); max-height: min(90vh, 900px); max-height: min(90dvh, 900px); flex-direction: column; overflow: hidden; border: 1px solid rgb(var(--c-border)); border-radius: 20px; background: rgb(var(--c-surface)); color: rgb(var(--c-ink)); box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24); animation: rk-pop-in 0.18s ease-out both; }
+.rk-modal--wide { width: min(100%, 1040px); }
+.rk-modal__header { display: flex; flex-shrink: 0; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 22px; border-bottom: 1px solid rgb(var(--c-border)); }
+.rk-modal__header h2 { margin: 0; font-size: 1.2rem; }
+.rk-modal__close { display: grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0; border: 1px solid rgb(var(--c-border)); border-radius: 12px; background: rgb(var(--c-surface)); color: rgb(var(--c-ink)); cursor: pointer; }
+.rk-modal__close:hover { border-color: rgb(var(--c-cta)); background: rgb(var(--c-canvas)); }
+.rk-modal__close:focus-visible { outline: 3px solid rgb(var(--c-cta) / 0.45); outline-offset: 2px; }
+.rk-modal__body { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 22px; }
+@keyframes rk-fade-in { from { opacity: 0; } }
+@keyframes rk-pop-in { from { opacity: 0; transform: translateY(8px) scale(0.985); } }
+@keyframes rk-sheet-in { from { transform: translateY(100%); } }
+@media (max-width: 600px) {
+  .rk-modal-backdrop { align-items: end; padding: 0; }
+  .rk-modal, .rk-modal--wide { width: 100%; max-height: 92vh; max-height: 92dvh; border-radius: 18px 18px 0 0; border-bottom: 0; animation: rk-sheet-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .rk-modal__header { padding: 14px 16px; }
+  .rk-modal__body { padding: 16px 16px calc(18px + env(safe-area-inset-bottom)); }
+}
+@media (prefers-reduced-motion: reduce) { .rk-modal-backdrop, .rk-modal { animation: none; } }
+
+/* Notification d'arrivée de visiteur (cloche de l'en-tête) */
+@keyframes rk-toast-in { from { opacity: 0; transform: translateX(16px); } }
+.rk-toast { animation: rk-toast-in 0.2s ease-out both; }
+@media (prefers-reduced-motion: reduce) { .rk-toast { animation: none; } }

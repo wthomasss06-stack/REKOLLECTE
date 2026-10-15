@@ -6,7 +6,7 @@ from rest_framework import serializers
 
 from .models import AccessPoint, CheckIn, FormTemplate
 
-ALLOWED_FIELD_TYPES = ("text", "phone", "email", "number", "date", "select", "checkbox", "signature", "photo", "document_scan")
+ALLOWED_FIELD_TYPES = ("text", "phone", "email", "number", "date", "select", "checkbox", "signature", "photo", "document_scan", "host")
 DOCUMENT_TYPES = ("cni", "passport", "free")
 DOCUMENT_EXTRACT_FIELDS = ("last_name", "first_names", "document_number", "birth_date", "nationality", "expiry_date")
 
@@ -35,6 +35,14 @@ class FormFieldSchemaSerializer(serializers.Serializer):
     extract_fields = serializers.ListField(child=serializers.ChoiceField(choices=DOCUMENT_EXTRACT_FIELDS), required=False)
     requires_agent_validation = serializers.BooleanField(required=False, default=True)
     retain_document_image = serializers.BooleanField(required=False, default=False)
+
+    def validate(self, attrs):
+        if attrs.get("type") == "host":
+            # « Qui venez-vous voir ? » est toujours facultatif, et sa liste vient des membres (jamais saisie à la main).
+            attrs["required"] = False
+            attrs.pop("options", None)
+            attrs.pop("identity_role", None)
+        return attrs
 
 
 class FormTemplateSerializer(serializers.ModelSerializer):

@@ -14,6 +14,11 @@
 - Sonde de santé : un 401/429 ou une page HTML d'attente passait pour « serveur réveillé ».
 - Lots d'envoi limités par poids (photos de pièces d'identité) pour rester sous le plafond serveur.
 
+**Profil / alertes (nouveau)**
+- `PATCH /auth/me/` : la photo n'accepte que `https://` (pas de `javascript:` ni `data:`), 1000 car. max ; nom nettoyé ; rôle, établissement et `is_visit_host` ne sont pas modifiables par ce point d'entrée (testé).
+- `GET /checkins/alerts/` : limité à l'établissement de l'utilisateur ; un membre simple ne voit que les visites où on le demande ; la réponse ne contient jamais la fiche complète (pièce d'identité, signature, téléphone) ; fenêtre de 24 h, 20 éléments max.
+- `PATCH /auth/team/members/<id>/visit-host/` : patron uniquement, même établissement, journalisé (`member.visit_host_updated`).
+
 **Authentification**
 - Google : audience non vérifiée si `GOOGLE_CLIENT_ID` absent (fail-open) → fail-closed.
 - Invitation révoquée qui bloquait une nouvelle invitation ; lien d'invitation pointait vers l'hôte API.

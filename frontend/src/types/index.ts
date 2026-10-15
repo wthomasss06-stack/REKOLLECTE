@@ -1,4 +1,5 @@
-export type FieldType = "text" | "phone" | "email" | "number" | "date" | "select" | "checkbox" | "signature" | "photo" | "document_scan";
+/** `host` = « Qui venez-vous voir ? » : le visiteur le reçoit comme une liste déroulante des personnes visitables (voir checkins/alerts.py). */
+export type FieldType = "text" | "phone" | "email" | "number" | "date" | "select" | "checkbox" | "signature" | "photo" | "document_scan" | "host";
 
 export interface FormField {
   id: string;
@@ -62,9 +63,25 @@ export interface UserProfile {
   organization_id: string;
   organization_name: string;
   is_active: boolean;
+  /** Apparaît dans « Qui venez-vous voir ? » et reçoit l'alerte d'arrivée (choisi par le patron). */
+  is_visit_host: boolean;
   access_revoked_at: string | null;
   access_revoked_reason: string;
 }
+
+/** Une arrivée à signaler (GET /checkins/alerts/). Jamais la fiche complète : seulement ce qu'affiche une notification. */
+export interface VisitAlert {
+  id: string;
+  visitor_name: string;
+  reason: string | null;
+  access_point: string | null;
+  /** `host` : on te demande toi ; `team` : aucune personne désignée, le patron et les gérants sont prévenus. */
+  for_you: "host" | "team";
+  arrived_at: string;
+  /** Synchronisée longtemps après l'arrivée (tablette restée hors ligne) : pas une arrivée « en direct ». */
+  late: boolean;
+}
+export interface VisitAlertsPayload { now: string; cursor: string; total: number; items: VisitAlert[]; }
 
 export interface StaffInvitation { id: string; email: string; role: AccountRole; accepted_at: string | null; revoked_at: string | null; revoked_reason: string; created_at: string; }
 export interface TeamAccess { members: UserProfile[]; invitations: StaffInvitation[]; }

@@ -2,7 +2,6 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { ArrowRight, CheckCircle, Lock } from "@phosphor-icons/react";
 
 import { useAuthContext } from "@/context/AuthContext";
@@ -24,9 +23,16 @@ interface GuideApi {
   visible: boolean;
   dismiss: () => void;
   refresh: () => Promise<void>;
+  /** Ouvrir la fenêtre Paiements = avoir « contrôlé » l'encaissement (dernière étape du guide). */
+  markPaymentsSeen: () => void;
 }
 
 const GuideContext = createContext<GuideApi | null>(null);
+
+/** Même chose que useGuide, mais renvoie null hors du fournisseur (page REKOLLECTE au Niveau 1, où le guide n'existe pas). */
+export function useGuideOptional(): GuideApi | null {
+  return useContext(GuideContext);
+}
 
 export function useGuide(): GuideApi {
   const ctx = useContext(GuideContext);
@@ -40,7 +46,6 @@ const write = (key: string) => { try { window.localStorage.setItem(key, "1"); } 
 
 export function GuideProvider({ children }: { children: ReactNode }) {
   const { organization, user } = useAuthContext();
-  const pathname = usePathname();
   const orgId = organization?.id ?? "org";
   const canManage = user?.role === "BOSS" || user?.role === "GERANT";
   const [summary, setSummary] = useState<KarnetSummary | null>(null);
@@ -63,18 +68,16 @@ export function GuideProvider({ children }: { children: ReactNode }) {
     setPaymentsSeen(read(flag("pay", orgId)));
   }, [orgId]);
 
-  // Ouvrir Paiements = avoir « contrôlé » l'encaissement (dernière étape).
-  useEffect(() => {
-    if (pathname.startsWith("/dashboard/karnet/paiements") && !read(flag("pay", orgId))) {
-      write(flag("pay", orgId));
-      setPaymentsSeen(true);
-    }
-  }, [pathname, orgId]);
+  const markPaymentsSeen = useCallback(() => {
+    if (read(flag("pay", orgId))) return;
+    write(flag("pay", orgId));
+    setPaymentsSeen(true);
+  }, [orgId]);
 
   useEffect(() => {
     void refresh();
     return onKarnetChanged(() => void refresh());
-  }, [refresh, pathname]);
+  }, [refresh]);
 
   const steps = useMemo(() => buildGuideSteps(summary, { paymentsSeen, canManage }), [summary, paymentsSeen, canManage]);
 
@@ -95,7 +98,7 @@ export function GuideProvider({ children }: { children: ReactNode }) {
   }, [orgId]);
 
   const visible = summary !== null && !dismissed && !completed && !allDone;
-  const value = useMemo<GuideApi>(() => ({ summary, steps, current, doneCount, visible, dismiss, refresh }), [summary, steps, current, doneCount, visible, dismiss, refresh]);
+  const value = useMemo<GuideApi>(() => ({ summary, steps, current, doneCount, visible, dismiss, refresh, markPaymentsSeen }), [summary, steps, current, doneCount, visible, dismiss, refresh, markPaymentsSeen]);
   return <GuideContext.Provider value={value}>{children}</GuideContext.Provider>;
 }
 

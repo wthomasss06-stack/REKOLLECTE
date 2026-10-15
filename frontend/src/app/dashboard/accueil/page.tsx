@@ -30,8 +30,8 @@ export default function AccueilPage() {
     load();
   }, [user?.role, load]);
 
-  if (state === "loading") return <Loader fullScreen={false} variant="cards" label="Ouverture du mode accueil…" />;
-  if (state === "error" || !org) return <AutoRetry variant="cards" onRetry={load} label="Ouverture du mode accueil…" />;
+  if (state === "loading") return <Loader fullScreen={false} label="Ouverture du mode accueil…" />;
+  if (state === "error" || !org) return <AutoRetry onRetry={load} label="Ouverture du mode accueil…" />;
 
   const visitorUrl = `/v/${org.qr_secure_token}`;
   if (mode === "qr") return <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-6"><button onClick={() => setMode("choose")} className="self-start inline-flex items-center gap-2 text-sm font-medium text-ink-soft hover:text-ink"><ArrowLeft size={17} /> Retour au Mode Accueil</button><div className="w-full rounded-2xl border border-border bg-surface p-6 text-center shadow-subtle sm:p-10"><p className="text-xs font-semibold uppercase tracking-[0.18em] text-ink-soft">Mode QR</p><h1 className="mt-2 text-3xl font-bold text-ink">QR visiteurs</h1><p className="mt-2 text-sm text-ink-soft">Présente ce QR aux visiteurs pour ouvrir le formulaire sur leur téléphone.</p><div className="mt-7 flex justify-center"><QRCodeManager qrToken={org.qr_secure_token} orgName={org.name} logoUrl={org.logo_url} canRegenerate={false} size={320} /></div></div></div>;

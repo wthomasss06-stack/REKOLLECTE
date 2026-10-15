@@ -1,33 +1,24 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import Loader from "@/components/Loader";
-import GettingStarted, { GuideProvider } from "@/components/karnet/GettingStarted";
+import { GuideProvider } from "@/components/karnet/GettingStarted";
 import { ReminderProvider } from "@/components/karnet/ReminderAlarm";
 import { useAuthContext } from "@/context/AuthContext";
 
-const TABS = [
-  { href: "/dashboard/karnet", label: "REKOLLECTE+", exact: true },
-  { href: "/dashboard/karnet/ressources", label: "Ressources", exact: false },
-  { href: "/dashboard/karnet/reservations", label: "Réservations", exact: false },
-  { href: "/dashboard/karnet/paiements", label: "Paiements", exact: false },
-  { href: "/dashboard/karnet/rappels", label: "Rappels", exact: false },
-];
-
+/** Ne reste ici que la fiche d'un client (/dashboard/karnet/clients/[id], lien partageable). Les autres rubriques de REKOLLECTE+
+ * vivent dans la page /dashboard/rekollecte (fenêtres) ; leurs anciennes adresses y sont redirigées (next.config). */
 export default function KarnetLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const pathname = usePathname();
   const { loading, organization, isAuthenticated } = useAuthContext();
   const karnetEnabled = Boolean(organization?.capabilities?.karnet);
 
   useEffect(() => {
     if (loading || !isAuthenticated) return;
-    // L'activation est decidee cote serveur uniquement : si l'etablissement revient
-    // au Niveau 1, un lien direct ne doit plus donner acces a ces pages.
-    if (!karnetEnabled) router.replace("/dashboard");
+    // L'activation est décidée côté serveur uniquement : si l'établissement revient au Niveau 1, un lien direct ne donne plus accès.
+    if (!karnetEnabled) router.replace("/dashboard/rekollecte");
   }, [loading, isAuthenticated, karnetEnabled, router]);
 
   if (loading || !karnetEnabled) return <Loader fullScreen={false} />;
@@ -35,33 +26,7 @@ export default function KarnetLayout({ children }: { children: React.ReactNode }
   return (
     <GuideProvider>
       <ReminderProvider>
-        {/* touch-comfort : champs et boutons >= 44 px sur tablette/téléphone (voir globals.css) */}
-        <div className="touch-comfort space-y-6">
-          <div>
-            <h1 className="text-2xl font-bold text-ink">REKOLLECTE+</h1>
-            <p className="mt-1 text-sm text-ink-soft">Les ressources, réservations, paiements et rappels de ton établissement.</p>
-          </div>
-          <GettingStarted variant={pathname === "/dashboard/karnet" ? "full" : "compact"} />
-          <div className="flex gap-1 overflow-x-auto border-b border-border">
-            {TABS.map((tab) => (
-              <Link
-                key={tab.href}
-                href={tab.href}
-                className={`inline-flex min-h-[44px] items-center whitespace-nowrap border-b-2 px-4 text-sm font-medium transition ${
-                  (tab.exact ? pathname === tab.href : pathname.startsWith(tab.href)) ? "border-cta text-ink" : "border-transparent text-ink-soft hover:text-ink"
-                }`}
-              >
-                {tab.label}
-              </Link>
-            ))}
-            {/* Le journal reste unique et deja construit dans Administration : on y renvoie
-                plutot que de dupliquer un second historique specifique a REKOLLECTE+. */}
-            <Link href="/dashboard/parametres/administration" className="inline-flex min-h-[44px] items-center whitespace-nowrap border-b-2 border-transparent px-4 text-sm font-medium text-ink-soft hover:text-ink">
-              Audit
-            </Link>
-          </div>
-          {children}
-        </div>
+        <div className="touch-comfort space-y-6">{children}</div>
       </ReminderProvider>
     </GuideProvider>
   );

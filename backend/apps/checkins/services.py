@@ -13,6 +13,7 @@ from apps.karnet.models import Client
 from apps.karnet.services import find_or_create_client as get_or_create_client, normalize_phone as canonicalize_phone
 from apps.organizations.models import Organization
 
+from .alerts import HOST_FIELD_TYPE, resolve_host
 from .models import AccessPoint, CheckIn, FormTemplate
 
 
@@ -40,6 +41,8 @@ def missing_required_fields(template: FormTemplate | None, responses: dict, sign
         return []
     missing = []
     for f in template.fields_schema:
+        if f.get("type") == HOST_FIELD_TYPE:
+            continue  # « Qui venez-vous voir ? » reste facultatif : une visite n'est jamais refusée pour ça
         if f.get("required") and not (
             bool(signature_blob) if f.get("type") == "signature" else bool(responses.get(f.get("id")))
         ):
@@ -101,6 +104,8 @@ def normalize_phone(value: object) -> str:
 
 
 def _field_identity_role(field: dict) -> str | None:
+    if field.get("type") == HOST_FIELD_TYPE:
+        return None  # le nom de la personne visitée n'est pas celui du visiteur (ni son téléphone ni son e-mail)
     explicit = field.get("identity_role")
     if explicit in {"full_name", "phone", "email"}:
         return explicit
@@ -190,6 +195,7 @@ def sync_single_checkin(item: dict) -> SyncOutcome:
                 form_template=template,
                 client=client,
                 access_point=access_point,
+                host=resolve_host(organization, template, item["responses"]),
                 idempotency_key=item["idempotency_key"],
                 responses=item["responses"],
                 signature_blob=item.get("signature_blob", ""),

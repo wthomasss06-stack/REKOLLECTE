@@ -54,6 +54,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         limit_choices_to={"role": Role.GERANT},
     )
     is_active = models.BooleanField(default=True)
+    # Apparaît dans la liste « Qui venez-vous voir ? » du formulaire visiteur et reçoit l'alerte d'arrivée qui le concerne.
+    is_visit_host = models.BooleanField(default=False)
     access_revoked_at = models.DateTimeField(null=True, blank=True)
     access_revoked_reason = models.CharField(max_length=255, blank=True)
     is_staff = models.BooleanField(default=False)  # acces Django admin, distinct du role produit STAFF

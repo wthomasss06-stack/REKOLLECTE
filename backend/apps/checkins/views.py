@@ -4,7 +4,7 @@ import re
 import secrets
 import uuid
 from collections import Counter
-from datetime import datetime, time
+from datetime import UTC, datetime, time
 
 from django.db import IntegrityError, transaction
 from django.http import StreamingHttpResponse
@@ -20,6 +20,7 @@ from apps.common.permissions import IsBoss, IsBossOrGerant, IsOrgMember
 from apps.common.responses import error_response
 from apps.organizations.models import Organization
 
+from .alerts import build_alert_payload, public_fields_schema
 from .models import AccessPoint, CheckIn, FormTemplate
 from .ocr_utils import OCR_FIELDS, run_document_ocr
 from .serializers import AccessPointSerializer, AccessPointWriteSerializer, CheckInSerializer, CheckInSyncItemSerializer, FormTemplateCreateSerializer, FormTemplateSerializer, PublicFormSerializer
@@ -178,7 +179,7 @@ class PublicFormView(APIView):
             return error_response("Aucun formulaire actif pour ce point d’accueil.", status.HTTP_404_NOT_FOUND)
         if access_point:
             AccessPoint.objects.filter(id=access_point.id).update(last_seen_at=timezone.now())
-        data = {"organization_name": organization.name, "organization_logo_url": organization.logo_url, "visit_reasons": organization.visit_reasons or [], "fields_schema": template.fields_schema, "form_id": template.id, "form_title": template.title, "access_point_id": access_point.id if access_point else None, "access_point_name": access_point.name if access_point else "Accueil principal"}
+        data = {"organization_name": organization.name, "organization_logo_url": organization.logo_url, "visit_reasons": organization.visit_reasons or [], "fields_schema": public_fields_schema(template, organization), "form_id": template.id, "form_title": template.title, "access_point_id": access_point.id if access_point else None, "access_point_name": access_point.name if access_point else "Accueil principal"}
         return Response(PublicFormSerializer(data).data)
 
 
@@ -202,6 +203,26 @@ class SyncCheckInsView(APIView):
                 continue
             processed.append(sync_single_checkin(serializer.validated_data).as_dict())
         return Response({"synced_count": len(processed), "processed": processed})
+
+
+class CheckInAlertsView(APIView):
+    """Alertes d'arrivée pour l'espace connecté (interrogé toutes les quelques secondes tant que le tableau de bord est ouvert).
+
+    `since` = le `cursor` renvoyé par l'appel précédent. Sans `since`, rien n'est renvoyé que le premier curseur : un tableau de
+    bord qui s'ouvre ne rejoue pas tout l'historique. Le curseur est une heure SERVEUR (pas l'horloge du navigateur)."""
+
+    permission_classes = [IsAuthenticated, IsOrgMember]
+
+    def get(self, request):
+        raw = request.query_params.get("since")
+        since = None
+        if raw:
+            since = parse_datetime(raw)
+            if since is None:
+                return error_response("Paramètre « since » invalide (date ISO 8601 attendue).", status.HTTP_400_BAD_REQUEST)
+            if timezone.is_naive(since):
+                since = since.replace(tzinfo=UTC)
+        return Response(build_alert_payload(request.user, since))
 
 
 class DocumentOcrView(APIView):

@@ -2,7 +2,6 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { BellRinging, SpeakerSlash } from "@phosphor-icons/react";
 
 import { apiClient } from "@/lib/api";
@@ -27,6 +26,8 @@ interface ReminderApi {
   disableSound: () => void;
   testSound: () => Promise<boolean>;
   setKeepAwake: (value: boolean) => void;
+  /** La fenêtre « Rappels » est ouverte : elle montre déjà les créneaux, on masque la bannière pour ne pas les afficher deux fois. */
+  setBannerHidden: (hidden: boolean) => void;
 }
 
 const ReminderContext = createContext<ReminderApi | null>(null);
@@ -46,11 +47,11 @@ type WakeNavigator = Navigator & { wakeLock?: { request: (type: "screen") => Pro
  * titre de l'onglet, vibration) — le son seul n'est jamais la seule issue.
  */
 export function ReminderProvider({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
   const [due, setDue] = useState<KarnetReservation[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [sound, setSound] = useState<SoundState>("off");
   const [keepAwake, setKeepAwakeState] = useState(false);
+  const [bannerHidden, setBannerHidden] = useState(false);
   const knownDue = useRef<Set<string>>(new Set());
   const firstLoad = useRef(true);
   const lastRing = useRef(0);
@@ -179,11 +180,11 @@ export function ReminderProvider({ children }: { children: ReactNode }) {
   }, [acquireWake, releaseWake]);
 
   const value = useMemo<ReminderApi>(
-    () => ({ due, loaded, sound, wakeLockSupported, keepAwake, refresh, enableSound, disableSound, testSound, setKeepAwake }),
+    () => ({ due, loaded, sound, wakeLockSupported, keepAwake, refresh, enableSound, disableSound, testSound, setKeepAwake, setBannerHidden }),
     [due, loaded, sound, wakeLockSupported, keepAwake, refresh, enableSound, disableSound, testSound, setKeepAwake],
   );
 
-  const onRemindersPage = pathname.startsWith("/dashboard/karnet/rappels");
+  const onRemindersPage = bannerHidden;
   return (
     <ReminderContext.Provider value={value}>
       {due.length > 0 && !onRemindersPage && (
@@ -198,7 +199,7 @@ export function ReminderProvider({ children }: { children: ReactNode }) {
                 <SpeakerSlash size={18} weight="bold" /> Réactiver le son
               </button>
             )}
-            <Link href="/dashboard/karnet/rappels" className="inline-flex min-h-[44px] items-center rounded-full bg-cta px-5 text-sm font-semibold text-cta-ink">Traiter maintenant</Link>
+            <Link href="/dashboard/rekollecte?open=rappels" className="inline-flex min-h-[44px] items-center rounded-full bg-cta px-5 text-sm font-semibold text-cta-ink">Traiter maintenant</Link>
           </div>
         </div>
       )}

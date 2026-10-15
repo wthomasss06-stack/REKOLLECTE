@@ -12,10 +12,13 @@
 | SEO (3 mots-clés, 1 page chacun) | ✅ En place — reste à soumettre le sitemap dans Search Console |
 | Parcours visiteur hors-ligne | ✅ Corrigé et testé en navigateur (serveur endormi, envoi différé) |
 | Sécurité / robustesse | ✅ Audit fait, failles sûres corrigées et testées |
-| Déploiement | ⏳ 3 actions de ta part (section 2) |
+| Espace connecté (4 liens, lignes + fenêtres, loader de marque) | ✅ Refait sur le modèle E-Carnet, testé en navigateur (Niveau 1 et 2, patron / gérant / staff, ordinateur et téléphone) |
+| Alerte à l'hôte (#1) | ✅ Dans le tableau de bord (cloche, pastille, carillon). WhatsApp/e-mail : volontairement pas fait |
+| Déploiement | ⏳ Actions de ta part (section 2) — dont `migrate` (2 migrations) |
 
 ## 2. Avant de reprendre — à faire de ton côté (≈ 30 min)
 
+- [ ] **`python manage.py migrate`** (accounts `0009`, checkins `0005`) avant de déployer le front : sans elle, `/checkins/alerts/` et la liste d'équipe répondent en erreur.
 - [ ] **Secret Cloudinary** : supprimer `frontend/hh` du dépôt et de l'historique git, puis régénérer le secret API dans Cloudinary et mettre à jour Render / Vercel.
 - [ ] **Variables Render** : `DEBUG=False`, `ALLOWED_HOSTS` explicite, `GOOGLE_CLIENT_ID`, `FRONTEND_URL`, `CORS_ALLOWED_ORIGINS`, `CSRF_TRUSTED_ORIGINS`.
 - [ ] **`NUM_PROXIES=2`** (Vercel puis Render) : sans lui, les limiteurs de débit se contournent en falsifiant l'IP.
@@ -32,7 +35,7 @@ Classées par valeur pour le client (hôtel, PME, établissement à Abidjan). Ef
 
 | # | Fonctionnalité | Pourquoi | Effort |
 |---|---|---|---|
-| 1 | **Alerte à l'hôte** (WhatsApp ou e-mail) quand un visiteur arrive | C'est ce qui donne de la valeur au produit : la personne attendue est prévenue tout de suite. Cible WhatsApp = marché ivoirien. | M |
+| 1 | ✅ **Alerte à l'hôte** — fait dans le tableau de bord. Reste : envoi **WhatsApp / e-mail** quand l'application est fermée (cible WhatsApp = marché ivoirien) | La personne attendue est prévenue tout de suite. | M |
 | 2 | **Sortie du visiteur** (heure de départ, durée de présence) | Un registre sans sortie est incomplet pour la sécurité (qui est encore dans les locaux ?). | M |
 | 3 | **Conservation des données** : suppression automatique après N mois + mention de consentement sur le formulaire | Tu stockes des pièces d'identité. Vérifie ce que la loi ivoirienne sur la protection des données personnelles (ARTCI) impose — à confirmer avec un juriste. | M |
 
@@ -53,7 +56,7 @@ Classées par valeur pour le client (hôtel, PME, établissement à Abidjan). Ef
 | 9 | Interface en anglais | Hôtels et clients internationaux. | M |
 | 10 | Statistiques avancées (heures de pointe, durée moyenne) | Après la sortie du visiteur (#2). | M |
 
-**Si une seule à garder pour la reprise : la #1.**
+**Prochaine à prendre : la #3 (conservation des données), puis la #2.**
 
 ## 4. Consolidation technique (issue de l'audit)
 
@@ -69,12 +72,13 @@ Classées par valeur pour le client (hôtel, PME, établissement à Abidjan). Ef
 - **CSP** : remplacer `'unsafe-inline'` par une CSP à nonce.
 - **Dépendances en retard** : Django 5.0.6 (fin de support), requests, Pillow, gunicorn, simplejwt → mise à jour par paliers avec la suite de tests.
 - **Chemin de l'admin Django** : définir `DJANGO_ADMIN_URL` en production.
+- **Sondage des alertes** (8 s par onglet ouvert) : correct pour quelques comptes ; au-delà, passer à des événements serveur (SSE) ou à du push.
 - **Test OCR** (`test_document_ocr`) dépend de la version de Tesseract → à rendre robuste.
 
 ## 5. Ordre conseillé à la reprise
 
 1. Section 2 (déploiement propre et test réel).
-2. Fonctionnalité #1 (alerte à l'hôte).
+2. ✅ Fonctionnalité #1 (alerte à l'hôte, tableau de bord) — fait.
 3. Fonctionnalité #3 (conservation des données) — avant d'avoir des clients payants.
 4. Fonctionnalité #2 (sortie du visiteur).
 5. Consolidation technique, au fil de l'eau.

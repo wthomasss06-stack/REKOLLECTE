@@ -43,6 +43,30 @@ const nextConfig = {
   reactStrictMode: true,
   outputFileTracingRoot: process.cwd(),
   allowedDevOrigins: ["127.0.0.1", "localhost"],
+  // Anciennes adresses des onglets Paramètres / REKOLLECTE+ : chaque rubrique est désormais une fenêtre de sa page (`?open=…`).
+  // Les liens enregistrés, les retours de connexion Facebook/Apple (`/dashboard/parametres/connexion?linked=…`) et l'ancien
+  // guide continuent de marcher ; les paramètres d'origine (`auth_error`, `client`, `onboarding`…) sont conservés par Next.
+  async redirects() {
+    const to = (source, destination, extra = {}) => ({ source, destination, permanent: false, ...extra });
+    return [
+      to("/dashboard/parametres/formulaire", "/dashboard/rekollecte?open=formulaire"),
+      to("/dashboard/parametres/qr-code", "/dashboard/rekollecte?open=qr"),
+      to("/dashboard/parametres/equipe", "/dashboard/parametres?open=equipe"),
+      to("/dashboard/parametres/entreprise", "/dashboard/parametres?open=entreprise"),
+      to("/dashboard/parametres/connexion", "/dashboard/parametres?open=connexion"),
+      to("/dashboard/parametres/administration", "/dashboard/parametres?open=administration"),
+      to("/dashboard/formulaire", "/dashboard/rekollecte?open=formulaire"),
+      to("/dashboard/qr-code", "/dashboard/rekollecte?open=qr"),
+      to("/dashboard/equipe", "/dashboard/parametres?open=equipe"),
+      to("/dashboard/karnet", "/dashboard/rekollecte?open=clients", { has: [{ type: "query", key: "new", value: "1" }] }),
+      to("/dashboard/karnet", "/dashboard/rekollecte"),
+      to("/dashboard/karnet/ressources", "/dashboard/rekollecte?open=ressources"),
+      to("/dashboard/karnet/reservations", "/dashboard/rekollecte?open=reservations"),
+      to("/dashboard/karnet/paiements", "/dashboard/rekollecte?open=paiements"),
+      to("/dashboard/karnet/rappels", "/dashboard/rekollecte?open=rappels"),
+      to("/dashboard/karnet/visiteurs", "/dashboard"),
+    ];
+  },
   async rewrites() {
     return [{ source: "/api/v1/:path*", destination: `${backendApiBase}/api/v1/:path*` }];
   },

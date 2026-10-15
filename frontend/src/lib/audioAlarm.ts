@@ -99,3 +99,60 @@ export async function playAlarm(): Promise<boolean> {
   beepAt(0.8);
   return true;
 }
+
+// --- Alertes d'arrivée de visiteurs ------------------------------------------------------------------------------------
+// Même contexte audio (donc même déblocage par geste) que la sonnerie des rappels, mais une préférence à part : un
+// patron peut vouloir le carillon des visiteurs sans la sonnerie des rappels, et inversement.
+
+export const VISIT_SOUND_PREF_KEY = "qr_visit_sound_v1";
+
+export function readVisitSoundPreference(): boolean {
+  try {
+    return window.localStorage.getItem(VISIT_SOUND_PREF_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function writeVisitSoundPreference(enabled: boolean): void {
+  try {
+    if (enabled) window.localStorage.setItem(VISIT_SOUND_PREF_KEY, "1");
+    else window.localStorage.removeItem(VISIT_SOUND_PREF_KEY);
+  } catch {
+    /* stockage indisponible : la préférence vaut pour cette session seulement */
+  }
+}
+
+export function currentVisitSoundState(): SoundState {
+  if (!audioSupported()) return "unsupported";
+  if (!readVisitSoundPreference()) return "off";
+  return context && context.state === "running" ? "ready" : "blocked";
+}
+
+/** Carillon doux à deux notes (do-sol aigus), distinct des trois bips d'alarme. Renvoie false si le son est bloqué. */
+export async function playChime(): Promise<boolean> {
+  if (!context || context.state === "closed") return false;
+  try {
+    if (context.state !== "running") await context.resume();
+  } catch {
+    return false;
+  }
+  if (context.state !== "running") return false;
+  const ctx = context;
+  const noteAt = (frequency: number, offset: number) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.value = frequency;
+    const start = ctx.currentTime + offset;
+    gain.gain.setValueAtTime(0.0001, start);
+    gain.gain.exponentialRampToValueAtTime(0.28, start + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.55);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(start);
+    osc.stop(start + 0.58);
+  };
+  noteAt(784, 0); // sol5
+  noteAt(1175, 0.22); // ré6
+  return true;
+}

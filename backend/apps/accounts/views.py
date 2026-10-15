@@ -236,6 +236,25 @@ class TeamAccessView(APIView):
         })
 
 
+class MemberVisitHostView(APIView):
+    """Le patron choisit qui apparaît dans « Qui venez-vous voir ? » (formulaire visiteur) et reçoit l'alerte d'arrivée."""
+
+    permission_classes = [IsAuthenticated, IsBoss]
+
+    def patch(self, request, user_id):
+        member = User.objects.filter(id=user_id, organization=request.user.organization, is_active=True, access_revoked_at__isnull=True, is_superuser=False).first()
+        if not member:
+            return error_response("Membre introuvable.", status.HTTP_404_NOT_FOUND)
+        value = request.data.get("is_visit_host")
+        if not isinstance(value, bool):
+            return error_response("Le champ « is_visit_host » doit être vrai ou faux.", status.HTTP_400_BAD_REQUEST)
+        if member.is_visit_host != value:
+            member.is_visit_host = value
+            member.save(update_fields=["is_visit_host"])
+            AuditEvent.objects.create(organization=request.user.organization, actor=request.user, action="member.visit_host_updated", target_user=member, metadata={"is_visit_host": value})
+        return Response(UserSerializer(member).data)
+
+
 class RevokeInvitationView(APIView):
     permission_classes = [IsAuthenticated, IsBoss]
 

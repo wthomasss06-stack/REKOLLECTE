@@ -1,5 +1,6 @@
 import uuid
 
+from django.conf import settings
 from django.db import models
 
 
@@ -51,6 +52,8 @@ class CheckIn(models.Model):
         related_name="checkins",
     )
     access_point = models.ForeignKey(AccessPoint, on_delete=models.SET_NULL, null=True, blank=True, related_name="checkins")
+    # Personne que le visiteur dit venir voir (champ « host » du formulaire). Nul = pas de réponse : l'alerte va au patron et aux gérants.
+    host = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="hosted_checkins")
     idempotency_key = models.UUIDField(unique=True)
     responses = models.JSONField(default=dict)
     signature_blob = models.TextField(blank=True, null=True)
@@ -59,7 +62,11 @@ class CheckIn(models.Model):
 
     class Meta:
         ordering = ["-created_at_client"]
-        indexes = [models.Index(fields=["organization", "-created_at_client"]), models.Index(fields=["access_point", "-created_at_client"])]
+        indexes = [
+            models.Index(fields=["organization", "-created_at_client"]),
+            models.Index(fields=["access_point", "-created_at_client"]),
+            models.Index(fields=["organization", "synced_at"], name="checkins_org_synced_idx"),  # alertes d'arrivée (curseur serveur)
+        ]
 
     def __str__(self):
         return f"Check-in {self.id} — {self.organization_id}"

@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "email", "full_name", "avatar_url", "role", "manager_id", "manager_name", "organization_id", "organization_name", "is_active", "access_revoked_at", "access_revoked_reason"]
+        fields = ["id", "email", "full_name", "avatar_url", "role", "manager_id", "manager_name", "organization_id", "organization_name", "is_active", "is_visit_host", "access_revoked_at", "access_revoked_reason"]
         read_only_fields = fields
 
 
@@ -40,7 +40,18 @@ class UserProfileUpdateSerializer(serializers.Serializer):
     une auto-promotion serait une faille de privilege escalation."""
 
     full_name = serializers.CharField(max_length=255, required=False, allow_blank=True)
-    avatar_url = serializers.CharField(required=False, allow_blank=True)
+    avatar_url = serializers.CharField(required=False, allow_blank=True, max_length=1000)
+
+    def validate_avatar_url(self, value: str) -> str:
+        """Une photo de profil est une adresse https (Cloudinary, Google…) : jamais `javascript:`, `data:` ni une adresse non chiffrée,
+        puisqu'elle est affichée aux autres membres de l'établissement (équipe, journal)."""
+        value = value.strip()
+        if value and not value.lower().startswith("https://"):
+            raise serializers.ValidationError("L’adresse de la photo doit commencer par https://.")
+        return value
+
+    def validate_full_name(self, value: str) -> str:
+        return " ".join(value.split())
 
 
 class GoogleAuthSerializer(serializers.Serializer):
