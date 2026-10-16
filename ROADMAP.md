@@ -13,7 +13,7 @@
 | Parcours visiteur hors-ligne | ✅ Corrigé et testé en navigateur (serveur endormi, envoi différé) |
 | Sécurité / robustesse | ✅ Audit fait, failles sûres corrigées et testées |
 | Espace connecté (4 liens, lignes + fenêtres, loader de marque) | ✅ Refait sur le modèle E-Carnet, testé en navigateur (Niveau 1 et 2, patron / gérant / staff, ordinateur et téléphone) |
-| Alerte à l'hôte (#1) | ✅ Dans le tableau de bord (cloche, pastille, carillon). WhatsApp/e-mail : volontairement pas fait |
+| Alerte à l'hôte (#1) | ✅ Dans le tableau de bord (cloche gooey, lues/non lues, effacement, pastille, carillon). WhatsApp/e-mail : volontairement pas fait |
 | Déploiement | ⏳ Actions de ta part (section 2) — dont `migrate` (2 migrations) |
 
 ## 2. Avant de reprendre — à faire de ton côté (≈ 30 min)

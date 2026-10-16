@@ -1,21 +1,64 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { GoogleLogin } from "@react-oauth/google";
 import { ArrowLeft, CheckCircle, Info, LockKey, QrCode, ShieldCheck, WarningCircle, WifiSlash, X } from "@phosphor-icons/react";
 
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
+import { WelcomeScene, type SceneStatus } from "@/components/auth/WelcomeScene";
 import SocialButtons, { SOCIAL_BUTTON_BASE, enabledProviders, useAuthNotice } from "@/components/auth/SocialButtons";
 import { useGoogleAuthLogin } from "@/hooks/useAuth";
+import "./auth-stage.css";
 
-const POINTS = [
-  { icon: QrCode, title: "Zéro compte pour le visiteur", body: "Il scanne, remplit et signe depuis son téléphone." },
-  { icon: WifiSlash, title: "Continue sans réseau", body: "Les visites se synchronisent au retour de la connexion." },
-  { icon: ShieldCheck, title: "Chacun voit ce qu’il doit voir", body: "Accès par rôle : Patron, Gérant ou Staff." },
+const CHIPS = [
+  { icon: QrCode, label: "Visiteur sans compte" },
+  { icon: WifiSlash, label: "Marche hors ligne" },
+  { icon: ShieldCheck, label: "Accès par rôle" },
 ];
+
+/** Délai d'apparition (animation d'entrée) : l'élément n°i arrive après i × 80 ms. */
+const reveal = (index: number) => ({ "--i": index }) as CSSProperties;
+
+/** Texte de la bulle de la scène : trois phrases qui tournent, remplacées par un message d'état pendant la connexion ou après une erreur.
+ * Sans animation (prefers-reduced-motion), la première phrase reste affichée. */
+function useBubble(status: SceneStatus): string {
+  const [index, setIndex] = useState(0);
+  const [greeting, setGreeting] = useState("Bonjour !");
+  useEffect(() => {
+    const hour = new Date().getHours();
+    setGreeting(hour >= 18 || hour < 5 ? "Bonsoir !" : "Bonjour !");
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = window.setInterval(() => setIndex((current) => (current + 1) % 3), 4200);
+    return () => window.clearInterval(timer);
+  }, []);
+  if (status === "busy") return "Un instant…";
+  if (status === "error") return "Oups, vérifions ça.";
+  return ["Bienvenue sur REKOLLECTE", greeting, "Vos visiteurs, bien accueillis"][index] ?? "Bienvenue sur REKOLLECTE";
+}
+
+/** Parallaxe douce de la scène avec le pointeur (souris uniquement, jamais en « mouvement réduit »). Écrit deux variables CSS, sans rendu React. */
+function useStageParallax(ref: React.RefObject<HTMLElement>) {
+  useEffect(() => {
+    const stage = ref.current;
+    if (!stage) return;
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let frame = 0;
+    const move = (event: PointerEvent) => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        stage.style.setProperty("--px", ((event.clientX / window.innerWidth - 0.5) * 2).toFixed(3));
+        stage.style.setProperty("--py", ((event.clientY / window.innerHeight - 0.5) * 2).toFixed(3));
+      });
+    };
+    window.addEventListener("pointermove", move, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("pointermove", move);
+    };
+  }, [ref]);
+}
 
 const GOOGLE_MIN_WIDTH = 200;
 const GOOGLE_MAX_WIDTH = 400; // bornes imposées par Google (200 à 400 px)
@@ -112,6 +155,7 @@ export default function LoginPage() {
   const { login, error, loading } = useGoogleAuthLogin();
   const { notice, dismiss } = useAuthNotice();
   const [googleFailed, setGoogleFailed] = useState(false);
+  const stageRef = useRef<HTMLElement>(null);
   const providers = enabledProviders();
   const hasSocial = providers.includes("facebook") || providers.includes("apple");
 
@@ -123,6 +167,11 @@ export default function LoginPage() {
       : notice
         ? { tone: notice.tone, text: notice.message }
         : null;
+
+  // La scène réagit : scan accéléré pendant la connexion, téléphone secoué sur une erreur.
+  const status: SceneStatus = loading ? "busy" : message?.tone === "error" ? "error" : "idle";
+  const bubble = useBubble(status);
+  useStageParallax(stageRef);
 
   return (
     <>
@@ -137,101 +186,98 @@ export default function LoginPage() {
         </div>
       )}
 
-      <div className="grid min-h-[100dvh] w-full bg-canvas lg:grid-cols-[1.05fr_1fr]">
-        {/* Colonne marque (ordinateur) */}
-        <aside className="relative hidden flex-col justify-between overflow-hidden bg-mk-deep p-12 text-deep-ink lg:flex">
-          <Image
-            src="/landing-images/securite-carre.webp"
-            alt=""
-            fill
-            className="object-cover opacity-35 mix-blend-overlay"
-            sizes="(min-width: 1024px) 52vw, 100vw"
-            priority
-          />
-          <div className="relative z-10"><Logo size={64} back /></div>
-          <div className="relative z-10 max-w-md space-y-8">
-            <div className="space-y-3">
-              <p className="text-balance font-heading text-3xl font-bold leading-tight xl:text-4xl">Le registre digital des établissements.</p>
-              <p className="text-sm leading-relaxed text-deep-ink/80">Une alternative moderne et sans contact au cahier de visites papier.</p>
-            </div>
-            <ul className="space-y-5">
-              {POINTS.map(({ icon: Icon, title, body }) => (
-                <li key={title} className="flex items-start gap-4">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/10 ring-1 ring-white/20"><Icon size={20} weight="bold" aria-hidden="true" /></span>
-                  <span className="text-sm leading-snug"><strong className="block font-semibold">{title}</strong><span className="text-deep-ink/75">{body}</span></span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </aside>
-
-        {/* Colonne connexion */}
-        <main className="flex flex-col px-5 pb-8 pt-5 sm:px-10">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="inline-flex min-h-[44px] items-center gap-2 rounded-full pr-3 text-sm font-medium text-ink-soft transition hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta">
-              <ArrowLeft size={16} aria-hidden="true" /> Retour au site
+      <div className="lg-root">
+        <div className="lg-frame">
+          <div className="lg-tools">
+            <Link href="/" className="lg-back" aria-label="Retour au site">
+              <ArrowLeft size={18} weight="bold" aria-hidden="true" />
+              <span className="lg-back__label">Retour au site</span>
             </Link>
-            <ThemeToggle />
+            <ThemeToggle className="lg-toggle" />
           </div>
 
-          <div className="mx-auto flex w-full max-w-[400px] flex-1 flex-col justify-center py-8">
-            <div className="flex flex-col items-center text-center">
-              <div className="lg:hidden"><Logo size={64} /></div>
-              <h1 className="mt-5 text-balance text-2xl font-bold tracking-tight text-ink sm:text-3xl lg:mt-0">Connecte-toi à ton espace</h1>
-              <p className="mt-3 text-balance text-sm leading-relaxed text-ink-soft">
-                Réservé au patron et à son équipe : un compte Google{hasSocial ? ", Facebook ou Apple" : ""} suffit, sans mot de passe.
-              </p>
+          {/* Volet scène : décoratif (la scène et la bulle sont masquées aux lecteurs d'écran). */}
+          <aside ref={stageRef} className="lg-stage" aria-label="Présentation de REKOLLECTE">
+            <i className="lg-blob lg-blob--a" aria-hidden="true" />
+            <i className="lg-blob lg-blob--b" aria-hidden="true" />
+            <div className="lg-brand"><span aria-hidden="true"><Logo size={34} /></span><span>REKOLLECTE</span></div>
+            <div className="lg-visual" aria-hidden="true">
+              <div className="lg-bubble-slot"><p key={bubble} className="lg-bubble" data-status={status}>{bubble}</p></div>
+              <WelcomeScene status={status} className="lg-scene" />
             </div>
+            <div className="lg-hero">
+              <p className="lg-hero__title">Le registre digital des établissements.</p>
+              <p className="lg-hero__lead">Une alternative moderne et sans contact au cahier de visites papier.</p>
+              <ul className="lg-chips">
+                {CHIPS.map(({ icon: Icon, label }, index) => (
+                  <li key={label} className="lg-chip" style={reveal(index)}><Icon size={15} weight="bold" aria-hidden="true" />{label}</li>
+                ))}
+              </ul>
+            </div>
+          </aside>
 
-            {message && (
-              <div
-                role={message.tone === "error" ? "alert" : "status"}
-                className={`mt-6 flex items-start gap-3 rounded-xl border p-3.5 text-left text-sm leading-snug ${
-                  message.tone === "error" ? "border-error-text/30 bg-error-bg text-error-text" : "border-info-text/30 bg-info-bg text-info-text"
-                }`}
-              >
-                {message.tone === "error" ? <WarningCircle size={20} weight="fill" className="mt-0.5 shrink-0" aria-hidden="true" /> : <Info size={20} weight="fill" className="mt-0.5 shrink-0" aria-hidden="true" />}
-                <p className="min-w-0 flex-1 font-medium">{message.text}</p>
-                {!error && (
-                  <button type="button" onClick={() => { dismiss(); setGoogleFailed(false); }} aria-label="Fermer ce message" className="-m-1.5 grid h-8 w-8 shrink-0 place-items-center rounded-full opacity-70 transition hover:opacity-100">
-                    <X size={16} aria-hidden="true" />
-                  </button>
-                )}
-              </div>
-            )}
+          {/* Volet connexion */}
+          <main className="lg-panel">
+            <div className="lg-col">
+              <div className="lg-main">
+                <div className="lg-reveal" style={reveal(0)}>
+                  <h1 className="text-balance text-[1.7rem] font-extrabold leading-tight tracking-tight text-ink sm:text-3xl">Connecte-toi à ton espace</h1>
+                  <p className="mt-2.5 text-sm leading-relaxed text-ink-soft">
+                    Réservé au patron et à son équipe : un compte Google{hasSocial ? ", Facebook ou Apple" : ""} suffit, sans mot de passe.
+                  </p>
+                </div>
 
-            <div className="mt-6 space-y-4 rounded-2xl border border-border bg-surface p-5 shadow-subtle sm:p-6">
-              <GoogleSlot onCredential={(credential) => { setGoogleFailed(false); void login(credential); }} onFailure={() => setGoogleFailed(true)} disabled={loading} />
-
-              {hasSocial && (
-                <>
-                  <div className="flex items-center gap-3 text-xs text-ink-soft" aria-hidden="true">
-                    <span className="h-px flex-1 bg-border" /> ou <span className="h-px flex-1 bg-border" />
+                {message && (
+                  <div
+                    role={message.tone === "error" ? "alert" : "status"}
+                    className={`mt-5 flex items-start gap-3 rounded-xl border p-3.5 text-left text-sm leading-snug ${
+                      message.tone === "error" ? "border-error-text/30 bg-error-bg text-error-text" : "border-info-text/30 bg-info-bg text-info-text"
+                    }`}
+                  >
+                    {message.tone === "error" ? <WarningCircle size={20} weight="fill" className="mt-0.5 shrink-0" aria-hidden="true" /> : <Info size={20} weight="fill" className="mt-0.5 shrink-0" aria-hidden="true" />}
+                    <p className="min-w-0 flex-1 font-medium">{message.text}</p>
+                    {!error && (
+                      <button type="button" onClick={() => { dismiss(); setGoogleFailed(false); }} aria-label="Fermer ce message" className="-m-1.5 grid h-8 w-8 shrink-0 place-items-center rounded-full opacity-70 transition hover:opacity-100">
+                        <X size={16} aria-hidden="true" />
+                      </button>
+                    )}
                   </div>
-                  <SocialButtons disabled={loading} />
-                </>
-              )}
+                )}
 
-              <p className="flex items-center justify-center gap-2 text-xs text-ink-soft">
-                <LockKey size={14} weight="bold" aria-hidden="true" /> Connexion sécurisée, aucun mot de passe à retenir.
-              </p>
+                <div className="lg-reveal mt-7 space-y-4" style={reveal(1)}>
+                  <GoogleSlot onCredential={(credential) => { setGoogleFailed(false); void login(credential); }} onFailure={() => setGoogleFailed(true)} disabled={loading} />
+
+                  {hasSocial && (
+                    <>
+                      <div className="flex items-center gap-3 text-xs text-ink-soft" aria-hidden="true">
+                        <span className="h-px flex-1 bg-border" /> ou <span className="h-px flex-1 bg-border" />
+                      </div>
+                      <SocialButtons disabled={loading} />
+                    </>
+                  )}
+
+                  <p className="flex items-center justify-center gap-2 pt-1 text-xs text-ink-soft">
+                    <LockKey size={14} weight="bold" aria-hidden="true" /> Connexion sécurisée, aucun mot de passe à retenir.
+                  </p>
+                </div>
+
+                <p className="lg-reveal mt-6 text-balance text-center text-xs leading-relaxed text-ink-soft" style={reveal(2)}>
+                  <CheckCircle size={14} weight="fill" className="mr-1.5 inline align-[-2px] text-success-text" aria-hidden="true" />
+                  Première visite ? Ton espace est créé automatiquement à ta première connexion.
+                </p>
+              </div>
+
+              <footer className="lg-legal space-y-1.5">
+                <p>
+                  En continuant, tu acceptes nos{" "}
+                  <Link href="/cgu" className="underline underline-offset-2 hover:text-ink">CGU</Link> et notre{" "}
+                  <Link href="/confidentialite" className="underline underline-offset-2 hover:text-ink">politique de confidentialité</Link>.
+                </p>
+                <p>Un souci pour te connecter ? <Link href="/aide" className="underline underline-offset-2 hover:text-ink">Consulte l’aide</Link>.</p>
+              </footer>
             </div>
-
-            <p className="mt-5 text-balance text-center text-xs leading-relaxed text-ink-soft">
-              <CheckCircle size={14} weight="fill" className="mr-1.5 inline align-[-2px] text-success-text" aria-hidden="true" />
-              Première visite ? Ton espace est créé automatiquement à ta première connexion.
-            </p>
-          </div>
-
-          <footer className="mx-auto w-full max-w-[400px] space-y-2 text-center text-xs leading-relaxed text-ink-soft">
-            <p>
-              En continuant, tu acceptes nos{" "}
-              <Link href="/cgu" className="underline underline-offset-2 hover:text-ink">CGU</Link> et notre{" "}
-              <Link href="/confidentialite" className="underline underline-offset-2 hover:text-ink">politique de confidentialité</Link>.
-            </p>
-            <p>Un souci pour te connecter ? <Link href="/aide" className="underline underline-offset-2 hover:text-ink">Consulte l’aide</Link>.</p>
-          </footer>
-        </main>
+          </main>
+        </div>
       </div>
     </>
   );

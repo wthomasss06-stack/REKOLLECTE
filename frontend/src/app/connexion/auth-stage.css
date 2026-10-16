@@ -1,0 +1,206 @@
+/* Page de connexion — deux volets sur ordinateur, un seul écran « application » sur mobile.
+   Ordinateur (≥ 860 px) : un cadre arrondi ; à gauche la scène (fond vert profond, SVG de bienvenue animé), à droite la connexion.
+   Mobile : la scène se réduit à un bandeau en haut, la connexion est une feuille qui remonte par-dessus (marges de sécurité incluses).
+   Tout passe par les tokens du thème (--c-*) : clair et sombre fonctionnent seuls. Aucun mouvement hors prefers-reduced-motion: no-preference. */
+
+/* ───────────────────────── Scène SVG (WelcomeScene) ─────────────────────────
+   Les styles de base sont l'IMAGE FINALE (fiche remplie, signée, « Bienvenue » affiché) : c'est ce que voit qui préfère moins de mouvement.
+   La boucle de 10 s (scan → champs → signature → bouton → bienvenue → retour) n'est ajoutée que plus bas. */
+.sc { --sc-cream: 238 238 226; --sc-night: 14 30 21; --sc-lime: 214 231 168; --sc-sage: 186 200 173; --sc-mint: 27 201 142; --sc-deep: 23 52 38;
+  display: block; width: 100%; height: auto; overflow: visible; }
+.sc-stop { stop-color: rgb(var(--sc-mint)); }
+.sc-shadow { fill: rgb(0 0 0 / 0.32); }
+.sc-dot { fill: rgb(var(--sc-lime) / 0.55); transform-box: fill-box; transform-origin: center; }
+.sc-par-a { transform: translate(calc(var(--px, 0) * -8px), calc(var(--py, 0) * -6px)); transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.sc-par-b { transform: translate(calc(var(--px, 0) * 12px), calc(var(--py, 0) * 8px)); transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+.sc-bezel { fill: rgb(var(--sc-night)); stroke: rgb(var(--sc-sage) / 0.55); stroke-width: 2; }
+.sc-screen { fill: rgb(var(--sc-cream)); }
+.sc-notch { fill: rgb(var(--sc-night)); }
+.sc-lime { fill: rgb(var(--sc-lime)); stroke: rgb(var(--sc-night) / 0.14); stroke-width: 1; }
+.sc-bar { fill: rgb(var(--sc-sage)); }
+.sc-field { fill: #fff; stroke: rgb(var(--sc-sage) / 0.75); stroke-width: 1.2; }
+.sc-fill { fill: rgb(var(--sc-night) / 0.78); transform-box: fill-box; transform-origin: left center; }
+.sc-sign { fill: none; stroke: rgb(var(--sc-night)); stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 100 101; stroke-dashoffset: 0; }
+.sc-btn { fill: rgb(var(--sc-deep)); transform-box: fill-box; transform-origin: center; }
+.sc-check { fill: none; stroke: rgb(var(--sc-lime)); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 100 101; stroke-dashoffset: 0; }
+
+.sc-qr { filter: drop-shadow(0 14px 16px rgb(0 0 0 / 0.34)); }
+.sc-card { fill: rgb(var(--sc-cream)); }
+.sc-qr-ink { fill: rgb(var(--sc-night)); }
+.sc-scan { opacity: 0; }
+.sc-brackets { opacity: 0.85; transform-box: fill-box; transform-origin: center; }
+.sc-brackets path { fill: none; stroke: rgb(var(--sc-lime)); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+
+.sc-badge { transform-box: fill-box; transform-origin: center; }
+.sc-badge-bg { fill: rgb(var(--sc-lime)); }
+.sc-badge-dot { fill: rgb(var(--sc-deep)); }
+.sc-badge-check { fill: none; stroke: rgb(var(--sc-lime)); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.sc-badge-text { fill: rgb(var(--sc-night)); font-family: inherit; font-size: 15px; font-weight: 700; }
+.sc-spark { fill: rgb(var(--sc-lime)); opacity: 0; }
+
+.sc[data-status="error"] .sc-brackets path { stroke: rgb(242 139 139); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .sc-float { animation: sc-float 6s ease-in-out infinite alternate; }
+  .sc-dot { animation: sc-twinkle 4.2s ease-in-out infinite; }
+  .sc-dot--2 { animation-delay: -1.4s; }
+  .sc-dot--3 { animation-delay: -2.8s; }
+
+  .sc-scan { animation: sc-scan 10s linear infinite; }
+  .sc-brackets { animation: sc-brackets 10s ease-in-out infinite; }
+  .sc-fill--1 { animation: sc-fill-1 10s cubic-bezier(0.3, 0.7, 0.2, 1) infinite; }
+  .sc-fill--2 { animation: sc-fill-2 10s cubic-bezier(0.3, 0.7, 0.2, 1) infinite; }
+  .sc-fill--3 { animation: sc-fill-3 10s cubic-bezier(0.3, 0.7, 0.2, 1) infinite; }
+  .sc-sign { animation: sc-sign 10s ease-in-out infinite; }
+  .sc-btn { animation: sc-btn 10s ease-in-out infinite; }
+  .sc-check { animation: sc-check 10s ease-out infinite; }
+  .sc-badge { animation: sc-badge 10s cubic-bezier(0.2, 1.3, 0.4, 1) infinite; }
+  .sc-spark { animation: sc-spark 10s ease-out infinite; }
+
+  /* Connexion en cours : le scan s'emballe. Erreur : le téléphone se secoue une fois. */
+  .sc[data-status="busy"] .sc-scan { animation: sc-scan-fast 0.9s linear infinite; }
+  .sc[data-status="busy"] .sc-brackets { animation: sc-pulse 0.55s ease-in-out infinite alternate; }
+  .sc[data-status="error"] .sc-phone { animation: sc-shake 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+}
+
+@keyframes sc-float { from { transform: translateY(-4px); } to { transform: translateY(5px); } }
+@keyframes sc-twinkle { 0%, 100% { opacity: 0.25; transform: scale(0.8); } 50% { opacity: 0.95; transform: scale(1.15); } }
+@keyframes sc-scan {
+  0%, 2% { opacity: 0; transform: translateY(0); }
+  4% { opacity: 1; transform: translateY(0); }
+  13% { opacity: 1; transform: translateY(96px); }
+  22% { opacity: 1; transform: translateY(0); }
+  24%, 100% { opacity: 0; transform: translateY(0); }
+}
+@keyframes sc-scan-fast { 0% { opacity: 0; transform: translateY(0); } 10% { opacity: 1; } 90% { opacity: 1; transform: translateY(96px); } 100% { opacity: 0; transform: translateY(96px); } }
+@keyframes sc-brackets {
+  0% { opacity: 0.3; transform: scale(0.94); }
+  4%, 26% { opacity: 1; transform: scale(1); }
+  32%, 100% { opacity: 0.6; transform: scale(1); }
+}
+@keyframes sc-pulse { from { opacity: 0.55; transform: scale(0.97); } to { opacity: 1; transform: scale(1.03); } }
+@keyframes sc-fill-1 { 0%, 23% { transform: scaleX(0); } 31%, 93% { transform: scaleX(1); } 98%, 100% { transform: scaleX(0); } }
+@keyframes sc-fill-2 { 0%, 31% { transform: scaleX(0); } 39%, 93% { transform: scaleX(1); } 98%, 100% { transform: scaleX(0); } }
+@keyframes sc-fill-3 { 0%, 39% { transform: scaleX(0); } 47%, 93% { transform: scaleX(1); } 98%, 100% { transform: scaleX(0); } }
+@keyframes sc-sign { 0%, 50% { stroke-dashoffset: 100.5; } 66%, 93% { stroke-dashoffset: 0; } 98%, 100% { stroke-dashoffset: 100.5; } }
+@keyframes sc-btn {
+  0%, 69% { fill: rgb(186 200 173 / 0.75); transform: scale(1); }
+  72% { fill: rgb(23 52 38); transform: scale(1.04); }
+  75%, 93% { fill: rgb(23 52 38); transform: scale(1); }
+  98%, 100% { fill: rgb(186 200 173 / 0.75); transform: scale(1); }
+}
+@keyframes sc-check { 0%, 73% { stroke-dashoffset: 100.5; } 79%, 93% { stroke-dashoffset: 0; } 97%, 100% { stroke-dashoffset: 100.5; } }
+@keyframes sc-badge {
+  0%, 76% { opacity: 0; transform: translateY(8px) scale(0.6); }
+  82% { opacity: 1; transform: translateY(0) scale(1.06); }
+  85%, 92% { opacity: 1; transform: translateY(0) scale(1); }
+  96%, 100% { opacity: 0; transform: translateY(0) scale(0.96); }
+}
+@keyframes sc-spark {
+  0%, 77% { opacity: 0; transform: translate(0, 0) scale(0.4); }
+  80% { opacity: 1; }
+  88%, 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1); }
+}
+@keyframes sc-shake {
+  10%, 90% { transform: translateX(-1.5px); } 20%, 80% { transform: translateX(3px); }
+  30%, 50%, 70% { transform: translateX(-5px); } 40%, 60% { transform: translateX(5px); }
+}
+
+/* ───────────────────────── Mise en page : mobile d'abord ───────────────────────── */
+.lg-root { min-height: 100dvh; display: grid; background: rgb(var(--c-canvas)); }
+.lg-frame { position: relative; display: grid; width: 100%; min-height: 100dvh; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; grid-template-areas: "stage" "panel"; }
+
+/* Barre du haut : posée par-dessus la scène sur mobile (retour à gauche, thème à droite). */
+.lg-tools { grid-area: stage; z-index: 3; align-self: start; display: flex; align-items: center; justify-content: space-between; padding: max(10px, env(safe-area-inset-top)) 14px 0; }
+.lg-back { display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; justify-content: center; gap: 8px; border-radius: 999px; background: rgb(var(--c-deep-ink) / 0.12); color: rgb(var(--c-deep-ink)); font-size: 0.875rem; font-weight: 500; transition: background-color 0.2s ease, color 0.2s ease; }
+.lg-back:hover { background: rgb(var(--c-deep-ink) / 0.22); }
+.lg-back:focus-visible { outline: 2px solid rgb(var(--c-lime)); outline-offset: 2px; }
+.lg-back__label { display: none; }
+.lg-toggle { position: relative; }
+.lg-toggle::after { content: ""; position: absolute; inset: -8px -2px; }
+
+/* Scène */
+.lg-stage { grid-area: stage; position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: max(14px, calc(env(safe-area-inset-top) + 4px)) 20px 64px; background: rgb(var(--c-deep)); color: rgb(var(--c-deep-ink)); }
+.lg-stage::before { content: ""; position: absolute; inset: 0; z-index: -1; background-image: radial-gradient(rgb(var(--c-deep-ink) / 0.14) 1px, transparent 1.6px); background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(80% 70% at 50% 42%, #000 20%, transparent 100%); mask-image: radial-gradient(80% 70% at 50% 42%, #000 20%, transparent 100%); }
+.lg-blob { position: absolute; z-index: -1; display: block; border-radius: 50%; pointer-events: none; aspect-ratio: 1; }
+.lg-blob--a { width: 80%; right: -26%; top: -30%; background: radial-gradient(closest-side, rgb(var(--c-lime) / 0.26), transparent); }
+.lg-blob--b { width: 76%; left: -26%; bottom: -34%; background: radial-gradient(closest-side, rgb(27 201 142 / 0.24), transparent); }
+
+.lg-brand { display: flex; min-height: 44px; align-items: center; gap: 8px; font-size: 0.95rem; font-weight: 800; letter-spacing: -0.01em; }
+.lg-visual { display: flex; width: 100%; flex-direction: column; align-items: center; gap: 12px; }
+.lg-bubble-slot { display: grid; min-height: 38px; place-items: center; }
+.lg-bubble { position: relative; max-width: 100%; border-radius: 16px; background: rgb(var(--c-lime)); padding: 8px 16px; color: rgb(14 30 21); font-size: 0.84rem; font-weight: 700; line-height: 1.25; text-align: center; transition: background-color 0.3s ease; }
+.lg-bubble::after { content: ""; position: absolute; bottom: -5px; left: 50%; width: 11px; height: 11px; border-radius: 2px; background: inherit; transform: translateX(-50%) rotate(45deg); }
+.lg-bubble[data-status="busy"] { background: rgb(27 201 142); }
+.lg-bubble[data-status="error"] { background: rgb(242 139 139); }
+.lg-scene { width: min(76vw, 300px); }
+.lg-hero { display: none; }
+
+/* Feuille de connexion : remonte par-dessus la scène, comme une feuille d'application. */
+.lg-panel { grid-area: panel; position: relative; z-index: 2; display: flex; flex-direction: column; margin-top: -34px; border-radius: 32px 32px 0 0; background: rgb(var(--c-surface)); padding: 28px 22px max(20px, env(safe-area-inset-bottom)); box-shadow: 0 -22px 40px -28px rgb(0 0 0 / 0.5); }
+.lg-col { display: flex; width: min(100%, 400px); flex: 1; flex-direction: column; margin: 0 auto; }
+.lg-main { display: flex; flex: 1; flex-direction: column; }
+.lg-legal { margin-top: auto; padding-top: 24px; text-align: center; font-size: 0.75rem; line-height: 1.6; color: rgb(var(--c-ink-soft)); }
+
+/* Petits écrans en hauteur : la scène se tasse pour laisser la place au bouton. */
+@media (max-height: 700px) and (max-width: 859px) {
+  .lg-scene { width: min(60vw, 210px); }
+  .lg-bubble-slot { display: none; }
+  .lg-stage { padding-bottom: 54px; }
+}
+@media (max-width: 359px) { .lg-panel { padding-inline: 16px; } }
+/* Tablette en portrait : on garde la feuille unique, mais la scène grandit et le contenu se centre. */
+@media (min-width: 600px) and (max-width: 859px) {
+  .lg-scene { width: 340px; }
+  .lg-main { justify-content: center; }
+}
+
+/* ───────────────────────── Ordinateur : cadre à deux volets ───────────────────────── */
+@media (min-width: 860px) {
+  .lg-root { place-items: center; padding: 28px 24px;
+    background: radial-gradient(70% 60% at 92% 0%, rgb(var(--c-lime) / 0.4), transparent 62%), radial-gradient(60% 55% at 0% 100%, rgb(var(--c-sage) / 0.3), transparent 62%), rgb(var(--c-canvas)); }
+  .dark .lg-root { background: radial-gradient(70% 60% at 92% 0%, rgb(var(--c-lime) / 0.07), transparent 62%), radial-gradient(60% 55% at 0% 100%, rgb(27 201 142 / 0.08), transparent 62%), rgb(var(--c-canvas)); }
+  .lg-frame { width: min(100%, 1120px); min-height: min(720px, calc(100dvh - 56px)); grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); grid-template-areas: "stage tools" "stage panel"; padding: 10px; border: 1px solid rgb(var(--c-border)); border-radius: 34px; background: rgb(var(--c-surface)); box-shadow: 0 40px 80px -48px rgb(var(--c-ink) / 0.55); }
+
+  .lg-tools { grid-area: tools; align-self: auto; padding: 14px 24px 0 18px; }
+  .lg-back { padding: 0 14px 0 10px; background: transparent; color: rgb(var(--c-ink-soft)); }
+  .lg-back:hover { background: rgb(var(--c-canvas)); color: rgb(var(--c-ink)); }
+  .lg-back:focus-visible { outline-color: rgb(var(--c-cta)); }
+  .lg-back__label { display: inline; }
+
+  .lg-stage { align-items: flex-start; justify-content: space-between; gap: 14px; border-radius: 26px; padding: 26px 34px 32px; }
+  .lg-brand { font-size: 1.05rem; }
+  .lg-visual { flex: 1; justify-content: center; }
+  .lg-scene { width: min(100%, 420px); }
+  .lg-hero { display: block; }
+  .lg-hero__title { margin: 0; font-size: clamp(1.6rem, 2.5vw, 2.15rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.025em; text-wrap: balance; max-width: 20ch; }
+  .lg-hero__lead { margin: 10px 0 0; max-width: 38ch; font-size: 0.9rem; line-height: 1.55; color: rgb(var(--c-deep-ink) / 0.74); }
+  .lg-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 0; padding: 0; list-style: none; }
+  .lg-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgb(var(--c-deep-ink) / 0.16); border-radius: 999px; background: rgb(var(--c-deep-ink) / 0.08); padding: 6px 12px 6px 9px; font-size: 0.78rem; font-weight: 600; }
+
+  .lg-panel { margin-top: 0; border-radius: 0; background: transparent; box-shadow: none; padding: 4px 28px 22px; }
+  .lg-main { justify-content: center; padding-block: 12px; }
+}
+@media (min-width: 860px) and (max-height: 780px) {
+  .lg-hero__lead { display: none; }
+  .lg-scene { width: min(100%, 330px); }
+  .lg-chips { margin-top: 12px; }
+}
+
+/* ───────────────────────── Entrée en scène + parallaxe ───────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  .lg-stage { animation: lg-fade 0.7s ease both; }
+  .lg-blob--a { animation: lg-drift 14s ease-in-out infinite alternate; }
+  .lg-blob--b { animation: lg-drift 17s ease-in-out -6s infinite alternate-reverse; }
+  .lg-panel { animation: lg-sheet-in 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.05s both; }
+  .lg-reveal { animation: lg-rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(var(--i, 0) * 80ms + 180ms); }
+  .lg-bubble { animation: lg-bubble-in 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) both; transform-origin: 50% 100%; }
+  .lg-chip { animation: lg-rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(var(--i, 0) * 70ms + 300ms); }
+}
+@keyframes lg-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes lg-drift { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(-4%, 6%, 0) scale(1.1); } }
+@keyframes lg-sheet-in { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+@keyframes lg-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes lg-bubble-in { from { opacity: 0; transform: translateY(6px) scale(0.85); } to { opacity: 1; transform: none; } }

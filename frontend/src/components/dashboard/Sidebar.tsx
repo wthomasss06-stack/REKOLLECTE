@@ -40,8 +40,8 @@ export default function Sidebar({ orgName, orgLogo = "", userName = "", role, ca
   const links = [
     { href: "/dashboard", label: "Visiteurs", icon: UsersThree, exact: true, also: [] as string[] },
     { href: "/dashboard/accueil", label: role === "STAFF" ? "Accueil" : "Mode Staff", icon: House, exact: true, also: [] as string[] },
-    { href: "/dashboard/parametres", label: "Paramètres", icon: GearSix, exact: false, also: [] as string[] },
     { href: "/dashboard/rekollecte", label: showKarnet ? "REKOLLECTE+" : "REKOLLECTE", icon: showKarnet ? SquaresFour : QrCode, exact: false, also: ["/dashboard/karnet"] },
+    { href: "/dashboard/parametres", label: "Paramètres", icon: GearSix, exact: false, also: [] as string[] },
   ];
   const active = (href: string, exact: boolean, also: string[]) => (exact ? pathname === href : pathname.startsWith(href)) || also.some((prefix) => pathname.startsWith(prefix));
   const Brand = () => orgLogo ? <img src={orgLogo} alt={`Logo de ${orgName}`} className="h-9 w-9 shrink-0 rounded-lg object-contain" referrerPolicy="no-referrer" /> : <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-cta text-xs font-bold text-white">{orgName.slice(0, 2).toUpperCase()}</div>;

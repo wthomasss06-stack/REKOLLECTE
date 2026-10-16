@@ -14,9 +14,9 @@ const publicForm = {
 test.describe("parcours publics et authentification", () => {
   test("landing et connexion sont disponibles", async ({ page }) => {
     await page.goto("/");
-    await expect(page).toHaveTitle(/R3S3IGN3M3NT/);
+    await expect(page).toHaveTitle(/REKOLLECTE/);
     await page.goto("/connexion");
-    await expect(page.getByRole("heading", { name: "Se connecter" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Connecte-toi à ton espace" })).toBeVisible();
   });
 
   test("un QR public charge le formulaire et gère une suspension", async ({ page }) => {

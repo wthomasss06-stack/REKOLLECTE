@@ -386,3 +386,6 @@ h1, h2, h3, h4 {
 @keyframes rk-toast-in { from { opacity: 0; transform: translateX(16px); } }
 .rk-toast { animation: rk-toast-in 0.2s ease-out both; }
 @media (prefers-reduced-motion: reduce) { .rk-toast { animation: none; } }
+
+/* Cloche d'arrivées « gooey » : le filtre SVG n'est actif que panneau ouvert (zone filtrée = GPU) */
+.rk-goo.rk-goo-on { filter: var(--rk-goo); }

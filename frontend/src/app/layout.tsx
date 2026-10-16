@@ -43,7 +43,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={sans.variable}>
+    <html lang="fr" className={sans.variable} suppressHydrationWarning>
       <body>
         {/* Applique la classe .dark avant l'hydratation React : evite un flash du
             mauvais theme au chargement (lit localStorage puis prefers-color-scheme). */}
