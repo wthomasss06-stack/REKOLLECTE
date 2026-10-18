@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "apps.checkins",
     "apps.feedback",
     "apps.karnet",
+    "apps.analytics",
 ]
 
 MIDDLEWARE = [
@@ -137,6 +138,8 @@ REST_FRAMEWORK = {
         "ocr": "6/min",
         # Connexion de l'administration de la plateforme (compte le plus puissant).
         "admin_login": "10/min",
+        # Collecte du suivi de la vitrine (une requête par page vue ou clic d'action), limitée par adresse.
+        "analytics": "120/min",
     },
     # Nombre de proxys de confiance devant l'API (Vercel + Render = 2) : sert à lire l'IP réelle dans X-Forwarded-For
     # pour les limiteurs de débit. Non défini : l'en-tête entier sert de clé (comportement historique).

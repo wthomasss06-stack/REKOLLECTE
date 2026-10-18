@@ -6,6 +6,10 @@
 3. **`NUM_PROXIES=2`** (Vercel puis Render). Non défini, l'en-tête `X-Forwarded-For` est falsifiable : les limiteurs de débit (OTP, login admin, OCR) se contournent en changeant d'IP à chaque requête. Je ne l'ai pas forcé : une mauvaise valeur bloquerait tout le monde derrière la même IP.
 
 ## ✅ Corrigé (testé)
+**Suivi du site et cookies (v4)**
+- Suivi **uniquement avec accord** : sans choix ou avec refus, aucun cookie et aucune visite stockée (compteur anonyme accepté/refusé seulement). Cookies de première partie `httpOnly`, posés par le serveur, `SameSite=Lax`, `Secure` en production, limités au chemin `/api/v1/analytics/`.
+- Pas d'adresse IP, pas de paramètres d'URL, referrer réduit au domaine, robots exclus, actions limitées à une liste fermée, débit limité (120/min) ; `/dashboard`, `/admin`, `/v/…` jamais suivis (côté navigateur **et** re-vérifié côté serveur).
+- Droit à l'oubli : refuser ou retirer l'accord efface le visiteur ; conservation 395 jours (purge automatique + `purge_analytics`). **Texte légal à faire relire.**
 **Visiteur / hors-ligne (QR)**
 - Faux « QR invalide » / « Pas encore configuré » quand Render dort → écran d'attente + réveil automatique + cache.
 - File hors-ligne bloquée en « syncing » (onglet fermé en plein envoi) ; « Réessayer » ne renvoyait pas les fiches en échec ; aucun renvoi automatique pendant le sommeil du serveur.

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowUp } from "@/components/icons";
 import Logo from "@/components/Logo";
 import { useLenis } from "@/components/marketing/SmoothScroll";
+import { openCookiePreferences } from "@/lib/analytics";
 import PwaInstallButton from "./PwaInstallButton";
 
 const COLUMNS: { title: string; links: [string, string][] }[] = [
@@ -52,6 +53,7 @@ export default function Footer() {
           </Link>
           <nav className="flex flex-wrap items-center gap-x-5 gap-y-2" aria-label="Légal">
             {LEGAL.map(([label, href]) => <Link key={href} href={href} className="transition-colors hover:text-ink">{label}</Link>)}
+            <button type="button" onClick={openCookiePreferences} className="transition-colors hover:text-ink">Gérer les cookies</button>
             <button onClick={scrollTop} className="flex items-center gap-1.5 font-bold text-ink transition-opacity hover:opacity-70">Retour en haut <ArrowUp size={13} /></button>
           </nav>
         </div>

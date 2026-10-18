@@ -14,14 +14,19 @@
 | Sécurité / robustesse | ✅ Audit fait, failles sûres corrigées et testées |
 | Espace connecté (4 liens, lignes + fenêtres, loader de marque) | ✅ Refait sur le modèle E-Carnet, testé en navigateur (Niveau 1 et 2, patron / gérant / staff, ordinateur et téléphone) |
 | Alerte à l'hôte (#1) | ✅ Dans le tableau de bord (cloche gooey, lues/non lues, effacement, pastille, carillon). WhatsApp/e-mail : volontairement pas fait |
-| Déploiement | ⏳ Actions de ta part (section 2) — dont `migrate` (2 migrations) |
+| Administration | ✅ Même barre latérale / barre du bas que l'app, recherche et filtres, onglet « Trafic du site » (v4) |
+| Cookies et suivi du site | ✅ Fenêtre cookies (SVG), suivi lié au choix du visiteur, visible dans l'admin, conservation 395 jours (v4) — ⏳ texte légal à faire relire |
+| Gooey sur toutes les fenêtres | ✅ Réglages, confirmations, formulaires, avis, menu profil, cookies (v4) |
+| Déploiement | ⏳ Actions de ta part (section 2) — dont `migrate` (3 migrations : accounts `0009`, checkins `0005`, analytics `0001`) |
 
 ## 2. Avant de reprendre — à faire de ton côté (≈ 30 min)
 
-- [ ] **`python manage.py migrate`** (accounts `0009`, checkins `0005`) avant de déployer le front : sans elle, `/checkins/alerts/` et la liste d'équipe répondent en erreur.
+- [ ] **`python manage.py migrate`** (accounts `0009`, checkins `0005`, **analytics `0001`**) avant de déployer le front : sans elle, `/checkins/alerts/` et la liste d'équipe répondent en erreur.
 - [ ] **Secret Cloudinary** : supprimer `frontend/hh` du dépôt et de l'historique git, puis régénérer le secret API dans Cloudinary et mettre à jour Render / Vercel.
 - [ ] **Variables Render** : `DEBUG=False`, `ALLOWED_HOSTS` explicite, `GOOGLE_CLIENT_ID`, `FRONTEND_URL`, `CORS_ALLOWED_ORIGINS`, `CSRF_TRUSTED_ORIGINS`.
 - [ ] **`NUM_PROXIES=2`** (Vercel puis Render) : sans lui, les limiteurs de débit se contournent en falsifiant l'IP.
+- [ ] **Faire relire `/confidentialite` et la fenêtre cookies** par un juriste (loi ivoirienne sur la protection des données personnelles) avant de compter sur le suivi.
+- [ ] (Conseillé) Cron hebdomadaire `python manage.py purge_analytics` en plus de la purge automatique (conservation 395 jours).
 - [ ] Lancer `python scripts/verify_production.py` sur le serveur configuré.
 - [ ] **Test réel après déploiement** : se connecter, scanner un QR et enregistrer une visite pendant que Render dort.
 - [ ] Search Console : soumettre `sitemap.xml` et demander l'indexation des 3 pages SEO.

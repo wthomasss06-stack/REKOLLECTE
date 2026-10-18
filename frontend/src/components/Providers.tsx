@@ -1,9 +1,12 @@
 "use client";
 import { useEffect } from "react";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import CookieConsent from "@/components/privacy/CookieConsent";
+import SiteAnalytics from "@/components/privacy/SiteAnalytics";
 import WebVitals from "@/components/WebVitals";
 import { DialogProvider } from "@/components/ui/DialogProvider";
 import { AuthProvider } from "@/context/AuthContext";
+import { GooeyProvider } from "@/lib/gooey";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
@@ -30,5 +33,5 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  return <GoogleOAuthProvider clientId={clientId}><AuthProvider><WebVitals /><DialogProvider>{children}</DialogProvider></AuthProvider></GoogleOAuthProvider>;
+  return <GoogleOAuthProvider clientId={clientId}><AuthProvider><WebVitals /><GooeyProvider /><DialogProvider>{children}</DialogProvider><SiteAnalytics /><CookieConsent /></AuthProvider></GoogleOAuthProvider>;
 }

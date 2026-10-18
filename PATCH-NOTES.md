@@ -1,6 +1,40 @@
 # REKOLLECTE – notes de patch
 
-## Patch v3 (par-dessus le v2 que tu as déjà appliqué)
+## Patch v4 (par-dessus le v3 que tu as déjà appliqué)
+
+Décompresser **à la racine du projet** (les chemins `backend/…` et `frontend/…` écrasent les fichiers existants). **1 migration à appliquer** (nouvelle app `analytics`) : `python manage.py migrate` **avant** de déployer le front. Aucune dépendance ajoutée, aucun fichier à supprimer.
+
+### A. Administration refaite (`app/admin/page.tsx`, `components/admin/*`)
+- **Même navigation que l'app** : la barre latérale repliable sur ordinateur et la **barre ronde du bas sur téléphone** (Accueil · Trafic · Clients · Équipe · Retours · Journal). Le code est partagé (`components/dashboard/AppNav.tsx`, utilisé par `Sidebar.tsx` et par l'admin) : même repli mémorisé, mêmes états actifs, un seul endroit à maintenir.
+- **Nouvel onglet « Trafic du site »** (voir B) et une **vue d'ensemble** qui montre les visites de la vitrine sur 7 jours + le nombre de personnes en ligne.
+- **Entreprises / Personnel / Feedbacks / Journal** : recherche, filtres par statut ou rôle, cartes sur téléphone et tableaux sur ordinateur, états vides, pastille « nouveau » sur les retours à traiter. Tes confirmations existantes (supprimer, désactiver, changer de rôle/d'entreprise, renommer, déconnexion) sont conservées.
+- L'onglet ouvert est dans l'adresse (`/admin#trafic`, `#feedbacks`…) ; le rechargement le retrouve. Une erreur du serveur s'affiche dans une bannière avec « Réessayer » au lieu de vider l'écran ; seule une vraie session expirée (401/403) ramène à la connexion.
+- Écran de connexion admin : œil pour voir le mot de passe, message clair, logo → accueil du site. L'adresse d'un retour s'affiche **sans paramètres**.
+
+### B. Cookies et suivi du site (`apps/analytics`, `components/privacy/*`, `lib/analytics.ts`)
+- **Fenêtre cookies avec SVG animé** (le petit cookie), « Accepter » et « Refuser » à poids égal, « Personnaliser », lien vers la confidentialité ; « Gérer les cookies » en pied de page pour changer d'avis. Le choix est gardé 6 mois (`localStorage`, clé `rk_cookie_consent`).
+- **Le suivi est branché sur ce choix** : sans accord, **aucun cookie, aucune visite enregistrée** (seul un compteur anonyme « accepté / refusé » est tenu, sans identifiant). Avec accord, le serveur Django pose deux cookies de première partie `httpOnly` : `rk_vid` (13 mois) et `rk_sid` (30 min glissantes). Aucune adresse IP stockée, robots filtrés, chemins sans paramètres, liste d'actions fermée (`cta_click`, `login_start`, `contact_click`), débit limité (120/min).
+- **Jamais dans l'app connectée, l'admin ni le formulaire visiteur.** Refuser ou retirer son accord **efface** le visiteur (`/api/v1/analytics/forget/`).
+- **Visible dans l'admin** : `GET /api/v1/admin/traffic/?days=7|30|90` → visiteurs (nouveaux/de retour), visites, pages vues, pages les plus vues, provenance, appareils, navigateurs, systèmes, actions, dernières visites, **taux de cookies acceptés** et visiteurs en ligne ; rafraîchi tout seul toutes les 30 s.
+- **Conservation 395 jours** : purge automatique (5 % des nouvelles visites) ou à la demande/cron : `python manage.py purge_analytics`. 
+- Page `/confidentialite` mise à jour (cookies, durées, droits). **À faire relire par un professionnel** (loi ivoirienne sur la protection des données personnelles) avant mise en ligne.
+
+### C. Gooey partout (`lib/gooey.tsx`)
+- Toute fenêtre ouverte depuis un bouton **sort de ce bouton comme une goutte** et s'y résorbe à la fermeture : réglages, **confirmations/saisies/alertes** (`DialogProvider`), formulaires (`Modal`), avis flottant, **menu du profil**, fenêtre cookies (depuis le pied de page). Rien à ajouter sur les boutons. « Mouvement réduit » : aucune animation. La cloche d'arrivées garde sa propre animation.
+
+### D. Connexion (`app/connexion/page.tsx`, `auth-stage.css`)
+- Retirés comme demandé : paragraphe barré, mention « aucun mot de passe à retenir », **grille de points** du volet gauche, **bouton « Retour au site »**, **interrupteur de thème**. Le **logo est un lien vers la page d'accueil**.
+
+### Vérifications
+`tsc --noEmit` propre ; `next build` OK (24 pages) ; `pytest` **242 verts** (hors `test_document_ocr`, déjà en échec : dépend de Tesseract) et aucune migration manquante ; navigateur : **admin 81/81** (PC, mobile 320 et 390, sombre, dialogues, erreur serveur), **connexion 95/95**, **cookies 68/68**, **menu profil 21/21**, app 35/35, rubriques 13/13, alertes 46/46.
+
+### Bon à savoir
+- Comme dans l'app, la barre latérale **dépliée recouvre** le contenu (elle ne le pousse pas) ; repliée, elle occupe 72 px. Le choix est mémorisé.
+- En mobile, le titre « REKOLLECTE · Admin » est masqué sous 400 px (la place revient aux boutons).
+
+---
+
+# Historique : patch v3 (déjà appliqué)
 
 Décompresser **à la racine du projet** (les chemins `frontend/…` écrasent les fichiers existants). **Aucune migration, aucune dépendance, aucun fichier à supprimer** : seuls des fichiers du front changent (GSAP est déjà installé). Ta base (`rekollecte.zip`) a été comparée au code de travail : le backend est identique, seuls 3 fichiers du front différaient.
 

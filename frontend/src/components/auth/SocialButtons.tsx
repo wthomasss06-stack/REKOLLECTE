@@ -111,6 +111,7 @@ export default function SocialButtons({ disabled = false }: { disabled?: boolean
         <a
           href={`${API_BASE}/auth/facebook/start/`}
           onClick={start("facebook")}
+          data-track="login_start"
           aria-busy={busy("facebook")}
           aria-disabled={Boolean(inactive("facebook"))}
           className={`${base} bg-[#1877F2] text-white hover:brightness-110 ${inactive("facebook") ? "pointer-events-none opacity-50" : ""}`}
@@ -124,6 +125,7 @@ export default function SocialButtons({ disabled = false }: { disabled?: boolean
         <a
           href={`${API_BASE}/auth/apple/start/`}
           onClick={start("apple")}
+          data-track="login_start"
           aria-busy={busy("apple")}
           aria-disabled={Boolean(inactive("apple"))}
           className={`${base} bg-black text-white hover:bg-neutral-800 ${inactive("apple") ? "pointer-events-none opacity-50" : ""}`}

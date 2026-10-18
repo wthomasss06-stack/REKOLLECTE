@@ -185,7 +185,17 @@ export interface ApiErrorShape {
   error: { message: string; retryable: boolean };
 }
 
-export interface PlatformOverview { organizations: number; users: number; active_users: number; checkins_total: number; checkins_30_days: number; feedback_total: number; feedback_new: number; }
+export interface PlatformOverview { organizations: number; users: number; active_users: number; checkins_total: number; checkins_30_days: number; feedback_total: number; feedback_new: number; site_sessions_7_days?: number; site_live_now?: number; }
+export interface TrafficRank { label: string; count: number; }
+export interface TrafficSession { id: string; started_at: string; last_activity_at: string; device: "desktop" | "mobile" | "tablet"; browser: string; os: string; source: string; landing_path: string; page_count: number; returning: boolean; visit_number: number; }
+export interface PlatformTraffic {
+  days: number; live_now: number;
+  totals: { visitors: number; new_visitors: number; returning_visitors: number; sessions: number; page_views: number; actions: number; pages_per_session: number };
+  consent: { accepted: number; rejected: number; rate: number | null };
+  daily: { date: string; sessions: number; page_views: number }[];
+  top_pages: TrafficRank[]; sources: TrafficRank[]; devices: TrafficRank[]; browsers: TrafficRank[]; systems: TrafficRank[]; actions: TrafficRank[];
+  recent: TrafficSession[];
+}
 export interface PlatformFeedback { id: string; category: string; category_label: string; message: string; page_url: string; contact_email: string; user_email: string | null; organization_name: string | null; status: string; status_label: string; admin_note: string; created_at: string; updated_at: string; }
 export interface PlatformMember { id: string; email: string; full_name: string; role: AccountRole; is_active: boolean; organization_id: string | null; organization_name: string | null; created_at: string; }
 export interface PlatformOrganization { id: string; name: string; logo_url: string; visit_reasons: string[]; created_at: string; member_count: number; checkin_count: number; feedback_count: number; members: PlatformMember[]; }

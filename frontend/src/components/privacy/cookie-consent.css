@@ -1,0 +1,102 @@
+/* Modal cookies — carte, illustration (ck-*), interrupteurs. Les couleurs viennent des variables du thème (--c-*). */
+
+/* ---- Fenêtre ------------------------------------------------------------------------------------------------------------------------- */
+.rk-cookie-overlay { position: fixed; inset: 0; z-index: 130; display: grid; place-items: center; padding: 16px; background: rgb(var(--c-deep) / 0.5); -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px); animation: rk-cookie-fade 200ms ease-out both; }
+.rk-cookie { --ck-dough: 236 190 118; --ck-shade: 206 150 80; --ck-chip: 92 58 38; position: relative; width: min(100%, 27rem); max-height: calc(100dvh - 32px); overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; border: 1px solid rgb(var(--c-ink) / 0.07); border-radius: 28px; background: rgb(var(--c-surface)); color: rgb(var(--c-ink)); box-shadow: 0 30px 70px -20px rgb(0 0 0 / 0.45); text-align: center; animation: rk-cookie-pop 380ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.rk-cookie:focus { outline: none; }
+.dark .rk-cookie { --ck-dough: 224 172 100; --ck-shade: 188 134 70; --ck-chip: 70 42 28; }
+
+.rk-cookie__stage { position: relative; height: 164px; padding-top: 14px; background: linear-gradient(180deg, rgb(var(--c-lime) / 0.6) 0%, rgb(var(--c-lime) / 0.28) 55%, rgb(var(--c-surface) / 0) 100%); }
+.dark .rk-cookie__stage { background: linear-gradient(180deg, rgb(var(--c-cta) / 0.17) 0%, rgb(var(--c-cta) / 0.07) 55%, rgb(var(--c-surface) / 0) 100%); }
+.rk-cookie__stage .ck { display: block; width: 210px; height: 150px; margin: 0 auto; }
+.rk-cookie__later { position: absolute; top: 12px; right: 12px; z-index: 2; display: grid; width: 40px; height: 40px; place-items: center; border-radius: 999px; color: rgb(var(--c-ink-soft)); transition: background-color 160ms ease, color 160ms ease; }
+.rk-cookie__later:hover, .rk-cookie__later:focus-visible { background: rgb(var(--c-ink) / 0.08); color: rgb(var(--c-ink)); outline: none; }
+.rk-cookie__body { padding: 6px 24px 24px; }
+.rk-cookie__title { margin: 0; font-size: clamp(1.4rem, 5.6vw, 1.65rem); font-weight: 700; line-height: 1.12; letter-spacing: -0.01em; text-wrap: balance; }
+.rk-cookie__text { max-width: 22rem; margin: 10px auto 0; color: rgb(var(--c-ink-soft)); font-size: 0.92rem; line-height: 1.5; text-wrap: pretty; }
+.rk-cookie__text a { color: rgb(var(--c-ink)); text-decoration: underline; text-underline-offset: 3px; }
+.rk-cookie__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 22px; }
+.rk-cookie__btn { display: inline-flex; width: 100%; min-height: 48px; align-items: center; justify-content: center; gap: 8px; border: 1.5px solid transparent; border-radius: 999px; padding: 0 16px; font-size: 0.95rem; font-weight: 700; line-height: 1; transition: transform 160ms ease, filter 160ms ease, background-color 160ms ease, border-color 160ms ease; }
+.rk-cookie__btn:focus-visible { outline: 3px solid rgb(var(--c-cta) / 0.4); outline-offset: 2px; }
+/* « Refuser » pèse autant que « Accepter » : même taille, même place, trait plein. */
+.rk-cookie__btn--primary { background: rgb(var(--c-cta)); color: rgb(var(--c-cta-ink)); box-shadow: 0 10px 20px -8px rgb(var(--c-cta) / 0.7); }
+.rk-cookie__btn--primary:hover { transform: translateY(-2px); filter: brightness(1.08); }
+.rk-cookie__btn--outline { border-color: rgb(var(--c-ink) / 0.45); background: transparent; color: rgb(var(--c-ink)); }
+.rk-cookie__btn--outline:hover { transform: translateY(-2px); background: rgb(var(--c-ink) / 0.06); border-color: rgb(var(--c-ink)); }
+.rk-cookie__btn--wide { grid-column: 1 / -1; }
+.rk-cookie__link { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; margin-top: 6px; padding: 0 12px; border-radius: 999px; color: rgb(var(--c-ink-soft)); font-size: 0.88rem; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; transition: color 160ms ease; }
+.rk-cookie__link:hover { color: rgb(var(--c-ink)); }
+.rk-cookie__link:focus-visible { outline: 3px solid rgb(var(--c-cta) / 0.4); outline-offset: 1px; }
+.rk-cookie__links { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 6px; }
+
+/* ---- Préférences ----------------------------------------------------------------------------------------------------------------------- */
+.rk-cookie__rows { display: grid; gap: 10px; margin-top: 18px; text-align: left; }
+.rk-cookie__row { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; border: 1px solid rgb(var(--c-border)); border-radius: 18px; background: rgb(var(--c-canvas) / 0.55); padding: 14px 16px; }
+.rk-cookie__row strong { display: block; font-size: 0.95rem; line-height: 1.3; }
+.rk-cookie__row span.rk-cookie__hint { display: block; margin-top: 3px; color: rgb(var(--c-ink-soft)); font-size: 0.82rem; line-height: 1.45; }
+.rk-cookie__row code { border-radius: 6px; background: rgb(var(--c-ink) / 0.08); padding: 1px 5px; font-size: 0.78rem; }
+.rk-switch { position: relative; flex-shrink: 0; width: 52px; height: 32px; margin-top: 2px; border-radius: 999px; background: rgb(var(--c-ink) / 0.22); transition: background-color 180ms ease; }
+.rk-switch::after { content: ""; position: absolute; top: 4px; left: 4px; width: 24px; height: 24px; border-radius: 50%; background: rgb(var(--c-surface)); box-shadow: 0 1px 3px rgb(0 0 0 / 0.35); transition: transform 220ms cubic-bezier(0.3, 1.4, 0.5, 1); }
+.rk-switch[aria-checked="true"] { background: rgb(var(--c-cta)); }
+.rk-switch[aria-checked="true"]::after { transform: translateX(20px); }
+.rk-switch:disabled { cursor: not-allowed; opacity: 0.55; }
+.rk-switch:focus-visible { outline: 3px solid rgb(var(--c-cta) / 0.4); outline-offset: 2px; }
+.rk-cookie__panel-actions { display: grid; gap: 4px; margin-top: 18px; }
+
+/* ---- Illustration ---------------------------------------------------------------------------------------------------------------------- */
+.ck { overflow: visible; color: rgb(var(--c-ink)); }
+.ck-shadow { fill: rgb(var(--c-ink) / 0.16); transform-origin: 104px 152px; animation: ck-shadow 3.6s ease-in-out infinite; }
+.ck-dough { fill: rgb(var(--ck-dough)); }
+.ck-shade { fill: rgb(var(--ck-shade)); opacity: 0.55; }
+.ck-bites circle, .ck-dough { stroke: currentColor; stroke-width: 3; }
+.ck-bites circle { fill: none; }
+.ck-chips ellipse { fill: rgb(var(--ck-chip)); }
+.ck-blush { fill: rgb(220 90 90 / 0.28); }
+.ck-eye { fill: currentColor; transform-box: fill-box; transform-origin: center; animation: ck-blink 5s ease-in-out infinite; }
+.ck-mouth { fill: none; stroke: currentColor; stroke-width: 3.2; stroke-linecap: round; }
+.ck-shield { fill: rgb(var(--c-cta)); stroke: currentColor; stroke-width: 3; stroke-linejoin: round; }
+.ck-tick { fill: none; stroke: rgb(var(--c-cta-ink)); stroke-width: 5.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 100; animation: ck-tick 4.2s ease-in-out infinite; }
+.ck-badge { transform-box: fill-box; transform-origin: 50% 100%; animation: ck-badge 4.2s cubic-bezier(0.3, 1.4, 0.5, 1) infinite; }
+.ck-bob { transform-box: fill-box; transform-origin: 50% 100%; animation: ck-bob 3.6s ease-in-out infinite; }
+.ck-spark { fill: rgb(var(--c-cta)); transform-box: fill-box; transform-origin: center; animation: ck-twinkle 2.8s ease-in-out infinite; }
+.dark .ck-spark { fill: rgb(var(--c-lime)); }
+.ck-spark--2 { animation-delay: 0.9s; }
+.ck-spark--3 { animation-delay: 1.7s; }
+.ck-crumb { fill: rgb(var(--ck-dough)); stroke: currentColor; stroke-width: 1.6; opacity: 0; animation: ck-crumb 3.2s ease-in infinite; }
+.ck-crumb--2 { animation-delay: 1.1s; }
+.ck-crumb--3 { animation-delay: 2.1s; }
+.ck--calm .ck-bob, .ck--calm .ck-shadow, .ck--calm .ck-badge, .ck--calm .ck-tick { animation: none; }
+
+@keyframes rk-cookie-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rk-cookie-pop { from { opacity: 0; transform: translateY(18px) scale(0.94); } to { opacity: 1; transform: none; } }
+@keyframes ck-bob { 0%, 100% { transform: translateY(0) rotate(-1.2deg); } 50% { transform: translateY(-6px) rotate(1.4deg); } }
+@keyframes ck-shadow { 0%, 100% { transform: scaleX(1); opacity: 1; } 50% { transform: scaleX(0.82); opacity: 0.6; } }
+@keyframes ck-blink { 0%, 44%, 50%, 100% { transform: scaleY(1); } 47% { transform: scaleY(0.1); } }
+@keyframes ck-twinkle { 0%, 100% { opacity: 0.25; transform: scale(0.6) rotate(0deg); } 50% { opacity: 1; transform: scale(1.1) rotate(25deg); } }
+@keyframes ck-crumb { 0% { opacity: 0; transform: translate(0, 0); } 12% { opacity: 1; } 100% { opacity: 0; transform: translate(6px, 58px); } }
+@keyframes ck-badge { 0%, 14% { transform: scale(0) rotate(-14deg); } 28%, 100% { transform: scale(1) rotate(0deg); } }
+@keyframes ck-tick { 0%, 26% { stroke-dashoffset: 100; } 46%, 100% { stroke-dashoffset: 0; } }
+
+/* ---- Petits écrans ------------------------------------------------------------------------------------------------------------------ */
+@media (max-width: 600px) {
+  .rk-cookie-overlay { align-items: end; padding: 0; }
+  .rk-cookie { width: 100%; max-height: calc(100dvh - 12px); border-bottom: 0; border-radius: 26px 26px 0 0; animation: rk-cookie-sheet 340ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .rk-cookie__stage { height: 132px; padding-top: 8px; }
+  .rk-cookie__stage .ck { width: 170px; height: 122px; }
+  .rk-cookie__body { padding: 4px 18px calc(18px + env(safe-area-inset-bottom)); }
+}
+@media (max-height: 560px) {
+  .rk-cookie__stage { height: 92px; padding-top: 4px; }
+  .rk-cookie__stage .ck { width: 118px; height: 84px; }
+}
+@keyframes rk-cookie-sheet { from { transform: translateY(100%); } to { transform: none; } }
+
+/* ---- Mouvement réduit : image fixe ------------------------------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .rk-cookie-overlay, .rk-cookie { animation: none; }
+  .ck-bob, .ck-shadow, .ck-eye, .ck-badge, .ck-spark, .ck-crumb { animation: none; }
+  .ck-tick { animation: none; stroke-dashoffset: 0; }
+  .ck-crumb { opacity: 0; }
+  .ck-spark { opacity: 0.9; }
+  .rk-switch, .rk-switch::after { transition: none; }
+}

@@ -3,13 +3,13 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { GoogleLogin } from "@react-oauth/google";
-import { ArrowLeft, CheckCircle, Info, LockKey, QrCode, ShieldCheck, WarningCircle, WifiSlash, X } from "@phosphor-icons/react";
+import { CheckCircle, Info, LockKey, QrCode, ShieldCheck, WarningCircle, WifiSlash, X } from "@phosphor-icons/react";
 
 import Logo from "@/components/Logo";
-import ThemeToggle from "@/components/ThemeToggle";
 import { WelcomeScene, type SceneStatus } from "@/components/auth/WelcomeScene";
 import SocialButtons, { SOCIAL_BUTTON_BASE, enabledProviders, useAuthNotice } from "@/components/auth/SocialButtons";
 import { useGoogleAuthLogin } from "@/hooks/useAuth";
+import { trackAction } from "@/lib/analytics";
 import "./auth-stage.css";
 
 const CHIPS = [
@@ -188,19 +188,10 @@ export default function LoginPage() {
 
       <div className="lg-root">
         <div className="lg-frame">
-          <div className="lg-tools">
-            <Link href="/" className="lg-back" aria-label="Retour au site">
-              <ArrowLeft size={18} weight="bold" aria-hidden="true" />
-              <span className="lg-back__label">Retour au site</span>
-            </Link>
-            <ThemeToggle className="lg-toggle" />
-          </div>
-
           {/* Volet scène : décoratif (la scène et la bulle sont masquées aux lecteurs d'écran). */}
           <aside ref={stageRef} className="lg-stage" aria-label="Présentation de REKOLLECTE">
-            <i className="lg-blob lg-blob--a" aria-hidden="true" />
             <i className="lg-blob lg-blob--b" aria-hidden="true" />
-            <div className="lg-brand"><span aria-hidden="true"><Logo size={34} /></span><span>REKOLLECTE</span></div>
+            <Link href="/" className="lg-brand" aria-label="REKOLLECTE, retour à l’accueil"><span aria-hidden="true"><Logo size={34} /></span><span aria-hidden="true">REKOLLECTE</span></Link>
             <div className="lg-visual" aria-hidden="true">
               <div className="lg-bubble-slot"><p key={bubble} className="lg-bubble" data-status={status}>{bubble}</p></div>
               <WelcomeScene status={status} className="lg-scene" />
@@ -222,9 +213,6 @@ export default function LoginPage() {
               <div className="lg-main">
                 <div className="lg-reveal" style={reveal(0)}>
                   <h1 className="text-balance text-[1.7rem] font-extrabold leading-tight tracking-tight text-ink sm:text-3xl">Connecte-toi à ton espace</h1>
-                  <p className="mt-2.5 text-sm leading-relaxed text-ink-soft">
-                    Réservé au patron et à son équipe : un compte Google{hasSocial ? ", Facebook ou Apple" : ""} suffit, sans mot de passe.
-                  </p>
                 </div>
 
                 {message && (
@@ -245,7 +233,7 @@ export default function LoginPage() {
                 )}
 
                 <div className="lg-reveal mt-7 space-y-4" style={reveal(1)}>
-                  <GoogleSlot onCredential={(credential) => { setGoogleFailed(false); void login(credential); }} onFailure={() => setGoogleFailed(true)} disabled={loading} />
+                  <GoogleSlot onCredential={(credential) => { trackAction("login_start"); setGoogleFailed(false); void login(credential); }} onFailure={() => setGoogleFailed(true)} disabled={loading} />
 
                   {hasSocial && (
                     <>
@@ -257,7 +245,7 @@ export default function LoginPage() {
                   )}
 
                   <p className="flex items-center justify-center gap-2 pt-1 text-xs text-ink-soft">
-                    <LockKey size={14} weight="bold" aria-hidden="true" /> Connexion sécurisée, aucun mot de passe à retenir.
+                    <LockKey size={14} weight="bold" aria-hidden="true" /> Connexion sécurisée
                   </p>
                 </div>
 

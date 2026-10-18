@@ -13,6 +13,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.accounts.models import AuditEvent, User
+from apps.analytics.models import SiteSession
 from apps.checkins.models import CheckIn
 from apps.organizations.models import Organization
 from apps.organizations.services import delete_organization
@@ -99,6 +100,9 @@ class PlatformOverviewView(APIView):
             "checkins_30_days": CheckIn.objects.filter(created_at_client__gte=since).count(),
             "feedback_total": Feedback.objects.count(),
             "feedback_new": Feedback.objects.filter(status=Feedback.Status.NEW).count(),
+            # Vitrine publique : uniquement les personnes ayant accepté la mesure d'audience.
+            "site_sessions_7_days": SiteSession.objects.filter(started_at__gte=timezone.now() - timedelta(days=7)).count(),
+            "site_live_now": SiteSession.objects.filter(last_activity_at__gte=timezone.now() - timedelta(minutes=5)).count(),
         })
 
 

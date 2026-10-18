@@ -4,6 +4,8 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { X } from "@phosphor-icons/react";
 
+import { useGooey } from "@/lib/gooey";
+
 /** Fenêtre d'une rubrique (réglages, REKOLLECTE) : bloque le défilement de la page, piège le focus, se ferme avec Échap
  * ou un clic dans le fond, et rend le focus à la ligne qui l'a ouverte. Sur téléphone : feuille qui monte du bas (voir globals.css).
  * Une autre fenêtre ouverte PAR-DESSUS (confirmation, formulaire d'une rubrique) garde la main : Échap et Tab ne la concernent pas. */
@@ -52,6 +54,8 @@ export default function SettingsModal({ title, onClose, wide = false, comfort = 
       previousFocus?.focus();
     };
   }, []);
+
+  useGooey(dialogRef); // la fenêtre sort du bouton cliqué (rangée de réglage, carte REKOLLECTE…) et s'y résorbe à la fermeture
 
   if (typeof document === "undefined") return null;
   // Portail : la fenêtre ne dépend ni des marges (space-y), ni des transformations, ni du défilement de la page qui l'ouvre.

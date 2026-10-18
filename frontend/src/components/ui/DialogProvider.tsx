@@ -6,6 +6,7 @@ import { CircleNotch } from "@phosphor-icons/react";
 import FlashCard, { type FlashTone } from "@/components/ui/FlashCard";
 import type { MoodName } from "@/components/ui/moods";
 import { normalizeApiError } from "@/lib/errors";
+import { useGooey } from "@/lib/gooey";
 
 /**
  * Boîtes de dialogue du projet — remplacent window.confirm / window.prompt / window.alert,
@@ -94,6 +95,8 @@ function DialogView({ request, onDone }: { request: Request; onDone: () => void 
   const uid = useId();
   const titleId = `${uid}-title`;
   const messageId = `${uid}-message`;
+
+  useGooey(cardRef, { selector: ".qr-flash" }); // la carte sort du bouton qui a demandé la confirmation et s'y résorbe
 
   const options = request.options;
   const runOptions = request.kind === "alert" ? undefined : request.options;

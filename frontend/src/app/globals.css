@@ -101,6 +101,10 @@ h1, h2, h3, h4 {
   @apply font-bold text-mk-ink;
 }
 
+.prose-legal code:not(:where(.not-prose *)) {
+  @apply rounded bg-ink/10 px-1 py-px text-[0.85em];
+}
+
 .prose-legal ol:not(:where(.not-prose *)) {
   @apply mt-3 list-decimal space-y-2 pl-5;
 }
@@ -389,3 +393,8 @@ h1, h2, h3, h4 {
 
 /* Cloche d'arrivées « gooey » : le filtre SVG n'est actif que panneau ouvert (zone filtrée = GPU) */
 .rk-goo.rk-goo-on { filter: var(--rk-goo); }
+
+/* Effet « gooey » commun (lib/gooey.tsx) : la goutte remplace l'apparition CSS de la carte, qui est révélée par le script. */
+.rk-modal[data-gooey], .qr-flash[data-gooey], .rk-cookie[data-gooey] { animation: none; }
+.qr-flash[data-gooey] .qr-flash__mood { animation-delay: 0.3s, 1.3s; }
+.rk-goo-layer { contain: layout style; }

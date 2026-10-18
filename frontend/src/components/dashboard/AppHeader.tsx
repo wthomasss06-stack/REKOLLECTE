@@ -9,6 +9,7 @@ import SyncStatusBadge from "@/components/SyncStatusBadge";
 import ThemeToggle from "@/components/ThemeToggle";
 import VisitAlerts from "./VisitAlerts";
 import { useAuthContext } from "@/context/AuthContext";
+import { GooeyPanel } from "@/lib/gooey";
 import { roleLabel } from "@/lib/roles";
 import { useLogout } from "./useLogout";
 
@@ -75,7 +76,7 @@ export default function AppHeader() {
           </button>
 
           {open && (
-            <div role="menu" aria-label="Profil" className="absolute right-0 top-full z-50 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl border border-border bg-surface p-2 shadow-2xl">
+            <GooeyPanel role="menu" aria-label="Profil" className="absolute right-0 top-full z-50 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl border border-border bg-surface p-2 shadow-2xl">
               <div className="flex items-center gap-3 border-b border-border px-3 pb-3 pt-2">
                 <Avatar name={name} url={user.avatar_url} size={40} />
                 <div className="min-w-0">
@@ -92,7 +93,7 @@ export default function AppHeader() {
                   <button type="button" role="menuitem" onClick={() => { setOpen(false); void askLogout(); }} className={`${itemClass} text-error-text`}><SignOut size={18} weight="bold" /> Se déconnecter</button>
                 </div>
               </div>
-            </div>
+            </GooeyPanel>
           )}
         </div>
       </div>
