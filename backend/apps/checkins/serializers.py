@@ -102,6 +102,25 @@ class PublicFormSerializer(serializers.Serializer):
     access_point_name = serializers.CharField(allow_blank=True)
 
 
+# Valeur qui remplace une image dans la liste du registre. Même constante côté front : lib/responseDisplay.ts.
+IMAGE_PLACEHOLDER = "__image__"
+
+
+def slim_response_value(value):
+    """Réponse allégée pour la LISTE du registre (rafraîchie toutes les 30 s par le dashboard).
+
+    Une photo (data URL base64) et l'image ou le texte OCR brut d'une pièce scannée pèsent plusieurs Mo par fiche : avec
+    20 lignes par page, la liste devenait une réponse de dizaines de Mo, que l'interface ne sait de toute façon pas afficher.
+    On garde l'information utile (« une photo existe », champs extraits de la pièce) ; les données complètes restent en base."""
+    if isinstance(value, str) and value.startswith("data:image/"):
+        return IMAGE_PLACEHOLDER
+    if isinstance(value, dict) and ("image" in value or "raw_text" in value):
+        slim = {key: item for key, item in value.items() if key not in ("image", "raw_text")}
+        slim["has_image"] = bool(value.get("image"))
+        return slim
+    return value
+
+
 class CheckInSerializer(serializers.ModelSerializer):
     client_id = serializers.UUIDField(read_only=True, allow_null=True)
     client_name = serializers.CharField(source="client.full_name", read_only=True, allow_null=True)
@@ -109,6 +128,13 @@ class CheckInSerializer(serializers.ModelSerializer):
     class Meta:
         model = CheckIn
         fields = ["id", "responses", "signature_blob", "created_at_client", "synced_at", "client_id", "client_name"]
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        responses = data.get("responses")
+        if isinstance(responses, dict):
+            data["responses"] = {key: slim_response_value(item) for key, item in responses.items()}
+        return data
 
 
 class CheckInSyncItemSerializer(serializers.Serializer):

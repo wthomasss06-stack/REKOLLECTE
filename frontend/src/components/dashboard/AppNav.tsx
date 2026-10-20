@@ -63,7 +63,7 @@ export default function AppNav({ items, activeKey, onSelect, brand, eyebrow, tit
   };
   const fade = `whitespace-nowrap transition-opacity duration-150 ${collapsed ? "w-0 opacity-0" : "opacity-100"}`;
   const desktopClass = (active: boolean) => `relative flex w-full items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-left text-sm font-medium ${active ? "bg-cta text-cta-ink" : "text-ink-soft hover:bg-canvas"}`;
-  const mobileClass = (active: boolean) => `relative flex min-w-0 flex-1 flex-col items-center gap-1 overflow-hidden rounded-full px-1 py-2 text-[10px] font-medium ${active ? "text-cta-ink" : "text-cta-ink/55"}`;
+  const mobileClass = (active: boolean) => `relative flex min-w-0 flex-1 flex-col items-center gap-1 overflow-hidden rounded-full px-1 py-2 text-[10px] font-medium ${active ? "text-cta-ink" : "text-cta-ink/75"}`;
 
   const render = (item: NavItem, mobile: boolean) => {
     const active = isActive(item);

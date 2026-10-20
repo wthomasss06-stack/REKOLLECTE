@@ -42,6 +42,24 @@ async function fetchForm(qrToken: string, timeout: number): Promise<FetchResult>
   }
 }
 
+/** Range le formulaire (champs, logo ET motifs de visite) pour qu'une tablette hors ligne l'affiche à l'identique. */
+async function cacheForm(qrToken: string, form: PublicFormData) {
+  try {
+    await db.formCache.put({
+      qr_token: qrToken,
+      organization_name: form.organization_name,
+      organization_logo_url: form.organization_logo_url || "",
+      fields_schema: form.fields_schema,
+      visit_reasons: form.visit_reasons || [],
+      cached_at: new Date().toISOString(),
+    });
+  } catch {
+    // Cache local indisponible (navigation privée, quota) : le formulaire s'affiche quand même.
+  }
+}
+
+export type RefreshResult = "updated" | "offline";
+
 /**
  * Formulaire visiteur "kiosque" : tente le réseau avec un timeout court, puis
  * retombe sur le cache local (IndexedDB) si l'appareil est hors-ligne ou si le serveur ne répond pas.
@@ -63,17 +81,7 @@ export function usePublicForm(qrToken: string) {
       setData(form);
       setFromCache(false);
       setStatus("ready");
-      try {
-        await db.formCache.put({
-          qr_token: qrToken,
-          organization_name: form.organization_name,
-          organization_logo_url: form.organization_logo_url || "",
-          fields_schema: form.fields_schema,
-          cached_at: new Date().toISOString(),
-        });
-      } catch {
-        // Cache local indisponible (navigation privée, quota) : le formulaire s'affiche quand même.
-      }
+      await cacheForm(qrToken, form);
     }
 
     async function load() {
@@ -94,7 +102,7 @@ export function usePublicForm(qrToken: string) {
         setData({
           organization_name: cached.organization_name,
           organization_logo_url: cached.organization_logo_url || "",
-          visit_reasons: [],
+          visit_reasons: cached.visit_reasons ?? [],
           fields_schema: cached.fields_schema as PublicFormData["fields_schema"],
           form_id: "cached",
           form_title: "Formulaire visiteur",
@@ -127,5 +135,23 @@ export function usePublicForm(qrToken: string) {
     };
   }, [qrToken, round]);
 
-  return { data, status, fromCache, retry };
+  /**
+   * Recharge le formulaire et ses motifs SANS repasser par l'écran de chargement (bouton « Actualiser les motifs »).
+   * Hors ligne ou serveur muet : la dernière liste connue reste affichée et on le dit (« offline »).
+   */
+  const refresh = useCallback(async (): Promise<RefreshResult> => {
+    const result = await fetchForm(qrToken, FETCH_TIMEOUT_MS);
+    if (result.kind === "not_found") {
+      setStatus("not_found");
+      return "updated";
+    }
+    if (result.kind !== "ok") return "offline";
+    setData(result.data);
+    setFromCache(false);
+    setStatus("ready");
+    await cacheForm(qrToken, result.data);
+    return "updated";
+  }, [qrToken]);
+
+  return { data, status, fromCache, retry, refresh };
 }

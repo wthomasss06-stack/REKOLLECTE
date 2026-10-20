@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 
 import Loader from "@/components/Loader";
 import { GuideProvider } from "@/components/karnet/GettingStarted";
-import { ReminderProvider } from "@/components/karnet/ReminderAlarm";
 import { useAuthContext } from "@/context/AuthContext";
 
 /** Ne reste ici que la fiche d'un client (/dashboard/karnet/clients/[id], lien partageable). Les autres rubriques de REKOLLECTE+
@@ -25,9 +24,7 @@ export default function KarnetLayout({ children }: { children: React.ReactNode }
 
   return (
     <GuideProvider>
-      <ReminderProvider>
-        <div className="touch-comfort space-y-6">{children}</div>
-      </ReminderProvider>
+      <div className="touch-comfort space-y-6">{children}</div>
     </GuideProvider>
   );
 }

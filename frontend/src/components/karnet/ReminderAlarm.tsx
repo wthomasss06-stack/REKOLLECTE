@@ -42,8 +42,8 @@ type WakeSentinel = { release: () => Promise<void> };
 type WakeNavigator = Navigator & { wakeLock?: { request: (type: "screen") => Promise<WakeSentinel> } };
 
 /**
- * Rappels de fin de créneau pour TOUT l'espace REKOLLECTE+ (avant : uniquement la page Rappels
- * ouverte). Alerte sonore si le navigateur l'autorise, et toujours une alerte visuelle (bannière,
+ * Rappels de fin de créneau pour TOUT le dashboard dès que REKOLLECTE+ est actif (monté dans app/dashboard/layout.tsx ;
+ * avant : uniquement la page Rappels ouverte). Alerte sonore si le navigateur l'autorise, et toujours une alerte visuelle (bannière,
  * titre de l'onglet, vibration) — le son seul n'est jamais la seule issue.
  */
 export function ReminderProvider({ children }: { children: ReactNode }) {
@@ -188,7 +188,7 @@ export function ReminderProvider({ children }: { children: ReactNode }) {
   return (
     <ReminderContext.Provider value={value}>
       {due.length > 0 && !onRemindersPage && (
-        <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-error-text/30 bg-error-bg p-4">
+        <div role="alert" className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-error-text/30 bg-error-bg p-4">
           <p className="flex items-center gap-2 text-sm font-semibold text-error-text">
             <BellRinging size={22} weight="fill" className="shrink-0" />
             {due.length === 1 ? "1 créneau terminé à traiter" : `${due.length} créneaux terminés à traiter`}

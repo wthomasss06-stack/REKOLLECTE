@@ -1,5 +1,6 @@
 "use client";
 
+import { humanizeFieldId, responseText } from "@/lib/responseDisplay";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
@@ -138,10 +139,10 @@ export default function ClientHistoryPanel({ clientId }: { clientId: string }) {
                   {format(new Date(c.created_at_client), "dd/MM/yyyy — HH:mm", { locale: fr })}
                 </summary>
                 <dl className="mt-3 grid gap-2 sm:grid-cols-2">
-                  {Object.entries(c.responses).map(([key, value]) => (
+                  {Object.entries(c.responses).filter(([key]) => !key.endsWith("_autre")).map(([key, value]) => (
                     <div key={key} className="text-xs">
-                      <dt className="text-ink-soft">{key}</dt>
-                      <dd className="text-ink">{value === true ? "Oui" : value === false ? "Non" : String(value ?? "—")}</dd>
+                      <dt className="text-ink-soft">{humanizeFieldId(key)}</dt>
+                      <dd className="text-ink">{value === "Autre" && typeof c.responses[`${key}_autre`] === "string" ? `Autre : ${String(c.responses[`${key}_autre`])}` : responseText(value) || "—"}</dd>
                     </div>
                   ))}
                   {c.signature_blob && (

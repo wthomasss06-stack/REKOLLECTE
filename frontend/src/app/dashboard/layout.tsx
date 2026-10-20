@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import AppHeader from "@/components/dashboard/AppHeader";
 import ProductIdentity from "@/components/dashboard/ProductIdentity";
 import Sidebar from "@/components/dashboard/Sidebar";
+import { ReminderProvider } from "@/components/karnet/ReminderAlarm";
 import { useDialog } from "@/components/ui/DialogProvider";
 import Loader from "@/components/Loader";
 import { useAuthContext } from "@/context/AuthContext";
@@ -13,7 +14,6 @@ import { firstNameOf } from "@/lib/greeting";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const pathname = usePathname();
   const { loading, user, organization, isAuthenticated } = useAuthContext();
   const { alert } = useDialog();
 
@@ -24,8 +24,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       router.replace("/connexion");
       return;
     }
-    // Le message d’accueil attend la fin de l’ancien onboarding, puis s’affiche une seule fois.
-    if (pathname.startsWith("/dashboard/onboarding")) return;
+    // Message d’accueil : affiché une seule fois (la clé de session est consommée).
     const raw = sessionStorage.getItem("qr_login_greeting");
     if (!raw) return;
     sessionStorage.removeItem("qr_login_greeting");
@@ -41,20 +40,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     } catch {
       // Une donnée de session corrompue ne doit pas bloquer l’espace.
     }
-  }, [loading, isAuthenticated, router, pathname, alert]);
+  }, [loading, isAuthenticated, router, alert]);
 
   // Pendant que la session se rétablit (ou que le serveur se réveille), seul le chargement REKOLLECTE est affiché.
   if (loading && !user) return <Loader label="Ouverture de ton espace…" />;
   if (!user) return null;
 
-  const isLegacyOnboarding = pathname.startsWith("/dashboard/onboarding");
+  // Les rappels de fin de créneau (sonnerie + bannière) tournent sur TOUT le dashboard dès que REKOLLECTE+ est actif :
+  // avant, ils n'existaient que sur la page REKOLLECTE+, donc un agent resté sur « Accueil » n'entendait jamais l'alarme.
+  const reminders = Boolean(organization?.capabilities?.karnet);
   return (
     <div className="min-h-screen bg-canvas">
       <ProductIdentity capabilities={organization?.capabilities} />
-      {!isLegacyOnboarding && <AppHeader />}
-      {!isLegacyOnboarding && <Sidebar orgName={organization?.name || user.organization_name} orgLogo={organization?.logo_url} userName={user.full_name || user.email} role={user.role} capabilities={organization?.capabilities} />}
-      <main className={isLegacyOnboarding ? "min-h-screen p-6 md:p-10" : "px-4 pb-28 pt-20 sm:px-6 md:ml-[72px] md:p-10 md:pb-10 md:pt-24"}>
-        {children}
+      <AppHeader />
+      <Sidebar orgName={organization?.name || user.organization_name} orgLogo={organization?.logo_url} userName={user.full_name || user.email} role={user.role} capabilities={organization?.capabilities} />
+      <main className="px-4 pb-28 pt-20 sm:px-6 md:ml-[72px] md:p-10 md:pb-10 md:pt-24">
+        {reminders ? <ReminderProvider>{children}</ReminderProvider> : children}
       </main>
     </div>
   );

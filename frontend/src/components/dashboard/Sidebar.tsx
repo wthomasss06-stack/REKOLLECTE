@@ -5,7 +5,7 @@ import AppNav, { type NavItem } from "./AppNav";
 import { useLogout } from "./useLogout";
 
 /** Navigation de l'espace d'un établissement. La mécanique (repli, états actifs, barre du bas) vit dans AppNav, partagée avec l'administration. */
-export default function Sidebar({ orgName, orgLogo = "", userName = "", role, capabilities }: { orgName: string; orgLogo?: string; userName?: string; role: AccountRole; capabilities?: OrganizationCapabilities }) {
+export default function Sidebar({ orgName, orgLogo = "", userName = "", capabilities }: { orgName: string; orgLogo?: string; userName?: string; role: AccountRole; capabilities?: OrganizationCapabilities }) {
   const askLogout = useLogout(userName);
   const showKarnet = Boolean(capabilities?.karnet);
   // Quatre entrées, dans cet ordre, pour tous les rôles. La quatrième est REKOLLECTE au Niveau 1 ; au Niveau 2, REKOLLECTE+ prend
@@ -13,7 +13,7 @@ export default function Sidebar({ orgName, orgLogo = "", userName = "", role, ca
   // Ce que chaque rôle voit DANS Paramètres et REKOLLECTE est filtré dans ces pages, pas ici.
   const items: NavItem[] = [
     { key: "visiteurs", href: "/dashboard", label: "Visiteurs", icon: UsersThree, exact: true },
-    { key: "accueil", href: "/dashboard/accueil", label: role === "STAFF" ? "Accueil" : "Mode Staff", icon: House, exact: true },
+    { key: "accueil", href: "/dashboard/accueil", label: "Accueil", icon: House, exact: true },
     { key: "rekollecte", href: "/dashboard/rekollecte", label: showKarnet ? "REKOLLECTE+" : "REKOLLECTE", icon: showKarnet ? SquaresFour : QrCode, also: ["/dashboard/karnet"] },
     { key: "parametres", href: "/dashboard/parametres", label: "Paramètres", icon: GearSix },
   ];

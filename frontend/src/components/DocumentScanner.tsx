@@ -83,12 +83,12 @@ export default function DocumentScanner({ qrToken, documentType = "free", extrac
   useEffect(() => {
     if (!open || !videoRef.current || !streamRef.current) return;
     videoRef.current.srcObject = streamRef.current;
-    void videoRef.current.play().catch(() => setError("La caméra ne peut pas démarrer automatiquement. Appuie à nouveau sur Capturer."));
+    void videoRef.current.play().catch(() => setError("La caméra ne peut pas démarrer automatiquement. Appuyez à nouveau sur Capturer."));
   }, [open]);
 
   const startCamera = async () => {
     setError("");
-    if (!navigator.mediaDevices?.getUserMedia) { setError("La caméra directe n’est pas disponible dans ce navigateur. Utilise le bouton de prise de photo."); return; }
+    if (!navigator.mediaDevices?.getUserMedia) { setError("La caméra directe n’est pas disponible dans ce navigateur. Utilisez le bouton de prise de photo."); return; }
     try {
       let stream: MediaStream;
       try {
@@ -98,7 +98,7 @@ export default function DocumentScanner({ qrToken, documentType = "free", extrac
       }
       streamRef.current = stream;
       setOpen(true);
-    } catch { setError("Impossible d’ouvrir la caméra arrière. Vérifie l’autorisation de la caméra ou utilise la prise de photo."); }
+    } catch { setError("Impossible d’ouvrir la caméra arrière. Vérifiez l’autorisation de la caméra ou utilisez la prise de photo."); }
   };
 
   const processImage = async (image: string) => {
@@ -122,11 +122,11 @@ export default function DocumentScanner({ qrToken, documentType = "free", extrac
       }
       setRawText(raw_text);
       setValues(Object.keys(extracted).length > 0 ? extracted : guessFields(raw_text, extractFields));
-      if (!raw_text) setError("Aucun texte lisible sur cette photo. Améliore la lumière, cadre tout le document, ou saisis les informations manuellement.");
+      if (!raw_text) setError("Aucun texte lisible sur cette photo. Améliorez la lumière, cadrez tout le document, ou saisissez les informations manuellement.");
     } catch (scanError) {
       const message = scanError instanceof Error && scanError.message === "ocr-timeout"
-        ? "La lecture a mis trop de temps (connexion lente). Tu peux saisir les informations manuellement ou réessayer."
-        : "La lecture OCR a échoué. Vérifie ta connexion, améliore la lumière, puis réessaie ou saisis les informations manuellement.";
+        ? "La lecture a mis trop de temps (connexion lente). Vous pouvez saisir les informations manuellement ou réessayer."
+        : "La lecture OCR a échoué. Vérifiez votre connexion, améliorez la lumière, puis réessayez ou saisissez les informations manuellement.";
       setError(message);
     } finally {
       setBusy(false);
@@ -160,7 +160,7 @@ export default function DocumentScanner({ qrToken, documentType = "free", extrac
     {!captured && !open && <div className="space-y-2"><button type="button" onClick={startCamera} className="flex w-full items-center justify-center gap-2 rounded-lg bg-cta px-4 py-3 text-sm font-semibold text-white"><Camera size={18} /> Ouvrir la caméra arrière</button><button type="button" onClick={() => fileRef.current?.click()} className="flex w-full items-center justify-center gap-2 rounded-lg border border-border px-4 py-3 text-sm font-medium text-ink"><UploadSimple size={18} /> Prendre une photo du document</button><input ref={fileRef} type="file" accept="image/*" capture="environment" onChange={(event) => { choosePhoto(event.target.files?.[0]); event.currentTarget.value = ""; }} className="sr-only" /></div>}
     {open && <div className="space-y-3"><video ref={videoRef} playsInline muted className="aspect-[4/3] w-full rounded-lg bg-black object-cover" /><div className="flex gap-2"><button type="button" onClick={capture} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-cta px-4 py-3 text-sm font-semibold text-white"><Camera size={18} /> Capturer</button><button type="button" onClick={() => { stopCamera(); setOpen(false); }} className="rounded-lg border border-border px-4 py-3 text-sm text-ink"><X size={18} /></button></div></div>}
     {busy && <p className="flex items-center gap-2 text-sm text-ink-soft"><Spinner size={18} className="animate-spin" /> Lecture en cours…</p>}
-    {captured && !busy && !validated && <div className="space-y-3"><img src={captured} alt="Photo du document" className="max-h-48 w-full rounded-lg border border-border object-contain" /><p className="text-xs text-ink-soft">Vérifie les informations extraites avant de valider. L’OCR peut faire des erreurs.</p>{extractFields.map((key) => <label key={key} className="block text-xs font-medium text-ink-soft">{LABELS[key]}<input value={values[key] || ""} onChange={(e) => setValues((prev) => ({ ...prev, [key]: e.target.value }))} required={required} className="mt-1 w-full rounded-lg border border-border bg-surface p-2.5 text-sm text-ink outline-none focus:border-ink" /></label>)}<div className="flex gap-2"><button type="button" onClick={validate} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-success-text px-4 py-3 text-sm font-semibold text-white"><Check size={18} /> {requiresAgentValidation ? "Valider les informations" : "Confirmer"}</button><button type="button" onClick={reset} className="rounded-lg border border-border px-4 py-3 text-sm text-ink">Reprendre</button></div></div>}
+    {captured && !busy && !validated && <div className="space-y-3"><img src={captured} alt="Photo du document" className="max-h-48 w-full rounded-lg border border-border object-contain" /><p className="text-xs text-ink-soft">Vérifiez les informations extraites avant de valider. L’OCR peut faire des erreurs.</p>{extractFields.map((key) => <label key={key} className="block text-xs font-medium text-ink-soft">{LABELS[key]}<input value={values[key] || ""} onChange={(e) => setValues((prev) => ({ ...prev, [key]: e.target.value }))} required={required} className="mt-1 w-full rounded-lg border border-border bg-surface p-2.5 text-sm text-ink outline-none focus:border-ink" /></label>)}<div className="flex gap-2"><button type="button" onClick={validate} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-success-text px-4 py-3 text-sm font-semibold text-white"><Check size={18} /> {requiresAgentValidation ? "Valider les informations" : "Confirmer"}</button><button type="button" onClick={reset} className="rounded-lg border border-border px-4 py-3 text-sm text-ink">Reprendre</button></div></div>}
     {validated && <div className="flex items-center justify-between rounded-lg border border-success-text/30 bg-success-bg p-3 text-sm text-success-text"><span className="flex items-center gap-2"><Check size={18} /> Identité vérifiée</span><button type="button" onClick={reset} className="text-xs underline">Modifier</button></div>}
     {error && <p className="text-xs text-error-text">{error}</p>}
     {required && !validated && <p className="text-xs text-ink-soft">Ce scan est obligatoire.</p>}

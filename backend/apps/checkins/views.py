@@ -7,6 +7,8 @@ from collections import Counter
 from datetime import UTC, datetime, time
 
 from django.db import IntegrityError, transaction
+from django.db.models import Q
+from django.db.models.fields.json import KeyTextTransform
 from django.http import StreamingHttpResponse
 from django.utils import timezone
 from django.utils.dateparse import parse_date, parse_datetime
@@ -291,6 +293,41 @@ def _query_datetime(raw: str, name: str, *, end_of_day: bool = False):
     return timezone.make_aware(parsed) if timezone.is_naive(parsed) else parsed
 
 
+# Types de champ dont la valeur est un texte que le patron peut chercher. Photos, signatures et pièces scannées en sont exclues :
+# ce sont des images en base64, sans intérêt pour une recherche et très coûteuses à parcourir.
+SEARCHABLE_FIELD_TYPES = ("text", "phone", "email", "number", "date", "select", "host")
+MAX_SEARCH_LENGTH = 100
+MAX_SEARCH_FIELDS = 40
+
+
+def _searchable_field_ids(organization: Organization) -> list[str]:
+    """Identifiants des champs textuels de TOUS les formulaires de l'établissement (+ la précision d'un choix « Autre »)."""
+    ids: list[str] = []
+    for schema in organization.form_templates.values_list("fields_schema", flat=True):
+        for field in schema or []:
+            if not isinstance(field, dict) or field.get("type") not in SEARCHABLE_FIELD_TYPES:
+                continue
+            field_id = field.get("id")
+            if not isinstance(field_id, str) or not field_id:
+                continue
+            for candidate in (field_id, f"{field_id}_autre") if field.get("type") == "select" else (field_id,):
+                if candidate not in ids:
+                    ids.append(candidate)
+    return ids[:MAX_SEARCH_FIELDS]
+
+
+def _apply_search(queryset, organization: Organization, term: str):
+    """Recherche texte dans le registre : nom du client REKOLLECTE+ et valeurs des champs textuels.
+
+    On cible chaque champ par son identifiant (KeyTextTransform) au lieu de chercher dans tout le JSON : sinon « nom » trouverait
+    toutes les fiches (c'est le nom d'une clé), et la recherche parcourrait les photos en base64."""
+    aliases = {f"search_{index}": KeyTextTransform(field_id, "responses") for index, field_id in enumerate(_searchable_field_ids(organization))}
+    condition = Q(client__full_name__icontains=term)
+    for alias in aliases:
+        condition |= Q(**{f"{alias}__icontains": term})
+    return queryset.annotate(**aliases).filter(condition)
+
+
 class CheckInListView(generics.ListAPIView):
     serializer_class = CheckInSerializer
     permission_classes = [IsAuthenticated, IsOrgMember]
@@ -298,7 +335,11 @@ class CheckInListView(generics.ListAPIView):
 
     def get_queryset(self):
         params = self.request.query_params
-        queryset = CheckIn.objects.filter(organization=self.request.user.organization)
+        # select_related : le nom du client est lu pour chaque ligne (sinon une requête SQL par fiche affichée).
+        queryset = CheckIn.objects.filter(organization=self.request.user.organization).select_related("client")
+        term = (params.get("q") or "").strip()[:MAX_SEARCH_LENGTH]
+        if term:
+            queryset = _apply_search(queryset, self.request.user.organization, term)
         if params.get("from"):
             queryset = queryset.filter(created_at_client__gte=_query_datetime(params["from"], "from"))
         if params.get("to"):
@@ -395,7 +436,11 @@ class CheckInExportView(APIView):
                     elif kind == "checkbox":
                         row.append("Oui" if responses.get(field_id) else "")
                     else:
-                        row.append(_csv_safe(responses.get(field_id, "")))
+                        value = responses.get(field_id, "")
+                        other = responses.get(f"{field_id}_autre") if kind == "select" and value == "Autre" else None
+                        if isinstance(other, str) and other.strip():
+                            value = f"Autre : {other.strip()}"  # la précision du visiteur n'apparaissait pas dans l'export
+                        row.append(_csv_safe(value))
                 yield _csv_row(row)
 
         response = StreamingHttpResponse(rows(), content_type="text/csv; charset=utf-8")

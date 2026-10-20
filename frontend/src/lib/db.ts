@@ -22,6 +22,8 @@ export interface CachedForm {
   organization_name: string;
   organization_logo_url?: string;
   fields_schema: unknown;
+  /** Motifs de visite : sans eux, une tablette hors ligne affichait une liste de motifs vide. */
+  visit_reasons?: string[];
   cached_at: string;
 }
 

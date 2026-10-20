@@ -41,3 +41,7 @@ if ((Test-Path "frontend\src\components\dashboard") -and -not (Get-ChildItem -Fo
 if ((Test-Path "frontend\src\components") -and -not (Get-ChildItem -Force "frontend\src\components")) { Remove-Item "frontend\src\components" }
 if ((Test-Path "frontend\src\hooks") -and -not (Get-ChildItem -Force "frontend\src\hooks")) { Remove-Item "frontend\src\hooks" }
 Write-Host "Fichiers obsolètes supprimés."
+# --- Patch v5 (QA/UX 20/10/2026) : onboarding en double, on garde /onboarding
+Remove-Item -LiteralPath "frontend\src\app\dashboard\onboarding\page.tsx" -Force -ErrorAction SilentlyContinue
+Remove-Item -LiteralPath "frontend\src\app\dashboard\onboarding\layout.tsx" -Force -ErrorAction SilentlyContinue
+if ((Test-Path "frontend\src\app\dashboard\onboarding") -and -not (Get-ChildItem -Force "frontend\src\app\dashboard\onboarding")) { Remove-Item "frontend\src\app\dashboard\onboarding" }

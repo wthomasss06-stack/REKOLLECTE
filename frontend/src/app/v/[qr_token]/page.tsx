@@ -9,7 +9,7 @@ import { usePublicForm } from "@/hooks/usePublicForm";
 export default function VisitorPage() {
   const params = useParams<{ qr_token: string }>();
   const qrToken = params.qr_token;
-  const { data, status, retry } = usePublicForm(qrToken);
+  const { data, status, retry, refresh } = usePublicForm(qrToken);
 
   // Vide la file des soumissions en attente des qu'une connexion revient sur CET
   // appareil (kiosque) — independant du statut de chargement du formulaire lui-meme.
@@ -26,19 +26,19 @@ export default function VisitorPage() {
     return (
       <CenteredMessage
         title="Service momentanément indisponible"
-        message="Le formulaire n'a pas pu se charger. Vérifie ta connexion puis réessaie."
+        message="Le formulaire n’a pas pu se charger. Vérifiez votre connexion puis réessayez."
         action={<button type="button" onClick={retry} className="mt-3 rounded-full bg-cta px-5 py-2.5 text-sm font-medium text-white">Réessayer</button>}
       />
     );
   }
   if (status === "not_found") {
-    return <CenteredMessage title="QR Code invalide" message="Ce lien n'est plus actif. Contacte l'accueil." />;
+    return <CenteredMessage title="QR Code invalide" message="Ce lien n’est plus actif. Contactez l’accueil." />;
   }
   if (status === "never_cached") {
     return (
       <CenteredMessage
         title="Pas encore configuré"
-        message="Connecte cet appareil à internet une première fois pour activer le formulaire."
+        message="Connectez cet appareil à internet une première fois pour activer le formulaire."
       />
     );
   }
@@ -52,6 +52,7 @@ export default function VisitorPage() {
       logoUrl={data.organization_logo_url}
       visitReasons={data.visit_reasons}
       syncState={sync}
+      onRefreshReasons={refresh}
     />
   );
 }

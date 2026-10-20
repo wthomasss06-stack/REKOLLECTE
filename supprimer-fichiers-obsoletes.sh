@@ -42,3 +42,7 @@ rmdir "frontend/src/components/dashboard" 2>/dev/null || true
 rmdir "frontend/src/components" 2>/dev/null || true
 rmdir "frontend/src/hooks" 2>/dev/null || true
 echo "Fichiers obsolètes supprimés."
+# --- Patch v5 (QA/UX 20/10/2026) : onboarding en double, on garde /onboarding
+rm -f "frontend/src/app/dashboard/onboarding/page.tsx"
+rm -f "frontend/src/app/dashboard/onboarding/layout.tsx"
+rmdir "frontend/src/app/dashboard/onboarding" 2>/dev/null || true

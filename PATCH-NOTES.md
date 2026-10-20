@@ -1,5 +1,46 @@
 # REKOLLECTE – notes de patch
 
+## Patch v5 — QA/UX (20/10/2026), par-dessus le v4
+
+Décompresser **à la racine du projet**, puis lancer **une fois** `supprimer-fichiers-obsoletes.sh` (ou `.ps1`) : il retire `/dashboard/onboarding`, doublon exact de `/onboarding` (que tu gardes). **Aucune migration.**
+**Vérifié** : 249 tests backend verts, `tsc` propre, `next build` OK (copie de vérification sans Google Fonts : le bac à sable n'y a pas accès). Un test échoue aussi sur le zip d'origine : `test_ocr_extracts_fields_from_synthetic_document` (dépend de la version de Tesseract installée). **Non testé sur un vrai appareil** : voir la recette en D.
+
+### A. Bugs corrigés
+- **Registre** (`CheckInsTable.tsx`, `lib/responseDisplay.ts`, `ClientHistoryPanel.tsx`) : une pièce scannée s'affichait « [object Object] » et une photo en base64 brut dans la cellule. Désormais « Photo fournie » ou les champs extraits de la pièce. La précision d'un choix « Autre » apparaît (registre, historique client, export CSV).
+- **Liste du registre** (`checkins/serializers.py`) : elle n'envoie plus les photos ni les images et textes OCR bruts (plusieurs Mo par fiche, rechargés toutes les 30 s). Rien n'est supprimé en base. `select_related` : plus une requête SQL par ligne pour le nom du client.
+- **Alarme des rappels** (`app/dashboard/layout.tsx`, `rekollecte/layout.tsx`, `karnet/layout.tsx`, `ReminderAlarm.tsx`) : le moteur de rappels est monté sur tout le dashboard dès que REKOLLECTE+ est actif, plus seulement sur la page REKOLLECTE+. Limite : « Mode formulaire » ouvre la page visiteur, hors dashboard, donc sans alarme.
+- **« Actualiser les motifs »** (`VisitorForm.tsx`, `usePublicForm.ts`) : le bouton ne faisait rien. Il recharge le formulaire et répond « Liste à jour » ou « Hors ligne : la dernière liste connue est conservée ».
+- **Motifs hors ligne** (`usePublicForm.ts`, `lib/db.ts`) : les motifs n'étaient pas mis en cache, une tablette hors ligne affichait une liste vide.
+- **Kiosque sur tablette 7"** (`VisitorForm.tsx`, `useSubmitForm.ts`, `lib/device.ts`) : sous 640 px, `window.close()` ne faisait rien et la tablette restait bloquée sur « Merci ». Tablette détectée (écran ≥ 600 px ou appli installée) : remise à zéro après 4,5 s sans recharger la page, bouton « Enregistrer un autre visiteur », et la réponse tardive d'un envoi précédent ne peut plus rouvrir un « Merci » sur la saisie suivante.
+- **Signature** (`SignaturePad.tsx`) : le canvas gardait sa taille HTML par défaut (300×150) étirée en CSS, donc le trait était décalé du doigt. Il est redimensionné à sa taille réelle ; les proportions sont conservées (avant : étiré en 500×180) ; la page ne défile plus pendant la signature.
+- **Onboarding en double** : `dashboard/layout.tsx` ne le gère plus ; le dossier est supprimé par le script.
+
+### B. UX visiteur
+- Vouvoiement (formulaire, scanner de pièce, messages d'erreur).
+- Mention sous le formulaire : « les informations servent uniquement à tenir le registre d'accès de… » + lien vers la confidentialité. **Texte à faire relire par un juriste.**
+- Libellés reliés aux champs ; autocomplétion coupée sur tablette partagée (sinon le navigateur proposerait les coordonnées du visiteur précédent), activée sur téléphone.
+- Champ manquant : défilement et focus sur le champ, message annoncé aux lecteurs d'écran. Une précision « Autre » n'est plus envoyée si le visiteur change de motif.
+- Bandeau de synchronisation sans information interne (plus de nombre de fiches en attente ni d'heure de dernière synchro).
+- Photo réduite (1280 px max, JPEG) avant la file hors-ligne. Zones tactiles de 44 px minimum.
+
+### C. UX patron et staff
+- **Registre** : recherche (nom, téléphone, motif, nom du client ; seulement le texte des champs, jamais les images) et période (Aujourd'hui, 7 jours, 30 jours). API : `GET /checkins/?q=…&from=AAAA-MM-JJ`.
+- Moins de trafic : formulaire, établissement et profil chargés à l'ouverture et au retour sur l'onglet ; liste et statistiques toutes les 30 s seulement si l'onglet est visible (avant : 5 requêtes toutes les 30 s, même onglet masqué).
+- Guide « Installer la tablette d'accueil » (page Accueil et dernière étape de l'onboarding) + bouton « Tester le formulaire visiteur ».
+- Menu : « Accueil » pour tous les rôles (au lieu de « Mode Staff » pour patron/gérant) ; texte inactif de la barre mobile plus contrasté.
+
+### D. Recette manuelle à faire (non testable ici)
+1. Tablette 7" (600 px) : valider une fiche, retour au formulaire vierge après environ 4,5 s.
+2. Signature au doigt sur téléphone et tablette : le trait suit le doigt, la page ne bouge pas.
+3. Charger le formulaire en ligne, couper le réseau, recharger : les motifs sont présents. Modifier les motifs, cliquer « Actualiser les motifs ».
+4. Agent resté sur « Accueil », créneau échu : bannière et sonnerie (après un premier toucher de l'écran, règle des navigateurs).
+5. Registre : recherche par nom et par téléphone, filtres de période, photo et pièce lisibles.
+
+### E. Décisions laissées ouvertes
+- **Heure de sortie du visiteur** (« qui est encore là ? ») : non ajoutée (modèle + migration).
+- Le tableau du registre n'affiche que les colonnes du formulaire par défaut : les fiches d'un autre formulaire ont des cellules « — ».
+- La recherche est sensible aux accents (Kone ≠ Koné). L'export CSV complet ignore les filtres.
+
 ## Patch v4 (par-dessus le v3 que tu as déjà appliqué)
 
 Décompresser **à la racine du projet** (les chemins `backend/…` et `frontend/…` écrasent les fichiers existants). **1 migration à appliquer** (nouvelle app `analytics`) : `python manage.py migrate` **avant** de déployer le front. Aucune dépendance ajoutée, aucun fichier à supprimer.

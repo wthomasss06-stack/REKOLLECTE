@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 
@@ -21,8 +21,17 @@ const WAKE_WAIT_MS = 90_000;
  */
 export function useSubmitForm(qrToken: string) {
   const [status, setStatus] = useState<SubmitStatus>("idle");
+  // Numéro de la saisie en cours. Sur une tablette on remet le formulaire à zéro pour le visiteur suivant : l'envoi
+  // de la fiche précédente peut encore être en vol, et sa réponse ne doit PAS rouvrir un « Merci » sur la saisie d'après.
+  const run = useRef(0);
+
+  const reset = useCallback(() => {
+    run.current += 1;
+    setStatus("idle");
+  }, []);
 
   const submitForm = async (responses: Record<string, unknown>, signatureBlob: string) => {
+    const myRun = ++run.current;
     setStatus("saving");
 
     const checkin: OfflineCheckIn = {
@@ -55,7 +64,7 @@ export function useSubmitForm(qrToken: string) {
         const result = Array.isArray(data?.processed) ? data.processed.find((item) => item.idempotency_key === checkin.idempotency_key) : undefined;
         if (result?.status === "created" || result?.status === "already_exists") {
           await markCheckInSynced(checkin.idempotency_key);
-          setStatus("synced");
+          if (run.current === myRun) setStatus("synced");
         } else {
           // Refus ou réponse inexploitable : la fiche reste en file, la synchronisation en arrière-plan prend le relais.
           await retryLater(result?.message || "La réponse serveur n’a pas confirmé l’enregistrement.");
@@ -73,5 +82,5 @@ export function useSubmitForm(qrToken: string) {
     }
   };
 
-  return { submitForm, status };
+  return { submitForm, status, reset };
 }

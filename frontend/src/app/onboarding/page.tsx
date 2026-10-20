@@ -7,6 +7,7 @@ import { ArrowRight, Check } from "@phosphor-icons/react";
 import CloudinaryImageUploader from "@/components/CloudinaryImageUploader";
 import SimpleFormSetup from "@/components/onboarding/SimpleFormSetup";
 import QRCodeManager from "@/components/QRCodeManager";
+import TabletSetupGuide from "@/components/dashboard/TabletSetupGuide";
 import Loader from "@/components/Loader";
 import { apiClient } from "@/lib/api";
 import type { AccountRole, Organization, UserProfile } from "@/types";
@@ -128,7 +129,7 @@ export default function OnboardingPage() {
 
         {step === 3 && role === "BOSS" && <div className="space-y-6"><div><h2 className="text-2xl font-bold text-ink">Ton formulaire visiteur</h2><p className="mt-2 text-sm text-ink-soft">Définis les champs utiles. Tu peux passer et le compléter depuis Paramètres.</p></div><SimpleFormSetup onSaved={() => setStep(4)} /><button onClick={() => setStep(4)} className="rounded-full border border-border px-5 py-3 text-sm">Passer pour l’instant</button></div>}
 
-        {step === 4 && role === "BOSS" && <div className="space-y-6"><div><h2 className="text-2xl font-bold text-ink">La présentation de ton QR code</h2><p className="mt-2 text-sm text-ink-soft">Voici le QR code de ton entreprise. Tu pourras le télécharger ou le régénérer depuis ton dashboard.</p></div><div className="flex justify-center"><QRCodeManager qrToken={org.qr_secure_token} orgName={org.name} logoUrl={org.logo_url} canRegenerate /></div><div className="flex justify-between border-t border-border pt-5"><button onClick={() => setStep(3)} className="rounded-full border border-border px-5 py-3 text-sm">Retour</button><button onClick={finishOnboarding} className="flex items-center gap-2 rounded-full bg-cta px-6 py-3 font-medium text-white"><Check size={16} /> Accéder à mon dashboard</button></div></div>}
+        {step === 4 && role === "BOSS" && <div className="space-y-6"><div><h2 className="text-2xl font-bold text-ink">La présentation de ton QR code</h2><p className="mt-2 text-sm text-ink-soft">Voici le QR code de ton entreprise. Tu pourras le télécharger ou le régénérer depuis ton dashboard.</p></div><div className="flex justify-center"><QRCodeManager qrToken={org.qr_secure_token} orgName={org.name} logoUrl={org.logo_url} canRegenerate /></div><div className="flex justify-center"><a href={`/v/${org.qr_secure_token}`} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-border px-5 text-sm font-medium text-ink hover:bg-canvas">Tester le formulaire visiteur</a></div><TabletSetupGuide /><div className="flex justify-between border-t border-border pt-5"><button onClick={() => setStep(3)} className="rounded-full border border-border px-5 py-3 text-sm">Retour</button><button onClick={finishOnboarding} className="flex items-center gap-2 rounded-full bg-cta px-6 py-3 font-medium text-white"><Check size={16} /> Accéder à mon dashboard</button></div></div>}
       </section>
     </div>
   );
