@@ -11,9 +11,13 @@ class HasKarnetEnabled(BasePermission):
     message = "REKOLLECTE+ n'est pas activé pour cet établissement."
 
     def has_permission(self, request, view):
-        return bool(
-            request.user
-            and request.user.is_authenticated
-            and request.user.organization_id
-            and request.user.organization.karnet_enabled
-        )
+        if not (request.user and request.user.is_authenticated and request.user.organization_id):
+            return False
+        organization = request.user.organization
+        if not organization.karnet_enabled:
+            return False
+        # Inclus dans le plan ? Quand les plans s'appliquent, lève PlanRequired (403 plan_required) ; sinon laisse passer.
+        from apps.billing.services import enforce_feature
+
+        enforce_feature(organization, "karnet")
+        return True

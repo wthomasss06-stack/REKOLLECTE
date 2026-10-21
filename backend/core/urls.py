@@ -13,6 +13,7 @@ urlpatterns = [
     path("api/v1/", include("apps.feedback.urls")),
     path("api/v1/karnet/", include("apps.karnet.urls")),
     path("api/v1/analytics/", include("apps.analytics.urls")),
+    path("api/v1/", include("apps.billing.urls")),
 ]
 
 if settings.DJANGO_ADMIN_URL:

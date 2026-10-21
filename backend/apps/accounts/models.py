@@ -59,6 +59,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     access_revoked_at = models.DateTimeField(null=True, blank=True)
     access_revoked_reason = models.CharField(max_length=255, blank=True)
     is_staff = models.BooleanField(default=False)  # acces Django admin, distinct du role produit STAFF
+    # Acceptation des conditions d'utilisation : version et date, tracées sur chaque compte (preuve en cas de litige).
+    terms_version = models.CharField(max_length=40, blank=True)
+    terms_accepted_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     objects = CustomUserManager()

@@ -8,10 +8,16 @@ class UserSerializer(serializers.ModelSerializer):
     organization_name = serializers.CharField(source="organization.name", read_only=True)
     manager_id = serializers.UUIDField(source="manager.id", read_only=True, allow_null=True)
     manager_name = serializers.CharField(source="manager.full_name", read_only=True, allow_null=True)
+    terms_current_version = serializers.SerializerMethodField()
+
+    def get_terms_current_version(self, user):
+        from django.conf import settings
+
+        return settings.TERMS_VERSION
 
     class Meta:
         model = User
-        fields = ["id", "email", "full_name", "avatar_url", "role", "manager_id", "manager_name", "organization_id", "organization_name", "is_active", "is_visit_host", "access_revoked_at", "access_revoked_reason"]
+        fields = ["id", "email", "full_name", "avatar_url", "role", "manager_id", "manager_name", "organization_id", "organization_name", "is_active", "is_visit_host", "access_revoked_at", "access_revoked_reason", "terms_version", "terms_accepted_at", "terms_current_version"]
         read_only_fields = fields
 
 

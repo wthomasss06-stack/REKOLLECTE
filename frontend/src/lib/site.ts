@@ -2,13 +2,15 @@
 // Module à part : importer ces valeurs n'entraîne pas layout.tsx (et son export `metadata`, réservé
 // au serveur) dans le bundle client.
 
+import { FREE_UNTIL_LABEL } from "@/lib/pricing";
+
 // URL publique canonique. NEXT_PUBLIC_SITE_URL permet de passer à un domaine personnalisé
 // (recommandé pour la marque) sans toucher au code : robots, sitemap, canoniques et JSON-LD suivent.
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://rekollecte-ci.vercel.app").replace(/\/+$/, "");
 export const SITE_NAME = "REKOLLECTE";
 // Description unique (snippet Google, Open Graph, Twitter) : valeur proposée, puis passage à REKOLLECTE+.
 export const SITE_DESCRIPTION =
-  "Logiciel de gestion des visiteurs par QR Code : registre numérique sans compte pour le visiteur, même hors ligne. Gratuit à ce jour, conçu à Abidjan.";
+  `Logiciel de gestion des visiteurs par QR Code : registre numérique sans compte pour le visiteur, même hors ligne. Gratuit jusqu’au ${FREE_UNTIL_LABEL}, conçu à Abidjan.`;
 export const OG_IMAGE = { url: "/og/rekollecte-og.jpg", width: 1200, height: 630, alt: "REKOLLECTE : le registre visiteurs par QR Code, sans compte, même hors ligne" } as const;
 export const PUBLISHER = { name: "AKATech Studio", url: "https://akatech.vercel.app", logo: "/akatech-studio-logo.webp" } as const;
 

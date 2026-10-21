@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "apps.feedback",
     "apps.karnet",
     "apps.analytics",
+    "apps.billing",
 ]
 
 MIDDLEWARE = [
@@ -269,3 +270,35 @@ LOGGING = {
         "qr_register.oauth": {"handlers": ["console_plain"], "level": "INFO", "propagate": False},
     },
 }
+
+
+# --- Plans et abonnements (apps.billing) ---------------------------------------------------------------------------
+# Les plans ne verrouillent RIEN tant que PLAN_ENFORCEMENT_STARTS_AT est vide. PLAN_OBSERVE_MODE journalise alors ce qui
+# serait bloqué (action d'audit « plan.would_block ») sans rien bloquer. Format de la date : ISO 8601, ex. 2026-12-01T00:00:00+00:00.
+def _optional_datetime(name: str):
+    raw = os.environ.get(name, "").strip()
+    if not raw:
+        return None
+    from datetime import datetime, timezone as _tz
+
+    value = datetime.fromisoformat(raw)
+    return value if value.tzinfo else value.replace(tzinfo=_tz.utc)
+
+
+PLAN_ENFORCEMENT_STARTS_AT = _optional_datetime("PLAN_ENFORCEMENT_STARTS_AT")
+PLAN_OBSERVE_MODE = os.environ.get("PLAN_OBSERVE_MODE", "true").lower() in ("1", "true", "yes", "on")
+PLAN_TRIAL_DAYS = int(os.environ.get("PLAN_TRIAL_DAYS", "14"))
+
+# --- Conservation des données (réglages SÉPARÉS de la fenêtre d'historique d'un plan) --------------------------------
+# Valeurs par défaut à faire valider dans le dossier ARTCI ; chaque établissement peut choisir une durée plus courte.
+RETENTION_VISITS_DAYS = int(os.environ.get("RETENTION_VISITS_DAYS", "365"))
+RETENTION_CLIENTS_DAYS = int(os.environ.get("RETENTION_CLIENTS_DAYS", "730"))  # après la dernière activité ; suppression à la demande
+RETENTION_AUDIT_DAYS = int(os.environ.get("RETENTION_AUDIT_DAYS", "365"))
+RETENTION_PAYMENTS_YEARS = 10  # obligation comptable : jamais purgés avec les visites
+PRIVACY_TRANSFER_NOTE = os.environ.get(
+    "PRIVACY_TRANSFER_NOTE",
+    "Le service est hébergé par des prestataires techniques qui peuvent être situés hors de Côte d’Ivoire.",
+)
+
+# Version des conditions générales d'utilisation que les comptes acceptent (tracée sur chaque compte).
+TERMS_VERSION = os.environ.get("TERMS_VERSION", "cgu-2026-11")

@@ -24,6 +24,8 @@ export interface CachedForm {
   fields_schema: unknown;
   /** Motifs de visite : sans eux, une tablette hors ligne affichait une liste de motifs vide. */
   visit_reasons?: string[];
+  /** Mention d'information : une tablette hors ligne doit l'afficher à l'identique. */
+  privacy_notice?: unknown;
   cached_at: string;
 }
 

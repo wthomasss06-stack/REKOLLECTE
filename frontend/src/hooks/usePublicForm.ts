@@ -51,6 +51,7 @@ async function cacheForm(qrToken: string, form: PublicFormData) {
       organization_logo_url: form.organization_logo_url || "",
       fields_schema: form.fields_schema,
       visit_reasons: form.visit_reasons || [],
+      privacy_notice: form.privacy_notice,
       cached_at: new Date().toISOString(),
     });
   } catch {
@@ -103,6 +104,7 @@ export function usePublicForm(qrToken: string) {
           organization_name: cached.organization_name,
           organization_logo_url: cached.organization_logo_url || "",
           visit_reasons: cached.visit_reasons ?? [],
+          privacy_notice: cached.privacy_notice as PublicFormData["privacy_notice"],
           fields_schema: cached.fields_schema as PublicFormData["fields_schema"],
           form_id: "cached",
           form_title: "Formulaire visiteur",

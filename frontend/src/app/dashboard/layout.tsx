@@ -1,21 +1,27 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import AppHeader from "@/components/dashboard/AppHeader";
 import ProductIdentity from "@/components/dashboard/ProductIdentity";
 import Sidebar from "@/components/dashboard/Sidebar";
+import PlanBanner from "@/components/billing/PlanBanner";
 import { ReminderProvider } from "@/components/karnet/ReminderAlarm";
 import { useDialog } from "@/components/ui/DialogProvider";
 import Loader from "@/components/Loader";
 import { useAuthContext } from "@/context/AuthContext";
 import { firstNameOf } from "@/lib/greeting";
+import { releaseStaleScrollLock } from "@/lib/scrollLock";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { loading, user, organization, isAuthenticated } = useAuthContext();
   const { alert } = useDialog();
+
+  // Filet de sécurité : si une fenêtre s'est mal refermée, le défilement ne reste jamais figé après un changement de page.
+  useEffect(() => { releaseStaleScrollLock(); }, [pathname]);
 
   useEffect(() => {
     if (loading) return;
@@ -55,6 +61,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <AppHeader />
       <Sidebar orgName={organization?.name || user.organization_name} orgLogo={organization?.logo_url} userName={user.full_name || user.email} role={user.role} capabilities={organization?.capabilities} />
       <main className="px-4 pb-28 pt-20 sm:px-6 md:ml-[72px] md:p-10 md:pb-10 md:pt-24">
+        <PlanBanner />
         {reminders ? <ReminderProvider>{children}</ReminderProvider> : children}
       </main>
     </div>

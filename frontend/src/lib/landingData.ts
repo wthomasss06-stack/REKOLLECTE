@@ -1,11 +1,13 @@
 import { faqPage } from "@/lib/jsonld";
 import { IDS, PUBLISHER, SITE_NAME, SITE_URL } from "@/lib/site";
+import { FREE_UNTIL_ISO, FREE_UNTIL_LABEL } from "@/lib/pricing";
 
 /** Données éditoriales de la landing — une seule source pour l'affichage et le JSON-LD. */
 
 export const FAQS = [
   { question: "Qu’est-ce que REKOLLECTE ?", answer: "REKOLLECTE est un registre visiteurs numérique par QR Code, conçu à Abidjan par AKATech Studio. Il remplace le cahier de visites papier des bureaux, restaurants, hôtels et accès chantier : le visiteur scanne un QR Code, remplit un formulaire et signe à l’écran, sans créer de compte, même sans connexion internet." },
-  { question: "REKOLLECTE est-il un logiciel de gestion des visiteurs ?", answer: "Oui. REKOLLECTE est un logiciel de gestion des visiteurs par QR Code : un registre numérique des visiteurs qui remplace le cahier de visites papier, avec formulaire d’accueil adapté à l’activité, rôles Patron, Gérant et Staff, statistiques de fréquentation et export CSV. Il est gratuit à ce jour." },
+  { question: "REKOLLECTE est-il un logiciel de gestion des visiteurs ?", answer: "Oui. REKOLLECTE est un logiciel de gestion des visiteurs par QR Code : un registre numérique des visiteurs qui remplace le cahier de visites papier, avec formulaire d’accueil adapté à l’activité, rôles Patron, Gérant et Staff, statistiques de fréquentation et export CSV. Il est gratuit jusqu’au " + FREE_UNTIL_LABEL + "." },
+  { question: "Combien coûte REKOLLECTE ?", answer: "REKOLLECTE est gratuit jusqu’au " + FREE_UNTIL_LABEL + ". Ensuite : un plan Gratuit à 0 FCFA, Essentiel à 3 000 FCFA par mois, REKOLLECTE+ à 7 000 FCFA par mois et une offre Entreprise sur devis. Vos données restent intactes et l’enregistrement des visiteurs n’est jamais bloqué par un plan." },
   { question: "Quelle différence entre REKOLLECTE et REKOLLECTE+ ?", answer: "REKOLLECTE est le registre visiteurs (niveau 1). REKOLLECTE+ est le niveau 2, activable depuis les paramètres : les visiteurs deviennent des fiches clients et l’établissement gère en plus ses ressources (chambre, table, salle…), ses réservations, ses encaissements et ses rappels de fin de créneau." },
   { question: "Le visiteur doit-il créer un compte ?", answer: "Non. Il scanne simplement le QR Code, remplit le formulaire depuis son téléphone ou la tablette d’accueil, puis signe. Aucune application ni inscription n’est nécessaire." },
   { question: "Est-ce que REKOLLECTE fonctionne sans connexion ?", answer: "Oui. Le formulaire continue d’enregistrer les visites hors-ligne sur l’appareil. Les données se synchronisent automatiquement dès que la connexion revient." },
@@ -33,7 +35,7 @@ const FEATURES_PLUS = [
   "Rappels de fin de créneau",
 ];
 
-const FREE = { "@type": "Offer", price: "0", priceCurrency: "XOF", availability: "https://schema.org/OnlineOnly" };
+const FREE = { "@type": "Offer", price: "0", priceCurrency: "XOF", priceValidUntil: FREE_UNTIL_ISO, availability: "https://schema.org/OnlineOnly" };
 const AREA = { "@type": "Country", name: "Côte d’Ivoire" };
 
 // Graphe relié par @id (éditeur -> site -> applications) : Google et les moteurs de réponse comprennent

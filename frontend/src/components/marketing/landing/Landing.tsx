@@ -13,6 +13,7 @@ import DepthShowcase from "@/components/marketing/landing/DepthShowcase";
 import LevelTabs from "@/components/marketing/landing/LevelTabs";
 import { ArtImage, CloudImage } from "@/components/marketing/landing/Media";
 import { MiniDash, MiniOffline, MiniScan, MiniSectors } from "@/components/marketing/landing/Mockups";
+import PricingSection from "@/components/marketing/landing/PricingSection";
 import Marquee from "@/components/marketing/Marquee";
 import { useLenis } from "@/components/marketing/SmoothScroll";
 import { CTA_BG, FAQS, FEATURE_ROWS, HERO_BG, PROMISES, SECTORS, STEPS, STEPS_PLUS, WHY } from "@/lib/landingData";
@@ -348,6 +349,9 @@ export default function Landing() {
           })}
         </div>
       </section>
+
+      {/* ——— Tarifs ——— */}
+      <PricingSection />
 
       {/* ——— FAQ ——— */}
       <section id="faq" className="mx-auto w-full max-w-[1180px] px-4 py-14 sm:px-6 sm:py-20">

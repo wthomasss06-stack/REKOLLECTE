@@ -1,5 +1,50 @@
 # REKOLLECTE – notes de patch
 
+## Patch v7 — grille tarifaire publique et corrections mobile (21/10/2026), par-dessus le v6
+
+Décompresser à la racine. Aucune migration. **Vérifié** : syntaxe TypeScript des fichiers modifiés (aucune erreur de syntaxe), contrôle exécutable du verrou de défilement (`node --experimental-strip-types frontend/scripts/scrollLock.check.mjs`). **Non testé** : `next build`, tests e2e (`frontend/e2e/tarifs.spec.ts`) et rendu sur appareil réel (dépendances absentes de l'archive) : lancer `npm ci && npm run build && npm run test:e2e` avant de déployer.
+
+### Grille tarifaire et gratuité jusqu'au 1er décembre 2026
+- Nouvelle section « Tarifs » sur la landing (`PricingSection.tsx`, ancre `#tarifs`, lien « Tarifs » dans le menu). **Pendant la période de lancement, tout est gratuit et libre : les prix payants sont barrés** avec « Usage libre jusqu'au 1er décembre 2026 », et les premiers utilisateurs sont invités à utiliser le bouton Feedback (ils sont les testeurs). Données dans `frontend/src/lib/pricing.ts` (une seule source : prix, date, notes). **Interrupteur du 1er décembre : `FREE_PERIOD_ACTIVE = false`**, puis republier (checklist dans `docs/PLANS_ET_ABONNEMENTS.md`).
+- Les mentions « gratuit à ce jour » (description du site, FAQ, pages « À propos » et « Logiciel de gestion des visiteurs », CGU art. 6, JSON-LD `priceValidUntil`) suivent la même date. Nouvelle question « Combien coûte REKOLLECTE ? » dans la FAQ de la landing.
+- **À faire valider par un juriste** : le texte de l'article 6 des CGU (tarification et résiliation).
+- Rien n'est verrouillé : `PLAN_ENFORCEMENT_STARTS_AT` reste vide. Voir `docs/PLANS_ET_ABONNEMENTS.md` et `Brief_implementation_plans_Rekollecte.md`.
+
+### Mobile
+- **Paramètres et REKOLLECTE+ ne défilaient plus.** Cause : quatre fenêtres (réglages, dialogues, menu, bandeau cookies) mémorisaient chacune « l'overflow précédent » ; deux fenêtres fermées dans le désordre laissaient la page figée. Remplacé par un verrou partagé à compteur (`lib/scrollLock.ts`) et un filet de sécurité au changement de page (`dashboard/layout.tsx`).
+- **QR visiteurs (mode Accueil)** : le QR était étiré (largeur réduite, hauteur fixe). Cadre carré (`aspect-square`), canvas à 100 % ; marges réduites sur téléphone pour agrandir le QR.
+- **Éditeur de formulaire** : « Repartir d'un modèle » est pliable (replié quand le formulaire a déjà des champs). Un champ ajouté (ou un modèle appliqué) apparaît en vert avec le badge « Nouveau » et un message « pas encore enregistré », s'affiche à l'écran et prend le focus ; la couleur disparaît après « Enregistrer ».
+
+## Patch v6 — plans, abonnements et conformité (20/10/2026), par-dessus le v5
+
+Décompresser à la racine. **Migrations à jouer** : `python manage.py migrate` (accounts 0010, organizations 0005, billing 0001 et 0002). Détail : `docs/PLANS_ET_ABONNEMENTS.md` et `docs/CONSERVATION_DONNEES.md`.
+**Aucune limite n'est appliquée par défaut** : tant que `PLAN_ENFORCEMENT_STARTS_AT` est vide, les plans fonctionnent en mode « observer » (ils journalisent ce qui serait bloqué, sans rien bloquer, et aucun cadenas ne s'affiche).
+**Vérifié** : suite backend complète verte (hors le test OCR déjà en échec sur le zip d'origine), `tsc` propre, `next build` OK. **Non testé** : interface sur appareil réel, paiements réels.
+
+### P0 — conformité (dossier ARTCI)
+- Durées de conservation par catégorie, réglables ; purge automatique des visites (`purge_expired_visits` + purge au fil de l'eau), sans jamais toucher aux paiements.
+- Export et suppression complets pour une personne (téléphone ou e-mail exacts). Fiche client anonymisée si des réservations y sont rattachées.
+- Mention d'information complète sous le formulaire (responsable, finalité, catégories, destinataires, durée, droits, hébergement), mise en cache pour les tablettes hors ligne. **Textes à faire valider.**
+- Option « motifs prédéfinis uniquement » (retire « Autre »). Numéro de pièce masqué par défaut ; texte OCR brut jamais conservé.
+- Acceptation des conditions d'utilisation tracée sur chaque compte (version + date) : bandeau « J'accepte » dans le dashboard.
+
+### P1 — moteur de plans (`backend/apps/billing`)
+- Modèles `Subscription` et `Payment` ; droits et quotas dans un seul fichier (`plans.py`) ; plan effectif calculé à la lecture (essai 14 jours, délai de grâce 7 jours, fondateurs).
+- Contrôles serveur : OCR (champ retiré du formulaire public + route refusée), téléphone, points d'accueil, formulaires, membres, export, fenêtre d'historique, REKOLLECTE+. Erreur toujours `{code: "plan_required", feature, required_plan}`.
+- Jamais bloqués : la synchronisation des fiches et l'export de sortie (`?purpose=exit`).
+- Comptes existants : statut « fondateur » (migration), limitation seulement après préavis écrit renseigné dans l'administration.
+
+### P3/P4 — interface et encaissement
+- Paramètres › **Abonnement** (plan, échéance, limites, reçus, export de sortie) et › **Données et confidentialité** (patron).
+- Cadenas (`LockedFeature`, export du registre) et bandeaux d'essai, de retard et d'expiration : visibles seulement quand les plans s'appliquent.
+- Administration › Entreprises › bouton carte : abonnement et **Enregistrer un paiement** (idempotent sur la référence ; « Reçu interne, non fiscal » sans référence FNE).
+
+### Décisions laissées ouvertes
+- Quotas de `plans.py` : hypothèses de départ. Le palier « ressources » n'est pas appliqué.
+- Durées de conservation et textes de la mention d'information : à valider avec ton conseil.
+- Acceptation des CGU : demandée par bandeau (pas dans l'onboarding). Le texte des CGU lui-même reste à finaliser.
+- Pas d'agrégateur de paiement ni d'e-mails d'échéance automatiques (J-7, J-1) : encaissement et préavis manuels pour l'instant.
+
 ## Patch v5 — QA/UX (20/10/2026), par-dessus le v4
 
 Décompresser **à la racine du projet**, puis lancer **une fois** `supprimer-fichiers-obsoletes.sh` (ou `.ps1`) : il retire `/dashboard/onboarding`, doublon exact de `/onboarding` (que tu gardes). **Aucune migration.**

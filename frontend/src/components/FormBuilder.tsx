@@ -1,6 +1,6 @@
 "use client";
-import { useRef, useState, type DragEvent, type PointerEvent } from "react";
-import { Check, DotsSixVertical, Plus, Trash } from "@phosphor-icons/react";
+import { useEffect, useId, useRef, useState, type DragEvent, type PointerEvent } from "react";
+import { CaretDown, Check, DotsSixVertical, Plus, Trash } from "@phosphor-icons/react";
 
 import { ArrowUpRight } from "@/components/icons";
 import { useDialog } from "@/components/ui/DialogProvider";
@@ -31,6 +31,30 @@ export default function FormBuilder({ initialSchema, formId, initialTitle = "Reg
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [dropTargetId, setDropTargetId] = useState<string | null>(null);
   const pointerDragRef = useRef<{ id: string; pointerId: number } | null>(null);
+  // Modèles : repliés quand le formulaire a déjà des champs (on le modifie), ouverts quand il est vide (on le crée).
+  const uid = useId();
+  const [presetsOpen, setPresetsOpen] = useState(() => initialSchema.length === 0);
+  // Champs ajoutés depuis la dernière sauvegarde : mis en évidence pour qu'on voie qu'ils existent bien.
+  const [freshIds, setFreshIds] = useState<Set<string>>(() => new Set());
+  const rowRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const fieldsSectionRef = useRef<HTMLElement>(null);
+  const revealRef = useRef<string | null>(null);
+
+  // Après un ajout (ou un modèle appliqué), amène le nouveau champ à l'écran : sur téléphone, il est sinon hors de vue.
+  useEffect(() => {
+    const target = revealRef.current;
+    if (!target) return;
+    revealRef.current = null;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const behavior: ScrollBehavior = reduce ? "auto" : "smooth";
+    if (target === "__fields") { fieldsSectionRef.current?.scrollIntoView({ behavior, block: "start" }); return; }
+    const row = rowRefs.current.get(target);
+    if (!row) return;
+    row.scrollIntoView({ behavior, block: "center" });
+    const input = row.querySelector<HTMLInputElement>("input:not([type])");
+    input?.focus({ preventScroll: true });
+    input?.select();
+  }, [fields]);
 
   const applyPreset = async (presetFields: FormField[]) => {
     if (fields.length > 0 && !(await confirm({
@@ -41,12 +65,19 @@ export default function FormBuilder({ initialSchema, formId, initialTitle = "Reg
       confirmLabel: "Remplacer",
       cancelLabel: "Garder mes champs",
     }))) return;
-    setFields(keepSignaturesLast(presetFields.map((f) => ({ ...f, id: newFieldId() }))));
+    const next = presetFields.map((f) => ({ ...f, id: newFieldId() }));
+    setFields(keepSignaturesLast(next));
+    setFreshIds(new Set(next.map((f) => f.id)));
+    setPresetsOpen(false);
+    revealRef.current = "__fields";
     setSaved(false);
   };
 
   const addField = () => {
-    setFields((prev) => keepSignaturesLast([...prev, { id: newFieldId(), type: "text", label: "Nouveau champ", required: false }]));
+    const id = newFieldId();
+    setFields((prev) => keepSignaturesLast([...prev, { id, type: "text", label: "Nouveau champ", required: false }]));
+    setFreshIds((prev) => new Set(prev).add(id));
+    revealRef.current = id;
     setSaved(false);
   };
 
@@ -119,30 +150,40 @@ export default function FormBuilder({ initialSchema, formId, initialTitle = "Reg
       const payload = { title, fields_schema: keepSignaturesLast(fields) };
       if (formId) await apiClient.patch(`/form-templates/${formId}/`, payload);
       else await apiClient.put("/form-template/", payload);
-      setSaved(true); onSaved?.();
+      setSaved(true); setFreshIds(new Set()); onSaved?.();
     } catch { setSaveError("Impossible d'enregistrer. Vérifie ta connexion et réessaie."); }
     finally { setSaving(false); }
   };
+
+  const freshCount = fields.filter((field) => freshIds.has(field.id)).length;
 
   return <div className="space-y-6">
     <section>
       <label className="mb-2 block text-sm font-medium text-ink-soft">Nom du formulaire</label>
       <input value={title} onChange={(e) => { setTitle(e.target.value); setSaved(false); }} className="mb-5 w-full rounded-md border border-border bg-surface p-2.5 text-sm text-ink outline-none focus:border-ink" />
-      <h2 className="mb-3 text-sm font-medium text-ink-soft">Repartir d&apos;un modèle</h2>
-      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-5">{FORM_PRESETS.map((preset) => <button key={preset.id} type="button" onClick={() => applyPreset(preset.fields)} className="rounded-lg border border-border bg-surface p-3 text-left text-sm transition hover:border-ink"><p className="font-medium text-ink">{preset.label}</p><p className="mt-0.5 text-xs text-ink-soft">{preset.fields.length} champs</p></button>)}</div>
+      <h2 className="mb-3 text-sm font-medium text-ink-soft">
+        <button type="button" id={`${uid}-presets-toggle`} aria-expanded={presetsOpen} aria-controls={`${uid}-presets-panel`} onClick={() => setPresetsOpen((open) => !open)} className="flex min-h-[44px] w-full items-center justify-between gap-3 rounded-lg border border-border bg-surface px-3 text-left transition hover:border-ink">
+          <span>Repartir d&apos;un modèle <span className="ml-1 text-xs font-normal">({FORM_PRESETS.length} modèles)</span></span>
+          <CaretDown size={16} weight="bold" aria-hidden="true" className={`shrink-0 transition-transform duration-200 ${presetsOpen ? "rotate-180" : ""}`} />
+        </button>
+      </h2>
+      {presetsOpen && <div id={`${uid}-presets-panel`} role="region" aria-labelledby={`${uid}-presets-toggle`} className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-5">{FORM_PRESETS.map((preset) => <button key={preset.id} type="button" onClick={() => applyPreset(preset.fields)} className="rounded-lg border border-border bg-surface p-3 text-left text-sm transition hover:border-ink"><p className="font-medium text-ink">{preset.label}</p><p className="mt-0.5 text-xs text-ink-soft">{preset.fields.length} champs</p></button>)}</div>}
     </section>
 
-    <section>
+    <section ref={fieldsSectionRef} className="scroll-mt-4">
       <div className="mb-3 flex items-center justify-between"><h2 className="font-heading font-semibold text-ink">Champs du formulaire</h2><button type="button" onClick={addField} className="flex items-center gap-1 text-sm font-medium text-ink transition hover:text-cta-hover"><Plus size={16} weight="bold" /> Ajouter</button></div>
+      {freshCount > 0 && <p role="status" aria-live="polite" className="mb-3 rounded-lg bg-success-bg px-3 py-2 text-xs font-medium text-success-text">{freshCount === 1 ? "1 champ ajouté, en vert : il n’est pas encore enregistré." : `${freshCount} champs ajoutés, en vert : ils ne sont pas encore enregistrés.`} Appuie sur « Enregistrer » pour les publier.</p>}
       <p className="mb-3 text-xs text-ink-soft">Sur ordinateur, fais glisser les champs par leur poignée pour changer leur ordre. La signature reste automatiquement en dernière position.</p>
       {fields.length === 0 ? <p className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-ink-soft">Aucun champ pour l&apos;instant — choisis un modèle ci-dessus ou ajoute tes propres champs.</p> : <div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
         {fields.map((field) => {
           const isSignature = field.type === "signature";
           const isDropTarget = dropTargetId === field.id && !isSignature;
-          return <div key={field.id} data-form-field-id={field.id} draggable={!isSignature} onDragStart={(event) => !isSignature && handleDragStart(event, field.id)} onDragOver={(event) => { if (draggedId && !isSignature) { event.preventDefault(); setDropTargetId(field.id); } }} onDragLeave={() => setDropTargetId(null)} onDrop={(event) => handleDrop(event, isSignature ? "signature" : field.id)} onDragEnd={() => { setDraggedId(null); setDropTargetId(null); }} className={`p-4 transition ${isDropTarget ? "border-t-2 border-cta bg-cta/5" : ""} ${draggedId === field.id ? "opacity-50" : ""}`}>
+          const isFresh = freshIds.has(field.id);
+          return <div key={field.id} ref={(node) => { if (node) rowRefs.current.set(field.id, node); else rowRefs.current.delete(field.id); }} data-form-field-id={field.id} data-fresh={isFresh ? "true" : undefined} draggable={!isSignature} onDragStart={(event) => !isSignature && handleDragStart(event, field.id)} onDragOver={(event) => { if (draggedId && !isSignature) { event.preventDefault(); setDropTargetId(field.id); } }} onDragLeave={() => setDropTargetId(null)} onDrop={(event) => handleDrop(event, isSignature ? "signature" : field.id)} onDragEnd={() => { setDraggedId(null); setDropTargetId(null); }} className={`p-4 transition ${isFresh ? "border-l-4 border-success-text bg-success-bg/70" : ""} ${isDropTarget ? "border-t-2 border-cta bg-cta/5" : ""} ${draggedId === field.id ? "opacity-50" : ""}`}>
             <div className="flex items-center gap-2">
               <span title={isSignature ? "La signature est toujours en dernier" : "Glisser pour réordonner avec la souris ou le doigt"} onPointerDown={(event) => !isSignature && handlePointerDown(event, field.id)} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerCancel={handlePointerUp} className={`shrink-0 select-none ${isSignature ? "text-ink-soft/50" : "cursor-grab touch-none text-ink-soft active:cursor-grabbing"}`}><DotsSixVertical size={22} weight="bold" /></span>
               <input value={field.label} onChange={(e) => updateField(field.id, "label", e.target.value)} placeholder="Nom du champ" className="min-w-0 flex-1 rounded-md border border-border bg-canvas p-2.5 text-sm text-ink outline-none focus:border-ink" />
+              {isFresh && <span className="shrink-0 rounded-full bg-success-text px-2 py-1 text-[11px] font-semibold text-surface">Nouveau</span>}
               {isSignature && <span className="hidden shrink-0 rounded-full bg-canvas px-2 py-1 text-[11px] text-ink-soft sm:inline">Dernier</span>}
               <button type="button" onClick={() => removeField(field.id)} aria-label="Supprimer ce champ" className="shrink-0 p-1 text-ink-soft transition hover:text-error-text"><Trash size={18} weight="bold" /></button>
             </div>

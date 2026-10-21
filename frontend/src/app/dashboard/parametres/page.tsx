@@ -1,10 +1,12 @@
 "use client";
 
 import { Suspense, type ReactNode } from "react";
-import { Buildings, ChatCircleDots, KeyIcon, ShieldCheck, UserCircle, UsersThree } from "@phosphor-icons/react";
+import { Buildings, ChatCircleDots, CreditCard, KeyIcon, LockKey, ShieldCheck, UserCircle, UsersThree } from "@phosphor-icons/react";
 
 import Loader from "@/components/Loader";
+import AbonnementPanel from "@/components/panels/AbonnementPanel";
 import AdministrationPanel from "@/components/panels/AdministrationPanel";
+import DonneesPanel from "@/components/panels/DonneesPanel";
 import ConnexionPanel from "@/components/panels/ConnexionPanel";
 import EntreprisePanel from "@/components/panels/EntreprisePanel";
 import EquipePanel from "@/components/panels/EquipePanel";
@@ -16,7 +18,7 @@ import { useAuthContext } from "@/context/AuthContext";
 import { useModalParam } from "@/hooks/useModalParam";
 import type { AccountRole } from "@/types";
 
-const IDS = ["moi", "entreprise", "equipe", "connexion", "administration", "avis"] as const;
+const IDS = ["moi", "entreprise", "equipe", "abonnement", "donnees", "connexion", "administration", "avis"] as const;
 type SettingId = (typeof IDS)[number];
 
 const ALL_ROLES: AccountRole[] = ["BOSS", "GERANT", "STAFF"];
@@ -28,6 +30,8 @@ const SECTIONS: Section[] = [
   { id: "moi", title: "Moi", description: "Ton nom, tes prénoms et ta photo de profil", icon: UserCircle, roles: ALL_ROLES, panel: () => <ProfilePanel /> },
   { id: "entreprise", title: "Entreprise", description: "Nom, logo et identité de l’établissement", icon: Buildings, roles: ALL_ROLES, panel: () => <EntreprisePanel /> },
   { id: "equipe", title: "Équipe", description: "Invitations, rôles et accès des personnes de l’établissement", icon: UsersThree, roles: MANAGERS, wide: true, panel: () => <EquipePanel /> },
+  { id: "abonnement", title: "Abonnement", description: "Ton plan, ses limites, tes reçus et l’export de tes données", icon: CreditCard, roles: MANAGERS, wide: true, panel: () => <AbonnementPanel /> },
+  { id: "donnees", title: "Données et confidentialité", description: "Durée de conservation, données minimisées, droits des personnes", icon: LockKey, roles: ["BOSS"], wide: true, panel: () => <DonneesPanel /> },
   { id: "connexion", title: "Connexion", description: "Google, Facebook, Apple : les façons de te connecter", icon: KeyIcon, roles: ALL_ROLES, panel: () => <ConnexionPanel /> },
   { id: "administration", title: "Administration", description: "Niveau 2, historique des connexions et actions sensibles", icon: ShieldCheck, roles: ["BOSS"], wide: true, panel: () => <AdministrationPanel /> },
   { id: "avis", title: "Votre avis", description: "Une idée, une erreur ? Dis-le nous", icon: ChatCircleDots, roles: ALL_ROLES, panel: () => <FeedbackPanel /> },

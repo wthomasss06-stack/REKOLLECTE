@@ -51,6 +51,7 @@ export default function VisitorPage() {
       orgName={data.organization_name}
       logoUrl={data.organization_logo_url}
       visitReasons={data.visit_reasons}
+      privacyNotice={data.privacy_notice}
       syncState={sync}
       onRefreshReasons={refresh}
     />

@@ -8,6 +8,7 @@ import { ArrowUpRight, CloseIcon } from "@/components/icons";
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
 import PwaInstallButton from "@/components/marketing/PwaInstallButton";
+import { lockScroll } from "@/lib/scrollLock";
 
 interface MenuItem {
   href: string;
@@ -47,10 +48,9 @@ export default function StaggeredMenu({ open, onClose, items }: { open: boolean;
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const unlockScroll = lockScroll();
     window.addEventListener("keydown", onKeyDown);
-    return () => { document.body.style.overflow = previousOverflow; window.removeEventListener("keydown", onKeyDown); };
+    return () => { unlockScroll(); window.removeEventListener("keydown", onKeyDown); };
   }, [open, onClose]);
 
   return (

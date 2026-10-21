@@ -5,19 +5,26 @@ from .models import Organization
 
 class OrganizationSerializer(serializers.ModelSerializer):
     capabilities = serializers.SerializerMethodField()
+    billing = serializers.SerializerMethodField()
 
     class Meta:
         model = Organization
         fields = [
             "id", "name", "logo_url", "visit_reasons", "qr_secure_token", "created_at",
-            "is_suspended", "karnet_enabled", "capabilities",
+            "is_suspended", "karnet_enabled", "capabilities", "billing",
+            "retention_visits_days", "restrict_visit_reasons", "store_document_number", "privacy_contact",
         ]
         # karnet_enabled n'est modifiable que via OrganizationKarnetView (meme logique que
         # is_suspended, reserve a OrganizationLifecycleView) ; capabilities est toujours calcule.
-        read_only_fields = ["id", "qr_secure_token", "created_at", "karnet_enabled", "capabilities"]
+        read_only_fields = ["id", "qr_secure_token", "created_at", "karnet_enabled", "capabilities", "billing"]
 
     def get_capabilities(self, organization):
         return organization.capabilities
+
+    def get_billing(self, organization):
+        from apps.billing.services import billing_payload
+
+        return billing_payload(organization)
 
 
 class OrganizationUpdateSerializer(serializers.Serializer):
@@ -26,6 +33,11 @@ class OrganizationUpdateSerializer(serializers.Serializer):
     visit_reasons = serializers.ListField(
         child=serializers.CharField(max_length=120), required=False, allow_empty=True
     )
+    # Conservation et confidentialité : réservées au patron (MyOrganizationView.patch).
+    retention_visits_days = serializers.IntegerField(min_value=30, max_value=3650, required=False, allow_null=True)
+    restrict_visit_reasons = serializers.BooleanField(required=False)
+    store_document_number = serializers.BooleanField(required=False)
+    privacy_contact = serializers.CharField(max_length=255, required=False, allow_blank=True)
 
 
 class RenameOrganizationSerializer(serializers.Serializer):

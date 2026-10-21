@@ -9,6 +9,7 @@ import { CookieScene } from "@/components/privacy/CookieScene";
 import { CONSENT_EVENT, OPEN_COOKIES_EVENT, forgetMeasuredData, isTrackablePath, readConsent, saveConsent, type ConsentChoice } from "@/lib/analytics";
 import { useGooey } from "@/lib/gooey";
 import "./cookie-consent.css";
+import { lockScroll } from "@/lib/scrollLock";
 
 const SNOOZE_KEY = "rk_cookie_later";
 const SHOW_DELAY_MS = 1300;
@@ -68,8 +69,7 @@ function CookieModal({ initialMode, fromUser, choice, onDecide, onLater }: { ini
   // Fond figé, focus piégé dans la carte, Échap = « Plus tard » ; le focus revient où il était.
   useEffect(() => {
     const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const unlockScroll = lockScroll();
     cardRef.current?.focus({ preventScroll: true }); // ni « Accepter » ni « Refuser » n'est pré-sélectionné : un Entrée distrait ne choisit rien
     const onKeyDown = (event: KeyboardEvent) => {
       const dialogs = document.querySelectorAll('[role="dialog"][aria-modal="true"], [role="alertdialog"][aria-modal="true"]');
@@ -86,7 +86,7 @@ function CookieModal({ initialMode, fromUser, choice, onDecide, onLater }: { ini
     document.addEventListener("keydown", onKeyDown);
     return () => {
       document.removeEventListener("keydown", onKeyDown);
-      document.body.style.overflow = previousOverflow;
+      unlockScroll();
       if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
     };
   }, []);

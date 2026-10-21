@@ -14,11 +14,24 @@ export interface FormField {
   retain_document_image?: boolean;
 }
 
+/** Mention d'information affichée sous le formulaire (construite par le serveur : responsable, finalité, durée, droits…). */
+export interface PrivacyNotice {
+  controller: string;
+  contact: string;
+  purpose: string;
+  categories: string[];
+  recipients: string;
+  retention: string;
+  rights: string;
+  transfer: string;
+}
+
 export interface PublicFormData {
   organization_name: string;
   organization_logo_url: string;
   visit_reasons: string[];
   fields_schema: FormField[];
+  privacy_notice?: PrivacyNotice;
   form_id: string;
   form_title: string;
   access_point_id: string | null;
@@ -67,6 +80,10 @@ export interface UserProfile {
   is_visit_host: boolean;
   access_revoked_at: string | null;
   access_revoked_reason: string;
+  /** Conditions d'utilisation acceptées : version et date, tracées sur le compte. */
+  terms_version?: string;
+  terms_accepted_at?: string | null;
+  terms_current_version?: string;
 }
 
 /** Une arrivée à signaler (GET /checkins/alerts/). Jamais la fiche complète : seulement ce qu'affiche une notification. */
@@ -97,6 +114,60 @@ export interface OrganizationCapabilities {
   rappels: boolean;
 }
 
+export type PlanId = "free" | "essentiel" | "plus" | "entreprise";
+export type PlanState = "free" | "trialing" | "active" | "grace" | "expired" | "founder";
+export type LockableFeature = "export_csv" | "ocr" | "phone" | "karnet";
+
+export interface PlanEntitlements {
+  access_points: number;
+  forms: number;
+  members: number;
+  history_days: number | null;
+  export_csv: boolean;
+  ocr: boolean;
+  phone: boolean;
+  karnet: boolean;
+  resources: number;
+}
+
+/** Plan en vigueur (calculé par le serveur). `locked` n'est vrai que quand les plans s'appliquent vraiment (`enforcement` = « enforce »). */
+export interface OrganizationBilling {
+  plan: PlanId;
+  plan_label: string;
+  state: PlanState;
+  enforcement: "off" | "observe" | "enforce";
+  trial_ends_at: string | null;
+  trial_days_left: number | null;
+  period_end: string | null;
+  grace_until: string | null;
+  entitlements: PlanEntitlements;
+  locked: Record<LockableFeature, boolean>;
+  required_plan: Record<LockableFeature, PlanId>;
+  plan_labels: Record<PlanId, string>;
+}
+
+export interface BillingSubscription extends OrganizationBilling {
+  usage: { access_points: number; forms: number; members: number };
+  retention_visits_days: number;
+}
+
+export interface BillingPayment {
+  id: string;
+  reference: string;
+  amount: number;
+  currency: string;
+  method: string;
+  plan: PlanId;
+  plan_label: string;
+  period_start: string;
+  period_end: string;
+  paid_at: string;
+  fne_reference: string;
+  /** « Reçu interne, non fiscal » tant qu'il n'y a pas de référence FNE ; jamais « facture » sans elle. */
+  document_label: string;
+  note: string;
+}
+
 export interface Organization {
   id: string;
   name: string;
@@ -105,6 +176,11 @@ export interface Organization {
   qr_secure_token: string;
   karnet_enabled: boolean;
   capabilities: OrganizationCapabilities;
+  billing?: OrganizationBilling;
+  retention_visits_days?: number | null;
+  restrict_visit_reasons?: boolean;
+  store_document_number?: boolean;
+  privacy_contact?: string;
   created_at: string;
 }
 

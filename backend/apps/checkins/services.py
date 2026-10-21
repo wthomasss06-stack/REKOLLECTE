@@ -13,7 +13,9 @@ from apps.karnet.models import Client
 from apps.karnet.services import find_or_create_client as get_or_create_client, normalize_phone as canonicalize_phone
 from apps.organizations.models import Organization
 
+from apps.billing.services import blocked_field_ids, karnet_active
 from .alerts import HOST_FIELD_TYPE, resolve_host
+from .privacy import maybe_purge_after_sync, sanitize_responses
 from .models import AccessPoint, CheckIn, FormTemplate
 
 
@@ -36,11 +38,13 @@ class SyncOutcome:
         return payload
 
 
-def missing_required_fields(template: FormTemplate | None, responses: dict, signature_blob: str = "") -> list[str]:
+def missing_required_fields(template: FormTemplate | None, responses: dict, signature_blob: str = "", skip=()) -> list[str]:
     if not template:
         return []
     missing = []
     for f in template.fields_schema:
+        if f.get("id") in skip:
+            continue  # champ retiré du formulaire public par le plan : il ne peut pas être exigé
         if f.get("type") == HOST_FIELD_TYPE:
             continue  # « Qui venez-vous voir ? » reste facultatif : une visite n'est jamais refusée pour ça
         if f.get("required") and not (
@@ -178,7 +182,12 @@ def sync_single_checkin(item: dict) -> SyncOutcome:
     if not organization:
         return SyncOutcome(key, "unknown_organization")
 
-    missing = missing_required_fields(template, item["responses"], item.get("signature_blob", ""))
+    fields = template.fields_schema if template else []
+    # Champs que le plan n'inclut pas : retirés du formulaire public ET écartés ici (une tablette hors ligne peut encore servir une
+    # ancienne version du formulaire). La fiche est ACCEPTÉE quand même : la collecte des visiteurs n'est jamais bloquée.
+    blocked = blocked_field_ids(fields, organization)
+    responses = {name: value for name, value in item["responses"].items() if name not in blocked}
+    missing = missing_required_fields(template, responses, item.get("signature_blob", ""), skip=blocked)
     if missing:
         return SyncOutcome(key, "missing_required_fields", missing)
 
@@ -186,8 +195,8 @@ def sync_single_checkin(item: dict) -> SyncOutcome:
         with transaction.atomic():
             client = None
             client_action = None
-            if organization.karnet_enabled:
-                identity = extract_client_identity(template, item["responses"])
+            if karnet_active(organization):
+                identity = extract_client_identity(template, responses)
                 client, client_action = find_or_create_client(organization, identity)
 
             CheckIn.objects.create(
@@ -195,14 +204,15 @@ def sync_single_checkin(item: dict) -> SyncOutcome:
                 form_template=template,
                 client=client,
                 access_point=access_point,
-                host=resolve_host(organization, template, item["responses"]),
+                host=resolve_host(organization, template, responses),
                 idempotency_key=item["idempotency_key"],
-                responses=item["responses"],
+                responses=sanitize_responses(organization, fields, responses),
                 signature_blob=item.get("signature_blob", ""),
                 created_at_client=item["created_at_client"],
             )
             if access_point:
                 AccessPoint.objects.filter(id=access_point.id).update(last_seen_at=timezone.now())
+        maybe_purge_after_sync(organization)
         return SyncOutcome(
             key,
             "created",

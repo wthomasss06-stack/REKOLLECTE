@@ -1,13 +1,17 @@
 import axios from "axios";
 
-export type AppError = { message: string; code: string; retryable: boolean; status: number | null };
+export type AppError = { message: string; code: string; retryable: boolean; status: number | null; feature?: string; requiredPlan?: string };
 
 export function normalizeApiError(error: unknown): AppError {
   if (!axios.isAxiosError(error)) return { message: "Une erreur inattendue est survenue.", code: "unknown", retryable: false, status: null };
   const status = error.response?.status ?? null;
   const payload = error.response?.data?.error;
+  // Erreur de plan : { code: "plan_required", feature, required_plan } (voir backend apps/billing/exceptions.py).
+  const planRequired = error.response?.data?.code === "plan_required";
   const transientRefreshFailure = (error as typeof error & { transient?: boolean }).transient === true;
-  const code = transientRefreshFailure
+  const code = planRequired
+    ? "plan_required"
+    : transientRefreshFailure
     ? "network"
     : status === 401
       ? "auth"
@@ -33,5 +37,6 @@ export function normalizeApiError(error: unknown): AppError {
     code,
     retryable: payload?.retryable ?? (transientRefreshFailure || status === null || Boolean(status && status >= 500)),
     status,
+    ...(planRequired ? { feature: error.response?.data?.feature, requiredPlan: error.response?.data?.required_plan } : {}),
   };
 }

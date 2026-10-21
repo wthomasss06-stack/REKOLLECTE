@@ -7,6 +7,7 @@ import FlashCard, { type FlashTone } from "@/components/ui/FlashCard";
 import type { MoodName } from "@/components/ui/moods";
 import { normalizeApiError } from "@/lib/errors";
 import { useGooey } from "@/lib/gooey";
+import { lockScroll } from "@/lib/scrollLock";
 
 /**
  * Boîtes de dialogue du projet — remplacent window.confirm / window.prompt / window.alert,
@@ -152,8 +153,7 @@ function DialogView({ request, onDone }: { request: Request; onDone: () => void 
   // Fond figé, focus rendu à l'élément d'origine, Échap = annuler, Tab reste dans la carte.
   useEffect(() => {
     const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const unlockScroll = lockScroll();
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); cancelHandlerRef.current(); return; }
       if (event.key !== "Tab") return;
@@ -169,7 +169,7 @@ function DialogView({ request, onDone }: { request: Request; onDone: () => void 
     document.addEventListener("keydown", onKeyDown, true);
     return () => {
       document.removeEventListener("keydown", onKeyDown, true);
-      document.body.style.overflow = previousOverflow;
+      unlockScroll();
       previousFocus?.focus?.();
     };
   }, []);

@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .oauth_views import IdentityListView, IdentityUnlinkView, OAuthCallbackView, OAuthLinkStartView, OAuthStartView
-from .views import AuditEventListView, CookieTokenRefreshView, DeactivateMeView, GoogleAuthView, InviteStaffView, LogoutView, MemberVisitHostView, MeView, RevokeInvitationView, RevokeMemberView, TeamAccessView
+from .views import AcceptTermsView, AuditEventListView, CookieTokenRefreshView, DeactivateMeView, GoogleAuthView, InviteStaffView, LogoutView, MemberVisitHostView, MeView, RevokeInvitationView, RevokeMemberView, TeamAccessView
 
 urlpatterns = [
     path("google/", GoogleAuthView.as_view(), name="auth-google"),
@@ -13,6 +13,7 @@ urlpatterns = [
     path("token/refresh/", CookieTokenRefreshView.as_view(), name="token-refresh"),
     path("logout/", LogoutView.as_view(), name="auth-logout"),
     path("me/", MeView.as_view(), name="auth-me"),
+    path("accept-terms/", AcceptTermsView.as_view(), name="auth-accept-terms"),
     path("me/deactivate/", DeactivateMeView.as_view(), name="auth-me-deactivate"),
     path("invite/", InviteStaffView.as_view(), name="auth-invite"),
     path("team/", TeamAccessView.as_view(), name="auth-team"),

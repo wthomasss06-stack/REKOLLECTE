@@ -211,6 +211,10 @@ class InviteStaffView(APIView):
                 status.HTTP_400_BAD_REQUEST,
             )
 
+        from apps.billing.services import enforce_limit, members_in_use
+
+        enforce_limit(request.user.organization, "members", members_in_use(request.user.organization))
+
         invitation = create_staff_invitation(
             organization=request.user.organization,
             email=serializer.validated_data["email"],
@@ -303,3 +307,23 @@ class AuditEventListView(generics.ListAPIView):
 
     def get_queryset(self):
         return AuditEvent.objects.filter(organization=self.request.user.organization).select_related("actor", "target_user")
+
+
+class AcceptTermsView(APIView):
+    """Trace l'acceptation des conditions d'utilisation : version et date sur le compte, plus une ligne au journal d'audit."""
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        from django.conf import settings as django_settings
+        from django.utils import timezone as django_timezone
+
+        version = str(request.data.get("version", "")).strip()
+        if version != django_settings.TERMS_VERSION:
+            return error_response("Ces conditions ne sont plus à jour : rechargez la page puis réessayez.", status.HTTP_400_BAD_REQUEST)
+        user = request.user
+        user.terms_version, user.terms_accepted_at = version, django_timezone.now()
+        user.save(update_fields=["terms_version", "terms_accepted_at"])
+        if user.organization_id:
+            AuditEvent.objects.create(organization=user.organization, actor=user, target_user=user, action="terms.accepted", metadata={"version": version})
+        return Response(UserSerializer(user).data)

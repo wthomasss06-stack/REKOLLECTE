@@ -5,13 +5,14 @@ import LegalLayout from "@/components/marketing/LegalLayout";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 import { pageMeta } from "@/lib/seo";
 import { CONTENT_UPDATED_ISO, CONTENT_UPDATED_LABEL, IDS, SITE_URL } from "@/lib/site";
+import { FREE_UNTIL_LABEL } from "@/lib/pricing";
 
 const FAQ = [
   { question: "Qui édite REKOLLECTE ?", answer: "REKOLLECTE est édité par AKATech Studio, un studio de développement basé à Abidjan, en Côte d’Ivoire." },
   { question: "REKOLLECTE est-il lié à reCollect ?", answer: "Non. REKOLLECTE (avec un K) est un registre visiteurs par QR Code créé à Abidjan. Il n’a aucun lien avec l’application reCollect de suivi de médias ni avec d’autres produits au nom proche." },
   { question: "Le visiteur doit-il installer une application ?", answer: "Non. Il scanne le QR Code avec l’appareil photo de son téléphone, le formulaire s’ouvre dans le navigateur, il le remplit et signe à l’écran. Aucun compte et aucune application ne sont nécessaires." },
   { question: "REKOLLECTE fonctionne-t-il sans internet ?", answer: "Oui. La tablette d’accueil continue d’enregistrer les visites hors ligne ; les fiches sont gardées sur l’appareil puis synchronisées automatiquement dès que la connexion revient." },
-  { question: "REKOLLECTE est-il payant ?", answer: "Non, le service est gratuit à ce jour." },
+  { question: "REKOLLECTE est-il payant ?", answer: "Pas avant le " + FREE_UNTIL_LABEL + " : le service est gratuit jusqu’à cette date. Ensuite, des offres payantes simples en FCFA sont détaillées sur la page d’accueil." },
 ];
 
 export const metadata = pageMeta({
@@ -60,7 +61,7 @@ export default function AboutPage() {
         <li><strong>Côté équipe :</strong> connexion avec un compte Google ; rôles Patron, Gérant et Staff.</li>
         <li><strong>Données :</strong> registre consultable, statistiques de fréquentation et export CSV.</li>
         <li><strong>Langue :</strong> français.</li>
-        <li><strong>Prix :</strong> gratuit à ce jour.</li>
+        <li><strong>Prix :</strong> gratuit jusqu’au {FREE_UNTIL_LABEL}, puis des offres à partir de 0 FCFA (voir la page d’accueil).</li>
       </ul>
 
       <h2>Comment ça marche</h2>

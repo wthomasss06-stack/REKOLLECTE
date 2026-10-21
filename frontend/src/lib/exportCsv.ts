@@ -1,7 +1,8 @@
 import { apiClient } from "@/lib/api";
 
-export async function exportAllToCSV(orgName: string): Promise<void> {
-  const response = await apiClient.get<Blob>("/checkins/export/", { responseType: "blob" });
+/** `exit` : export de SORTIE (toutes les données, jamais verrouillé par un plan) ; sinon export récurrent, selon le plan. */
+export async function exportAllToCSV(orgName: string, options: { exit?: boolean } = {}): Promise<void> {
+  const response = await apiClient.get<Blob>("/checkins/export/", { responseType: "blob", params: options.exit ? { purpose: "exit" } : undefined });
   const disposition = String(response.headers["content-disposition"] || "");
   const match = disposition.match(/filename="?([^";]+)"?/i);
   const filename = match?.[1] || `registre_${orgName.replace(/\s+/g, "_")}_${new Date().toISOString().split("T")[0]}.csv`;

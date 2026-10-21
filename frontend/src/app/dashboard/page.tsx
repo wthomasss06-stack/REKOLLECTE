@@ -1,6 +1,8 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ChartLineUp, Clock, MagnifyingGlass, TrendUp, UsersThree } from "@phosphor-icons/react";
+import Link from "next/link";
+import { ChartLineUp, Clock, LockSimple, MagnifyingGlass, TrendUp, UsersThree } from "@phosphor-icons/react";
+import { useEntitlements } from "@/hooks/useEntitlements";
 import { format, subDays } from "date-fns";
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
@@ -49,6 +51,8 @@ export default function RegistrePage() {
   const [sessionExpired, setSessionExpired] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState("");
+  const { isLocked, requiredPlanLabel } = useEntitlements();
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [period, setPeriod] = useState<Period>("all");
@@ -135,8 +139,8 @@ export default function RegistrePage() {
   const canExport = user?.role === "BOSS" || user?.role === "GERANT";
   const handleExport = async () => {
     if (!canExport || exporting || totalCount === 0) return;
-    setExporting(true);
-    try { await exportAllToCSV(orgName); } finally { setExporting(false); }
+    setExporting(true); setExportError("");
+    try { await exportAllToCSV(orgName); } catch (error) { setExportError(normalizeApiError(error).message); } finally { setExporting(false); }
   };
 
   if (state === "loading") return <Loader fullScreen={false} label="Chargement des visiteurs…" />;
@@ -146,9 +150,12 @@ export default function RegistrePage() {
   if (state === "error") return <AutoRetry onRetry={() => { firstLoad.current = true; void load(true); }} />;
 
   return <div className="space-y-6">
-    <div className="flex flex-wrap items-start justify-between gap-4"><div><h1 className="text-2xl font-bold text-ink">Visiteurs</h1><p className="text-sm text-ink-soft">{stats?.total ?? totalCount} visiteur{(stats?.total ?? totalCount) > 1 ? "s" : ""} · {karnetEnabled ? "les passages alimentent automatiquement les fiches clients" : "actualisation automatique toutes les 30 secondes"}{lastUpdated ? ` · ${lastUpdated.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}` : ""}</p></div><div className="flex flex-wrap items-center justify-end gap-3">{canExport && <button onClick={() => void handleExport()} disabled={totalCount === 0 || exporting} className="rounded-full bg-cta px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50">{exporting ? "Export en cours…" : "Exporter en CSV"}</button>}</div></div>
+    <div className="flex flex-wrap items-start justify-between gap-4"><div><h1 className="text-2xl font-bold text-ink">Visiteurs</h1><p className="text-sm text-ink-soft">{stats?.total ?? totalCount} visiteur{(stats?.total ?? totalCount) > 1 ? "s" : ""} · {karnetEnabled ? "les passages alimentent automatiquement les fiches clients" : "actualisation automatique toutes les 30 secondes"}{lastUpdated ? ` · ${lastUpdated.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}` : ""}</p></div><div className="flex flex-wrap items-center justify-end gap-3">{canExport && (isLocked("export_csv")
+      ? <Link href="/dashboard/parametres?open=abonnement" className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-border px-4 text-sm font-medium text-ink"><LockSimple size={16} weight="bold" aria-hidden="true" />Export CSV · plan {requiredPlanLabel("export_csv")}</Link>
+      : <button onClick={() => void handleExport()} disabled={totalCount === 0 || exporting} className="min-h-[44px] rounded-full bg-cta px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50">{exporting ? "Export en cours…" : "Exporter en CSV"}</button>)}</div></div>
     {stats && <section className="grid gap-4 sm:grid-cols-3"><StatCard icon={<UsersThree size={21} />} label="Volume total" value={String(stats.total)} detail={`${stats.today} aujourd’hui`} /><StatCard icon={<Clock size={21} />} label="Heure de pointe" value={stats.peak_hour || "—"} detail="sur l’ensemble des visites" /><StatCard icon={<TrendUp size={21} />} label="Motif principal" value={stats.frequent_reasons[0]?.label || "—"} detail={stats.frequent_reasons[0] ? `${stats.frequent_reasons[0].count} visite${stats.frequent_reasons[0].count > 1 ? "s" : ""}` : "Aucune donnée"} /></section>}
     {stats && <section className="grid gap-4 lg:grid-cols-[1.15fr_.85fr]"><div className="rounded-xl border border-border bg-surface p-5"><div className="flex items-center gap-2"><ChartLineUp size={20} className="text-ink" /><h2 className="font-heading font-semibold text-ink">Visites par heure</h2></div><div className="mt-5 h-56 w-full"><ResponsiveContainer width="100%" height="100%"><LineChart data={hourlyData} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}><CartesianGrid stroke="#eee8dc" strokeDasharray="3 3" vertical={false} /><XAxis dataKey="label" interval={2} tick={{ fontSize: 10, fill: "#817d75" }} axisLine={false} tickLine={false} /><YAxis allowDecimals={false} width={32} tick={{ fontSize: 10, fill: "#817d75" }} axisLine={false} tickLine={false} /><Tooltip contentStyle={tooltipStyle} labelStyle={{ color: "#817d75" }} /><Line type="monotone" dataKey="visites" name="Visites" stroke="#bd5b3f" strokeWidth={3} dot={{ r: 3, fill: "#bd5b3f", strokeWidth: 0 }} activeDot={{ r: 5 }} /></LineChart></ResponsiveContainer></div></div><div className="rounded-xl border border-border bg-surface p-5"><h2 className="font-heading font-semibold text-ink">Motifs fréquents</h2><div className="mt-4 h-56 w-full">{reasonsData.length === 0 ? <p className="pt-10 text-sm text-ink-soft">Les motifs apparaîtront après les premières visites.</p> : <ResponsiveContainer width="100%" height="100%"><BarChart data={reasonsData} layout="vertical" margin={{ top: 4, right: 8, left: 0, bottom: 0 }}><CartesianGrid stroke="#eee8dc" strokeDasharray="3 3" horizontal={false} /><XAxis type="number" allowDecimals={false} hide /><YAxis type="category" dataKey="label" width={105} tick={{ fontSize: 10, fill: "#817d75" }} axisLine={false} tickLine={false} /><Tooltip contentStyle={tooltipStyle} /><Bar dataKey="visites" name="Visites" fill="#bd5b3f" radius={[0, 6, 6, 0]} barSize={18} /></BarChart></ResponsiveContainer>}</div></div></section>}
+    {exportError && <p role="alert" className="text-xs text-error-text">{exportError}</p>}
     {liveError && <p role="status" className="text-xs text-error-text">Actualisation impossible pour le moment : nouvelle tentative automatique.</p>}
     <div className="space-y-3">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">

@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { X } from "@phosphor-icons/react";
 
 import { useGooey } from "@/lib/gooey";
+import { lockScroll } from "@/lib/scrollLock";
 
 /** Fenêtre d'une rubrique (réglages, REKOLLECTE) : bloque le défilement de la page, piège le focus, se ferme avec Échap
  * ou un clic dans le fond, et rend le focus à la ligne qui l'a ouverte. Sur téléphone : feuille qui monte du bas (voir globals.css).
@@ -19,8 +20,7 @@ export default function SettingsModal({ title, onClose, wide = false, comfort = 
 
   useEffect(() => {
     const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const unlockScroll = lockScroll();
     closeRef.current?.focus();
 
     // La fenêtre la plus récente (dernière dans le document) est celle qui reçoit les touches.
@@ -49,7 +49,7 @@ export default function SettingsModal({ title, onClose, wide = false, comfort = 
 
     document.addEventListener("keydown", onKeyDown);
     return () => {
-      document.body.style.overflow = previousOverflow;
+      unlockScroll();
       document.removeEventListener("keydown", onKeyDown);
       previousFocus?.focus();
     };

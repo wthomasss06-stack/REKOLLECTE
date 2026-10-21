@@ -8,7 +8,7 @@ import type { SyncController } from "@/hooks/useBackgroundSync";
 import type { RefreshResult } from "@/hooks/usePublicForm";
 import { isKioskLikeDevice } from "@/lib/device";
 import { compressImageFile } from "@/lib/imageCompress";
-import type { FormField } from "@/types";
+import type { FormField, PrivacyNotice } from "@/types";
 import SignaturePad from "./SignaturePad";
 import DocumentScanner, { type DocumentScanResult } from "./DocumentScanner";
 
@@ -36,13 +36,15 @@ function autoCompleteFor(field: FormField, kiosk: boolean): string | undefined {
 }
 
 export default function VisitorForm({
-  schema, qrToken, orgName, logoUrl = "", visitReasons = NO_REASONS, syncState, onRefreshReasons,
+  schema, qrToken, orgName, logoUrl = "", visitReasons = NO_REASONS, privacyNotice, syncState, onRefreshReasons,
 }: {
   schema: FormField[];
   qrToken: string;
   orgName: string;
   logoUrl?: string;
   visitReasons?: string[];
+  /** Mention d'information construite par le serveur (responsable, finalité, durée, droits…). */
+  privacyNotice?: PrivacyNotice;
   syncState: SyncController;
   /** Recharge le formulaire et les motifs depuis le serveur. Absent : le bouton « Actualiser les motifs » n'est pas proposé. */
   onRefreshReasons?: () => Promise<RefreshResult>;
@@ -263,10 +265,7 @@ export default function VisitorForm({
 
     {validationError && <p role="alert" className="text-sm font-medium text-error-text">{validationError}</p>}
 
-    <p className="text-xs leading-relaxed text-ink-soft">
-      Les informations saisies servent uniquement à tenir le registre d’accès de {orgName}.{" "}
-      <a href="/confidentialite" target="_blank" rel="noopener noreferrer" className="underline">Politique de confidentialité</a>
-    </p>
+    <PrivacyInfo notice={privacyNotice} orgName={orgName} />
 
     <button type="submit" disabled={status === "saving"} className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-cta py-3.5 font-medium text-white disabled:opacity-50">
       {status === "saving" ? "Enregistrement…" : <>Valider mon entrée <ArrowUpRight size={16} /></>}
@@ -301,6 +300,32 @@ function SyncBanner({ hasNetwork, pending, failed, syncing, retryNow }: { hasNet
     </div>;
   }
   return null;
+}
+
+/** Mention d'information sous le formulaire : une phrase visible, le détail (responsable, finalité, catégories, destinataires, durée, droits, transfert) en un toucher. */
+function PrivacyInfo({ notice, orgName }: { notice?: PrivacyNotice; orgName: string }) {
+  if (!notice) {
+    return <p className="text-xs leading-relaxed text-ink-soft">
+      Les informations saisies servent uniquement à tenir le registre d’accès de {orgName}.{" "}
+      <a href="/confidentialite" target="_blank" rel="noopener noreferrer" className="underline">Politique de confidentialité</a>
+    </p>;
+  }
+  const rows: [string, string][] = [
+    ["Responsable", notice.contact ? `${notice.controller} (${notice.contact})` : notice.controller],
+    ["Finalité", notice.purpose],
+    ["Informations collectées", notice.categories.join(", ")],
+    ["Destinataires", notice.recipients],
+    ["Durée de conservation", notice.retention],
+    ["Vos droits", notice.rights],
+    ["Hébergement", notice.transfer],
+  ];
+  return <details className="rounded-xl border border-border bg-canvas p-3 text-xs leading-relaxed text-ink-soft">
+    <summary className="min-h-[44px] cursor-pointer list-none py-2 font-medium text-ink [&::-webkit-details-marker]:hidden">
+      Vos informations servent à tenir le registre d’accès de {notice.controller}. <span className="underline">En savoir plus</span>
+    </summary>
+    <dl className="mt-1 space-y-2">{rows.map(([label, value]) => <div key={label}><dt className="font-semibold text-ink">{label}</dt><dd>{value}</dd></div>)}</dl>
+    <p className="mt-2"><a href="/confidentialite" target="_blank" rel="noopener noreferrer" className="underline">Politique de confidentialité</a></p>
+  </details>;
 }
 
 function NextVisitorButton({ onClick }: { onClick: () => void }) {

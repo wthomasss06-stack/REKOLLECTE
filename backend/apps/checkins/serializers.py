@@ -96,6 +96,7 @@ class PublicFormSerializer(serializers.Serializer):
     organization_logo_url = serializers.CharField(allow_blank=True)
     visit_reasons = serializers.ListField(child=serializers.CharField())
     fields_schema = serializers.JSONField()
+    privacy_notice = serializers.DictField(required=False)
     form_id = serializers.UUIDField()
     form_title = serializers.CharField()
     access_point_id = serializers.UUIDField(allow_null=True)

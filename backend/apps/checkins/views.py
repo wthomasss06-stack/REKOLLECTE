@@ -18,12 +18,17 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.accounts.models import AuditEvent
+from apps.billing.services import apply_history_window, enforce_feature, enforce_limit
 from apps.common.permissions import IsBoss, IsBossOrGerant, IsOrgMember
 from apps.common.responses import error_response
 from apps.organizations.models import Organization
 
 from .alerts import build_alert_payload, public_fields_schema
 from .models import AccessPoint, CheckIn, FormTemplate
+from .privacy import (
+    build_privacy_notice, delete_subject_data, export_subject_data, public_schema, public_visit_reasons, retention_policy,
+)
 from .ocr_utils import OCR_FIELDS, run_document_ocr
 from .serializers import AccessPointSerializer, AccessPointWriteSerializer, CheckInSerializer, CheckInSyncItemSerializer, FormTemplateCreateSerializer, FormTemplateSerializer, PublicFormSerializer
 from .services import default_template, resolve_target, sync_single_checkin
@@ -62,6 +67,7 @@ class FormTemplateListView(APIView):
     def post(self, request):
         if request.user.role not in ("BOSS", "GERANT"):
             self.permission_denied(request, message=IsBossOrGerant.message)
+        enforce_limit(request.user.organization, "forms", request.user.organization.form_templates.count())
         serializer = FormTemplateCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
@@ -120,6 +126,7 @@ class AccessPointListView(APIView):
     def post(self, request):
         if request.user.role not in ("BOSS", "GERANT"):
             self.permission_denied(request, message=IsBossOrGerant.message)
+        enforce_limit(request.user.organization, "access_points", request.user.organization.access_points.count())
         serializer = AccessPointWriteSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         form = FormTemplate.objects.filter(id=serializer.validated_data["form_template"].id, organization=request.user.organization).first()
@@ -181,7 +188,8 @@ class PublicFormView(APIView):
             return error_response("Aucun formulaire actif pour ce point d’accueil.", status.HTTP_404_NOT_FOUND)
         if access_point:
             AccessPoint.objects.filter(id=access_point.id).update(last_seen_at=timezone.now())
-        data = {"organization_name": organization.name, "organization_logo_url": organization.logo_url, "visit_reasons": organization.visit_reasons or [], "fields_schema": public_fields_schema(template, organization), "form_id": template.id, "form_title": template.title, "access_point_id": access_point.id if access_point else None, "access_point_name": access_point.name if access_point else "Accueil principal"}
+        fields = public_schema(template, organization)
+        data = {"organization_name": organization.name, "organization_logo_url": organization.logo_url, "visit_reasons": public_visit_reasons(organization), "fields_schema": fields, "privacy_notice": build_privacy_notice(organization, fields), "form_id": template.id, "form_title": template.title, "access_point_id": access_point.id if access_point else None, "access_point_name": access_point.name if access_point else "Accueil principal"}
         return Response(PublicFormSerializer(data).data)
 
 
@@ -243,6 +251,8 @@ class DocumentOcrView(APIView):
         organization, template, _ = resolve_public_target(qr_token)
         if not organization:
             return error_response("QR Code invalide ou désactivé.", status.HTTP_404_NOT_FOUND)
+
+        enforce_feature(organization, "ocr")  # 403 plan_required si le plan n'inclut pas la lecture des pièces (quand les plans s'appliquent)
 
         image = request.data.get("image")
         if not isinstance(image, str) or not image:
@@ -337,6 +347,7 @@ class CheckInListView(generics.ListAPIView):
         params = self.request.query_params
         # select_related : le nom du client est lu pour chaque ligne (sinon une requête SQL par fiche affichée).
         queryset = CheckIn.objects.filter(organization=self.request.user.organization).select_related("client")
+        queryset = apply_history_window(queryset, self.request.user.organization)  # fenêtre d'AFFICHAGE du plan : rien n'est supprimé
         term = (params.get("q") or "").strip()[:MAX_SEARCH_LENGTH]
         if term:
             queryset = _apply_search(queryset, self.request.user.organization, term)
@@ -359,7 +370,7 @@ class CheckInStatsView(APIView):
 
     def get(self, request):
         organization = request.user.organization
-        checkins = list(CheckIn.objects.filter(organization=organization).select_related("form_template").only("responses", "created_at_client", "form_template__fields_schema"))
+        checkins = list(apply_history_window(CheckIn.objects.filter(organization=organization), organization).select_related("form_template").only("responses", "created_at_client", "form_template__fields_schema"))
         today, hourly, reasons = timezone.localdate(), Counter(), Counter()
         for checkin in checkins:
             local_date = timezone.localtime(checkin.created_at_client); hourly[local_date.hour] += 1
@@ -410,6 +421,11 @@ class CheckInExportView(APIView):
 
     def get(self, request):
         organization = request.user.organization
+        if request.query_params.get("purpose") == "exit":
+            # Export de SORTIE (réversibilité, droit d'accès) : toujours disponible, quel que soit le plan ou l'état de l'abonnement.
+            AuditEvent.objects.create(organization=organization, actor=request.user, action="export.exit", metadata={})
+        else:
+            enforce_feature(organization, "export_csv")
         # Colonnes dédupliquées par identifiant de champ : le même champ (« nom ») présent dans plusieurs formulaires
         # produisait autant de colonnes, avec la valeur répétée.
         columns: dict[str, dict] = {}
@@ -454,3 +470,48 @@ def _csv_row(values: list) -> str:
     buffer = io.StringIO()
     csv.writer(buffer).writerow(values)
     return buffer.getvalue()
+
+
+class RetentionPolicyView(APIView):
+    """Durées de conservation en vigueur pour l'établissement (visites, fiches clients, journaux, paiements)."""
+
+    permission_classes = [IsAuthenticated, IsOrgMember]
+
+    def get(self, request):
+        return Response(retention_policy(request.user.organization))
+
+
+class SubjectExportView(APIView):
+    """Export complet des données d'UNE personne (droit d'accès), retrouvée par téléphone ou e-mail exacts. Patron seulement."""
+
+    permission_classes = [IsAuthenticated, IsBoss]
+    throttle_classes = [throttling.UserRateThrottle]
+
+    def post(self, request):
+        organization = request.user.organization
+        try:
+            data = export_subject_data(organization, str(request.data.get("phone") or ""), str(request.data.get("email") or ""))
+        except ValueError as error:
+            return error_response(str(error), status.HTTP_400_BAD_REQUEST)
+        AuditEvent.objects.create(organization=organization, actor=request.user, action="privacy.subject_exported",
+                                  metadata={"checkins": len(data["checkins"]), "clients": len(data["clients"])})
+        response = Response(data)
+        response["Cache-Control"] = "no-store"
+        return response
+
+
+class SubjectDeleteView(APIView):
+    """Suppression complète des données d'UNE personne (droit à l'effacement). Exige `confirm: true`. Patron seulement."""
+
+    permission_classes = [IsAuthenticated, IsBoss]
+    throttle_classes = [throttling.UserRateThrottle]
+
+    def post(self, request):
+        if request.data.get("confirm") is not True:
+            return error_response("Confirmation requise : la suppression est définitive.", status.HTTP_400_BAD_REQUEST)
+        try:
+            result = delete_subject_data(request.user.organization, str(request.data.get("phone") or ""), str(request.data.get("email") or ""), actor=request.user)
+        except ValueError as error:
+            return error_response(str(error), status.HTTP_400_BAD_REQUEST)
+        return Response(result)
+

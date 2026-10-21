@@ -20,6 +20,15 @@ class Organization(models.Model):
     qr_secure_token = models.CharField(max_length=64, unique=True, db_index=True)
     karnet_enabled = models.BooleanField(default=False)
     karnet_capabilities = models.JSONField(default=dict, blank=True)
+    # --- Confidentialité et conservation (réglables par le patron ; voir checkins/privacy.py) ---
+    # Durée de conservation des visites en jours. Vide = durée par défaut de la plateforme (settings.RETENTION_VISITS_DAYS).
+    retention_visits_days = models.PositiveIntegerField(null=True, blank=True)
+    # Motifs prédéfinis uniquement : retire « Autre » (texte libre) du formulaire, où un visiteur pourrait écrire une donnée de santé.
+    restrict_visit_reasons = models.BooleanField(default=False)
+    # Numéro de pièce lu par l'OCR : masqué par défaut (seuls les derniers caractères sont gardés). À activer sur besoin démontré.
+    store_document_number = models.BooleanField(default=False)
+    # Contact « droits des personnes » affiché sur le formulaire. Vide = e-mail du patron.
+    privacy_contact = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -37,8 +46,13 @@ class Organization(models.Model):
         dans karnet_capabilities. Tant que karnet_enabled est False, tout retombe a
         False sans effacer l'etat enregistre : reactiver KARNET restaure exactement
         ce qui etait deja configure."""
-        if not self.karnet_enabled:
+        # Le plan compte aussi : REKOLLECTE+ n'est actif que s'il est inclus dans le plan, quand les plans s'appliquent
+        # (jamais avant : en mode « observer » le résultat est identique à karnet_enabled).
+        from apps.billing.services import karnet_active
+
+        active = karnet_active(self)
+        if not active:
             subs = {key: False for key in self.KarnetCapability.values}
         else:
             subs = {key: bool(self.karnet_capabilities.get(key, True)) for key in self.KarnetCapability.values}
-        return {"registration": True, "karnet": self.karnet_enabled, **subs}
+        return {"registration": True, "karnet": active, **subs}
