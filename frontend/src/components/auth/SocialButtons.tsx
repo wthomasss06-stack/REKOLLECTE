@@ -15,16 +15,16 @@ export function enabledProviders(): string[] {
 export const SOCIAL_BUTTON_BASE = "flex h-12 w-full items-center justify-center gap-3 rounded-full text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta";
 
 const MESSAGES: Record<string, string> = {
-  state: "Ta tentative de connexion a expiré. Réessaie.",
+  state: "Votre tentative de connexion a expiré. Réessayez.",
   cancelled: "Connexion annulée.",
-  provider: "Le fournisseur n’a pas répondu. Réessaie dans un instant.",
-  session: "Impossible d’ouvrir ta session. Réessaie.",
-  expired: "Ta session a expiré. Reconnecte-toi pour continuer.",
+  provider: "Le fournisseur n’a pas répondu. Réessayez dans un instant.",
+  session: "Impossible d’ouvrir votre session. Réessayez.",
+  expired: "Votre session a expiré. Reconnectez-vous pour continuer.",
   conflict: "Ce compte est déjà utilisé par un autre espace REKOLLECTE.",
-  access_revoked: "Ton accès à cet établissement a été retiré.",
-  email_missing: "Aucune adresse e-mail n’a été transmise. Connecte-toi avec Google, ou autorise le partage de ton e-mail puis réessaie.",
-  email_unverified: "Ton adresse e-mail n’est pas vérifiée chez ce fournisseur. Vérifie-la, ou utilise une autre méthode.",
-  email_private_relay: "Tu as masqué ton e-mail avec Apple. Connecte-toi d’abord avec ta méthode habituelle, puis lie Apple dans Paramètres > Connexion. (Ou : Réglages Apple ID > Se connecter avec Apple > REKOLLECTE > Arrêter, puis réessaie en choisissant « Partager mon e-mail ».)",
+  access_revoked: "Votre accès à cet établissement a été retiré.",
+  email_missing: "Aucune adresse e-mail n’a été transmise. Connectez-vous avec Google, ou autorisez le partage de votre e-mail puis réessayez.",
+  email_unverified: "Votre adresse e-mail n’est pas vérifiée chez ce fournisseur. Vérifiez-la, ou utilisez une autre méthode.",
+  email_private_relay: "Vous avez masqué votre e-mail avec Apple. Connectez-vous d’abord avec votre méthode habituelle, puis liez Apple dans Paramètres > Connexion. (Ou : Réglages Apple ID > Se connecter avec Apple > REKOLLECTE > Arrêter, puis réessayez en choisissant « Partager mon e-mail ».)",
 };
 
 // Codes qui ne sont pas des échecs : on les affiche comme une information, pas comme une erreur.
@@ -35,7 +35,7 @@ export interface AuthNotice {
   message: string;
 }
 
-/** Retire de l'URL le code d'erreur et le fragment `#_=_` que Facebook ajoute au retour (il reste sinon dans la barre d'adresse). */
+/** Retire de l’URL le code d’erreur et le fragment `#_=_` que Facebook ajoute au retour (il reste sinon dans la barre d’adresse). */
 function cleanAddressBar() {
   try {
     const url = new URL(window.location.href);
@@ -43,12 +43,12 @@ function cleanAddressBar() {
     const clean = `${url.pathname}${url.search}`;
     if (clean !== `${window.location.pathname}${window.location.search}` || window.location.hash) window.history.replaceState(window.history.state, "", clean);
   } catch {
-    // La barre d'adresse reste telle quelle : sans conséquence.
+    // La barre d’adresse reste telle quelle : sans conséquence.
   }
 }
 
-/** Message de connexion à afficher : code `?auth_error=…` renvoyé par le serveur, ou session expirée détectée par l'app.
- * Lu une fois au montage, puis l'URL est nettoyée. `dismiss` le referme. */
+/** Message de connexion à afficher : code `?auth_error=…` renvoyé par le serveur, ou session expirée détectée par l’app.
+ * Lu une fois au montage, puis l’URL est nettoyée. `dismiss` le referme. */
 export function useAuthNotice(): { notice: AuthNotice | null; dismiss: () => void } {
   const [notice, setNotice] = useState<AuthNotice | null>(null);
   useEffect(() => {
@@ -59,9 +59,9 @@ export function useAuthNotice(): { notice: AuthNotice | null; dismiss: () => voi
         code = code || "expired";
       }
     } catch {
-      // sessionStorage indisponible : on se contente de l'URL.
+      // sessionStorage indisponible : on se contente de l’URL.
     }
-    if (code) setNotice({ tone: INFO_CODES.has(code) ? "info" : "error", message: MESSAGES[code] || "Connexion impossible. Réessaie." });
+    if (code) setNotice({ tone: INFO_CODES.has(code) ? "info" : "error", message: MESSAGES[code] || "Connexion impossible. Réessayez." });
     cleanAddressBar();
   }, []);
   const dismiss = useCallback(() => setNotice(null), []);

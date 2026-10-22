@@ -9,7 +9,7 @@ import { PERMISSION_MATRIX } from "@/lib/roles";
 const columns = [
   { key: "boss" as const, label: "Patron" },
   { key: "gerant" as const, label: "Gérant" },
-  { key: "staff" as const, label: "Staff" },
+  { key: "staff" as const, label: "Agent" },
 ];
 
 export default function PermissionMatrixModal() {
@@ -66,7 +66,7 @@ export default function PermissionMatrixModal() {
           </table>
         </div>
         <p className="mt-4 text-xs leading-relaxed text-ink-soft">
-          Le Patron contrôle les actions sensibles. Le Gérant gère les opérations courantes et peut inviter un Staff. Le Staff consulte le registre et assure l’accueil sans configurer l’établissement.
+          Le Patron contrôle les actions sensibles. Le Gérant gère les opérations courantes et peut inviter un Agent. L’Agent consulte le registre et assure l’accueil sans configurer l’établissement.
         </p>
       </Modal>
     </>

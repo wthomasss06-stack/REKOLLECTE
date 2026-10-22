@@ -1,9 +1,9 @@
 // Verrou de défilement PARTAGÉ par toutes les fenêtres (réglages, dialogues, menu, bandeau cookies).
 //
-// Avant : chaque fenêtre mémorisait « l'overflow précédent » puis le rétablissait à sa fermeture. Dès que deux fenêtres se
+// Avant : chaque fenêtre mémorisait « l’overflow précédent » puis le rétablissait à sa fermeture. Dès que deux fenêtres se
 // chevauchaient et se fermaient dans un autre ordre que celui de leur ouverture (ex. une confirmation ouverte depuis un
 // réglage), la dernière « restaurait » la valeur « hidden » : la page restait figée, surtout sur mobile (Paramètres, REKOLLECTE+).
-// Ici, un compteur : le défilement n'est rétabli que lorsque la DERNIÈRE fenêtre se ferme, quel que soit l'ordre.
+// Ici, un compteur : le défilement n’est rétabli que lorsque la DERNIÈRE fenêtre se ferme, quel que soit l’ordre.
 
 let locks = 0;
 let originalOverflow = "";

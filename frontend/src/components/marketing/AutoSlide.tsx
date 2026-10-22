@@ -21,7 +21,7 @@ export default function AutoSlide({
   interval?: number;
   className?: string;
   /** Masque les puces de navigation — utile quand le carrousel sert de simple
-   * fond d'image (ex. section CTA) plutôt que de contenu principal. */
+   * fond d’image (ex. section CTA) plutôt que de contenu principal. */
   showDots?: boolean;
 }) {
   const [active, setActive] = useState(0);

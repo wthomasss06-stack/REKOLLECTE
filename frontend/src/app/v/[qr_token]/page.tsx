@@ -11,7 +11,7 @@ export default function VisitorPage() {
   const qrToken = params.qr_token;
   const { data, status, retry, refresh } = usePublicForm(qrToken);
 
-  // Vide la file des soumissions en attente des qu'une connexion revient sur CET
+  // Vide la file des soumissions en attente des qu’une connexion revient sur CET
   // appareil (kiosque) — independant du statut de chargement du formulaire lui-meme.
   const sync = useBackgroundSync();
 
@@ -19,7 +19,7 @@ export default function VisitorPage() {
     return <Loader />;
   }
   if (status === "waking") {
-    // Le serveur gratuit s'endort après un moment sans visite : on attend son réveil, le formulaire s'affiche tout seul.
+    // Le serveur gratuit s’endort après un moment sans visite : on attend son réveil, le formulaire s’affiche tout seul.
     return <Loader label="Préparation du formulaire… quelques secondes, la première fois." />;
   }
   if (status === "unavailable") {

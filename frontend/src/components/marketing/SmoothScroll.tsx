@@ -14,10 +14,10 @@ gsap.registerPlugin(ScrollTrigger);
  * gemini-code (Lenis 1.x) :
  *  - easing exponentiel + durée 1.2 s
  *  - scrollTo avec décalage (offset) pour les ancres, sous le header fixe
- *  - durée dynamique par section via l'attribut data-lenis-duration
+ *  - durée dynamique par section via l’attribut data-lenis-duration
  *  - vitesse instantanée exposée aux composants (marquee, skew)
  * Lenis est branché sur le ticker GSAP : ScrollTrigger reste synchronisé au pixel près.
- * Désactivé si l'utilisateur demande moins de mouvement.
+ * Désactivé si l’utilisateur demande moins de mouvement.
  */
 
 const EXPO_OUT = (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t));
@@ -76,7 +76,7 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
     };
   }, []);
 
-  // À chaque page marketing : retour en haut (ou ancre de l'URL), et observation des
+  // À chaque page marketing : retour en haut (ou ancre de l’URL), et observation des
   // sections qui demandent une durée de scroll propre (data-lenis-duration="2.2").
   useEffect(() => {
     if (!lenis) return undefined;

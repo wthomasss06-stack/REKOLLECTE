@@ -6,7 +6,7 @@ import {
 } from "@phosphor-icons/react";
 
 /**
- * Maquettes d'interface 100 % JSX (pas d'images) : nettes à toutes les densités,
+ * Maquettes d’interface 100 % JSX (pas d’images) : nettes à toutes les densités,
  * thémables clair/sombre via les tokens, et sans poids réseau. Les données
  * affichées sont purement illustratives.
  */
@@ -56,7 +56,7 @@ export function VisitorsPanel() {
   return (
     <div className="w-full space-y-3" data-skew>
       <div className="grid grid-cols-3 gap-3">
-        <Stat label="Aujourd'hui" value="42" delta="+8%" />
+        <Stat label="Aujourd’hui" value="42" delta="+8%" />
         <Stat label="Sur place" value="7" />
         <Stat label="À synchro" value="3" />
       </div>
@@ -79,7 +79,7 @@ export function VisitorsPanel() {
 const BARS = [46, 64, 38, 72, 52, 30, 58];
 const DAYS = ["L", "M", "M", "J", "V", "S", "D"];
 
-/** Ligne 2 — hors-ligne et synchronisation (graphique + infobulle). */
+/** Ligne 2 — hors ligne et synchronisation (graphique + infobulle). */
 export function ChartPanel() {
   return (
     <div className={`${card} w-full p-4`} data-skew>
@@ -100,7 +100,7 @@ export function ChartPanel() {
         <div className="absolute left-[44%] top-1 -translate-x-1/2 rounded-xl bg-[#12231a] px-3 py-2 text-white shadow-xl">
           <p className="text-[9px] text-white/60">Jeudi</p>
           <p className="text-lg font-bold leading-tight">38 visites</p>
-          <p className="text-[9px] text-white/60">dont 3 hors-ligne</p>
+          <p className="text-[9px] text-white/60">dont 3 hors ligne</p>
         </div>
       </div>
     </div>
@@ -120,7 +120,7 @@ export function RolesPanel() {
   const roles = [
     { icon: <Crown size={18} weight="duotone" />, name: "Patron", desc: "Registre, équipe, paramètres, export", on: true },
     { icon: <Buildings size={18} weight="duotone" />, name: "Gérant", desc: "Registre et équipe du site", on: true },
-    { icon: <Signature size={18} weight="duotone" />, name: "Staff d'accueil", desc: "Enregistre les visites, rien de plus", on: false },
+    { icon: <Signature size={18} weight="duotone" />, name: "Agent d’accueil", desc: "Enregistre les visites, rien de plus", on: false },
   ];
   return (
     <div className={`${card} w-full p-4`} data-skew>
@@ -147,9 +147,9 @@ export function ReservationsPanel() {
     <div className={`${card} w-full overflow-hidden`} data-skew>
       <div className="flex items-center justify-between px-4 py-3">
         <p className="flex items-center gap-2 text-sm font-bold text-ink"><CalendarCheck size={16} weight="bold" className="text-cta" /> Réservations</p>
-        <Chip tone="info"><Funnel size={11} weight="bold" /> Aujourd&apos;hui</Chip>
+        <Chip tone="info"><Funnel size={11} weight="bold" /> Aujourd’hui</Chip>
       </div>
-      <Row name="N° 0142 · Chambre 12" meta="Réglée d'avance" time="Jusqu'à 12:00" chip={<Chip tone="ok"><CheckCircle size={11} weight="fill" /> Payée</Chip>} />
+      <Row name="N° 0142 · Chambre 12" meta="Réglée d’avance" time="Jusqu’à 12:00" chip={<Chip tone="ok"><CheckCircle size={11} weight="fill" /> Payée</Chip>} />
       <Row name="N° 0143 · Table 4" meta="Fin du créneau dans 10 min" time="13:30" chip={<Chip tone="warn"><Bell size={11} weight="fill" /> Rappel</Chip>} />
       <Row name="N° 0144 · Salle B" meta="Un geste : valider ou annuler" time="15:00" chip={<Chip tone="info">À venir</Chip>} />
     </div>
@@ -181,11 +181,11 @@ export function MiniOffline() {
     <div className="mx-auto w-full max-w-[16rem] space-y-3">
       <div className={`${card} flex items-center gap-3 p-3`}>
         <span className="grid h-9 w-9 place-items-center rounded-xl bg-[rgb(var(--c-warn-text)/0.14)] text-[rgb(var(--c-warn-text))]"><WifiSlash size={18} weight="bold" /></span>
-        <div><p className="text-xs font-bold text-ink">Hors-ligne</p><p className="text-[10px] text-ink-soft">3 visites gardées sur l&apos;appareil</p></div>
+        <div><p className="text-xs font-bold text-ink">Hors ligne</p><p className="text-[10px] text-ink-soft">3 visites gardées sur l’appareil</p></div>
       </div>
       <div className={`${card} ml-6 flex items-center gap-3 p-3`}>
         <span className="grid h-9 w-9 place-items-center rounded-xl bg-success-bg text-success-text"><ArrowsClockwise size={18} weight="bold" /></span>
-        <div><p className="text-xs font-bold text-ink">Réseau de retour</p><p className="text-[10px] text-ink-soft">3 envoyées au dashboard</p></div>
+        <div><p className="text-xs font-bold text-ink">Réseau de retour</p><p className="text-[10px] text-ink-soft">3 envoyées au tableau de bord</p></div>
       </div>
     </div>
   );
@@ -213,7 +213,7 @@ export function MiniDash() {
   return (
     <div className="mx-auto w-full max-w-[16rem] space-y-3">
       <div className="grid grid-cols-2 gap-3">
-        <Stat label="Aujourd'hui" value="42" />
+        <Stat label="Aujourd’hui" value="42" />
         <Stat label="Ce mois" value="618" />
       </div>
       <div className={`${card} flex items-center justify-between px-4 py-3`}>

@@ -29,7 +29,7 @@ export default function SimpleFormSetup({ onSaved }: { onSaved?: () => void }) {
       setSaved(true);
       onSaved?.();
     } catch {
-      setError("Impossible d'enregistrer. Réessaie.");
+      setError("Impossible d’enregistrer. Réessayez.");
     } finally {
       setSaving(false);
     }
@@ -38,7 +38,7 @@ export default function SimpleFormSetup({ onSaved }: { onSaved?: () => void }) {
   return (
     <div className="space-y-6">
       <p className="text-sm text-ink-soft">
-        Choisis un modèle prêt à l&apos;emploi — tu pourras le personnaliser plus tard dans les paramètres.
+        Choisis un modèle prêt à l’emploi — vous pourrez le personnaliser plus tard dans les paramètres.
       </p>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

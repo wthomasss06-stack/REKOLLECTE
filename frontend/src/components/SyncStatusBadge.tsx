@@ -5,8 +5,8 @@ import { useBackgroundSync } from "@/hooks/useBackgroundSync";
 
 const PILL = "inline-flex h-8 items-center gap-1.5 rounded-full border px-2.5 text-xs";
 
-/** Pastille de synchronisation du header : l'icône seule sur téléphone, avec son libellé dès que la place le permet.
- * Elle ne parle JAMAIS du serveur qui se réveille : un serveur muet alors que l'appareil est en ligne est géré par le chargement REKOLLECTE
+/** Pastille de synchronisation du header : l’icône seule sur téléphone, avec son libellé dès que la place le permet.
+ * Elle ne parle JAMAIS du serveur qui se réveille : un serveur muet alors que l’appareil est en ligne est géré par le chargement REKOLLECTE
  * des pages, pas par un message. Seuls restent : hors ligne, envois en attente, envois à réessayer, synchronisation faite. */
 export default function SyncStatusBadge() {
   const { network, pendingCount, failedCount, syncing, lastSyncedAt, retryNow } = useBackgroundSync();

@@ -14,10 +14,9 @@ from apps.testing_utils import auth_client, valid_checkin_payload
 
 from .helpers import enforce_plans, free_plan, set_subscription
 
-SCHEMA_WITH_OCR = [
+SCHEMA_WITH_PHONE = [
     {"id": "nom", "type": "text", "label": "Nom", "required": True},
     {"id": "telephone", "type": "phone", "label": "Téléphone", "required": True},
-    {"id": "piece", "type": "document_scan", "label": "Pièce d'identité", "required": True},
     {"id": "signature", "type": "signature", "label": "Signature", "required": True},
 ]
 
@@ -70,7 +69,7 @@ def test_default_mode_is_observe_and_nothing_is_blocked(db, settings, organizati
     free_plan(organization)
     assert enforcement_mode() == "observe"
 
-    second_form = auth_client(boss_user).post("/api/v1/form-templates/", {"title": "Deuxième", "fields_schema": SCHEMA_WITH_OCR}, format="json")
+    second_form = auth_client(boss_user).post("/api/v1/form-templates/", {"title": "Deuxième", "fields_schema": SCHEMA_WITH_PHONE}, format="json")
     csv = auth_client(boss_user).get("/api/v1/checkins/export/")
 
     assert second_form.status_code == 201
@@ -93,7 +92,7 @@ def test_enforced_free_plan_refuses_extra_form_and_access_point_with_the_standar
     enforce_plans(settings)
     client = auth_client(boss_user)
 
-    form = client.post("/api/v1/form-templates/", {"title": "Deuxième", "fields_schema": SCHEMA_WITH_OCR}, format="json")
+    form = client.post("/api/v1/form-templates/", {"title": "Deuxième", "fields_schema": SCHEMA_WITH_PHONE}, format="json")
 
     assert form.status_code == 403
     assert (form.data["code"], form.data["feature"], form.data["required_plan"]) == ("plan_required", "forms", "essentiel")
@@ -133,27 +132,36 @@ def test_exit_export_still_works_after_trial_end_and_unpaid(db, settings, organi
     assert auth_client(boss_user).get("/api/v1/checkins/export/?purpose=exit").status_code == 200
 
 
-def test_enforced_free_plan_removes_ocr_and_phone_from_the_public_form_and_refuses_ocr(db, settings, organization, api_client):
-    FormTemplate.objects.create(organization=organization, title="Registre", fields_schema=SCHEMA_WITH_OCR)
+def test_enforced_free_plan_removes_phone_from_the_public_form(db, settings, organization, api_client):
+    FormTemplate.objects.create(organization=organization, title="Registre", fields_schema=SCHEMA_WITH_PHONE)
     free_plan(organization)
     enforce_plans(settings)
 
     form = api_client.get(f"/api/v1/public/forms/{organization.qr_secure_token}/")
-    ocr = api_client.post(f"/api/v1/public/forms/{organization.qr_secure_token}/ocr/", {"image": "data:image/png;base64,AAAA"}, format="json")
 
     assert form.status_code == 200
     assert [field["id"] for field in form.data["fields_schema"]] == ["nom", "signature"]
-    assert ocr.status_code == 403 and ocr.data["code"] == "plan_required" and ocr.data["feature"] == "ocr"
 
 
-def test_paid_plan_keeps_ocr_and_phone_in_the_public_form(db, settings, organization, api_client):
-    FormTemplate.objects.create(organization=organization, title="Registre", fields_schema=SCHEMA_WITH_OCR)
+def test_paid_plan_keeps_phone_in_the_public_form(db, settings, organization, api_client):
+    FormTemplate.objects.create(organization=organization, title="Registre", fields_schema=SCHEMA_WITH_PHONE)
     set_subscription(organization, plan="essentiel", status="active", current_period_end=timezone.now() + timedelta(days=10))
     enforce_plans(settings)
 
     form = api_client.get(f"/api/v1/public/forms/{organization.qr_secure_token}/")
 
-    assert [field["id"] for field in form.data["fields_schema"]] == ["nom", "telephone", "piece", "signature"]
+    assert [field["id"] for field in form.data["fields_schema"]] == ["nom", "telephone", "signature"]
+
+
+def test_retired_document_scan_field_is_never_served_to_visitors(db, settings, organization, api_client):
+    legacy = [*SCHEMA_WITH_PHONE[:2], {"id": "piece", "type": "document_scan", "label": "Pièce d'identité", "required": True}, SCHEMA_WITH_PHONE[2]]
+    FormTemplate.objects.create(organization=organization, title="Registre", fields_schema=legacy)
+    set_subscription(organization, plan="essentiel", status="active", current_period_end=timezone.now() + timedelta(days=10))
+    enforce_plans(settings)
+
+    form = api_client.get(f"/api/v1/public/forms/{organization.qr_secure_token}/")
+
+    assert "piece" not in [field["id"] for field in form.data["fields_schema"]]
 
 
 def test_enforced_free_plan_hides_old_history_but_exit_export_keeps_it(db, settings, organization, form_template, boss_user):
@@ -193,16 +201,16 @@ def test_karnet_unchanged_in_observe_mode(db, organization, boss_user):
 # --- la collecte n'est JAMAIS bloquée ----------------------------------------------------------------------------------
 
 def test_sync_is_never_blocked_by_an_expired_plan_and_drops_non_included_fields(db, settings, api_client, organization):
-    FormTemplate.objects.create(organization=organization, title="Registre", fields_schema=SCHEMA_WITH_OCR)
+    FormTemplate.objects.create(organization=organization, title="Registre", fields_schema=SCHEMA_WITH_PHONE)
     set_subscription(organization, plan="plus", status="trialing", trial_ends_at=timezone.now() - timedelta(days=5))
     enforce_plans(settings)
-    payload = valid_checkin_payload(organization.qr_secure_token, responses={"nom": "Awa Koné", "telephone": "+2250707070707", "piece": {"extracted": {"last_name": "KONE"}}})
+    payload = valid_checkin_payload(organization.qr_secure_token, responses={"nom": "Awa Koné", "telephone": "+2250707070707"})
 
     response = api_client.post("/api/v1/checkins/sync/", {"checkins": [payload]}, format="json")
 
     assert response.data["processed"][0]["status"] == "created"
     stored = CheckIn.objects.get(organization=organization)
-    assert stored.responses == {"nom": "Awa Koné"}  # téléphone et pièce écartés (hors plan), fiche acceptée
+    assert stored.responses == {"nom": "Awa Koné"}  # téléphone écarté (hors plan), fiche acceptée
 
 
 def test_sync_accepts_fiches_for_a_suspended_billing_state_in_every_mode(db, settings, api_client, organization, form_template):

@@ -10,7 +10,7 @@ import { apiClient } from "@/lib/api";
 
 const fmt = (value: string | null) => (value ? new Date(value).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }) : "");
 
-/** Bandeaux du dashboard : état du plan (seulement quand les plans s'appliquent, et seulement pour ceux qui peuvent agir) et conditions d'utilisation. */
+/** Bandeaux du tableau de bord : état du plan (seulement quand les plans s’appliquent, et seulement pour ceux qui peuvent agir) et conditions d’utilisation. */
 export default function PlanBanner() {
   const { user, refreshUser } = useAuthContext();
   const { billing, enforced } = useEntitlements();

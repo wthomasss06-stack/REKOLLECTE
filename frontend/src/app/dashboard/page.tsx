@@ -25,7 +25,7 @@ const PERIODS: { key: Period; label: string }[] = [
   { key: "30d", label: "30 jours" },
 ];
 
-/** Début de la période choisie, au format AAAA-MM-JJ attendu par l'API (`from`). Undefined = pas de borne. */
+/** Début de la période choisie, au format AAAA-MM-JJ attendu par l’API (`from`). Undefined = pas de borne. */
 function periodStart(period: Period): string | undefined {
   const now = new Date();
   if (period === "today") return format(now, "yyyy-MM-dd");
@@ -62,7 +62,7 @@ export default function RegistrePage() {
   const listRequest = useRef(0);
   const filtered = debouncedQuery !== "" || period !== "all";
 
-  // Ce qui ne bouge presque jamais (formulaire, établissement, profil) n'est chargé qu'à l'ouverture et au retour sur l'onglet ;
+  // Ce qui ne bouge presque jamais (formulaire, établissement, profil) n’est chargé qu’à l’ouverture et au retour sur l’onglet ;
   // seules la liste et les statistiques sont rafraîchies toutes les 30 s (avant : 5 requêtes à chaque cycle).
   const loadStatic = useCallback(async () => {
     const [tpl, org, me] = await Promise.all([
@@ -127,7 +127,7 @@ export default function RegistrePage() {
     const initial = firstLoad.current;
     firstLoad.current = false;
     void load(initial);
-    // Pas de requêtes dans le vide : l'onglet masqué (tablette en veille, autre application) ne sollicite pas le serveur.
+    // Pas de requêtes dans le vide : l’onglet masqué (tablette en veille, autre application) ne sollicite pas le serveur.
     const timer = window.setInterval(() => { if (document.visibilityState === "visible") void load(false); }, 30_000);
     const onVisible = () => { if (document.visibilityState === "visible") void load(false, true); };
     document.addEventListener("visibilitychange", onVisible);
@@ -146,7 +146,7 @@ export default function RegistrePage() {
   if (state === "loading") return <Loader fullScreen={false} label="Chargement des visiteurs…" />;
   // Session réellement morte : on explique et on renvoie vers la connexion. Toute autre panne (serveur qui dort, réseau,
   // erreur passagère) : la page reste en squelette et se relance toute seule, sans bouton « Réessayer ».
-  if (state === "error" && sessionExpired) return <div role="alert" className="flex max-w-xl flex-col items-start gap-3 rounded-xl border border-border bg-surface p-5"><h1 className="font-semibold text-ink">Ta session a expiré</h1><p className="text-sm text-ink-soft">{loadError}</p><a href="/connexion" className="rounded-full bg-cta px-4 py-2.5 text-sm font-medium text-white">Retour à la connexion</a></div>;
+  if (state === "error" && sessionExpired) return <div role="alert" className="flex max-w-xl flex-col items-start gap-3 rounded-xl border border-border bg-surface p-5"><h1 className="font-semibold text-ink">Votre session a expiré</h1><p className="text-sm text-ink-soft">{loadError}</p><a href="/connexion" className="rounded-full bg-cta px-4 py-2.5 text-sm font-medium text-white">Retour à la connexion</a></div>;
   if (state === "error") return <AutoRetry onRetry={() => { firstLoad.current = true; void load(true); }} />;
 
   return <div className="space-y-6">

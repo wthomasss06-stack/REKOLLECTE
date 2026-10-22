@@ -20,7 +20,7 @@ import type { PlatformAuditEvent, PlatformFeedback, PlatformMember, PlatformOrga
 
 const ADMIN_SESSION_KEY = "platform_admin_session";
 const ROLE_LABELS: Record<string, string> = { BOSS: "Patron", GERANT: "Gérant", STAFF: "Staff" };
-/** Le trafic se rafraîchit seul tant que l'onglet est ouvert et visible : on voit la surveillance du site « vivre ». */
+/** Le trafic se rafraîchit seul tant que l’onglet est ouvert et visible : on voit la surveillance du site « vivre ». */
 const TRAFFIC_REFRESH_MS = 30_000;
 
 const tabFromHash = (hash: string): AdminTab | null => ADMIN_TABS.find((entry) => entry.hash === hash.replace(/^#/, ""))?.key ?? null;
@@ -48,7 +48,7 @@ export default function AdminPage() {
 
   const endSession = useCallback(() => { setAccessToken(null); localStorage.removeItem(ADMIN_SESSION_KEY); setLogged(false); }, []);
 
-  /** Charge tout le tableau de bord. Renvoie false si la session n'est plus valable ; les autres erreurs restent visibles dans une bannière sans vider l'écran. */
+  /** Charge tout le tableau de bord. Renvoie false si la session n’est plus valable ; les autres erreurs restent visibles dans une bannière sans vider l’écran. */
   const load = useCallback(async (): Promise<boolean> => {
     setLoading(true);
     try {
@@ -91,7 +91,7 @@ export default function AdminPage() {
     return () => { mounted = false; };
   }, [load]);
 
-  // L'onglet ouvert est reflété dans l'adresse (#trafic, #feedbacks…) : on peut le mettre en favori ou l'envoyer.
+  // L’onglet ouvert est reflété dans l’adresse (#trafic, #feedbacks…) : on peut le mettre en favori ou l’envoyer.
   useEffect(() => {
     const sync = () => { const next = tabFromHash(window.location.hash); if (next) setTab(next); };
     sync();
@@ -105,7 +105,7 @@ export default function AdminPage() {
     window.scrollTo({ top: 0 });
   }, []);
 
-  // Trafic : chargé à l'ouverture de l'onglet, puis toutes les 30 s tant que la page est visible.
+  // Trafic : chargé à l’ouverture de l’onglet, puis toutes les 30 s tant que la page est visible.
   useEffect(() => {
     if (!logged || tab !== "traffic") return;
     void loadTraffic(trafficDays);
@@ -125,14 +125,14 @@ export default function AdminPage() {
       setLoginError(status === 400 || status === 401 || status === 403 ? "Identifiants admin invalides." : normalizeApiError(error).message);
       return;
     }
-    if (!(await load())) { localStorage.removeItem(ADMIN_SESSION_KEY); setLoginError("Connexion refusée par le serveur. Réessaie dans un instant."); }
+    if (!(await load())) { localStorage.removeItem(ADMIN_SESSION_KEY); setLoginError("Connexion refusée par le serveur. Réessayez dans un instant."); }
   };
 
   // Au revoir : la déconnexion part dans la boîte (bouton en chargement).
   const logout = async () => {
     await confirm({
       tone: "brand", mood: "wink", title: "À bientôt !",
-      message: <><strong>{dayPartWish()}.</strong><br />Ta session administrateur sera fermée sur cet appareil.</>,
+      message: <><strong>{dayPartWish()}.</strong><br />Votre session administrateur sera fermée sur cet appareil.</>,
       confirmLabel: "Se déconnecter", cancelLabel: "Rester connecté", runningLabel: "Déconnexion…",
       run: async () => { try { await axios.post(`${API_URL}/auth/logout/`, null, { withCredentials: true }); } catch {} endSession(); setTraffic(null); setOverview(null); },
     });
@@ -163,7 +163,7 @@ export default function AdminPage() {
     });
   };
 
-  // Désactiver un compte, changer un rôle ou un rattachement a des effets immédiats : on confirme avant d'agir.
+  // Désactiver un compte, changer un rôle ou un rattachement a des effets immédiats : on confirme avant d’agir.
   const updateMember = async (member: PlatformMember, patch: Record<string, unknown>) => {
     const name = member.full_name || member.email;
     const apply = async () => { await apiClient.patch(`/admin/members/${member.id}/`, patch); void load(); };
@@ -175,7 +175,7 @@ export default function AdminPage() {
       const target = organizations.find((item) => item.id === patch.organization_id)?.name;
       await confirm({ tone: "warning", mood: "smug", title: "Changer d’entreprise ?", message: <><strong>{name}</strong> sera rattaché à {target ? <strong>{target}</strong> : "aucune entreprise"}.</>, confirmLabel: "Confirmer", runningLabel: "Modification…", run: apply, successTitle: "Rattachement mis à jour", errorTitle: "Modification impossible" });
     } else {
-      try { await apply(); } catch { await notify({ tone: "danger", title: "Oups !", message: "La modification n’a pas pu être enregistrée. Réessaie dans un instant." }); }
+      try { await apply(); } catch { await notify({ tone: "danger", title: "Oups !", message: "La modification n’a pas pu être enregistrée. Réessayez dans un instant." }); }
     }
   };
   const createMember = async (input: { email: string; organization_id: string; role: string }) => {

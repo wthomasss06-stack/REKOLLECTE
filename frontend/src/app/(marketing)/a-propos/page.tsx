@@ -5,19 +5,17 @@ import LegalLayout from "@/components/marketing/LegalLayout";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 import { pageMeta } from "@/lib/seo";
 import { CONTENT_UPDATED_ISO, CONTENT_UPDATED_LABEL, IDS, SITE_URL } from "@/lib/site";
-import { FREE_UNTIL_LABEL } from "@/lib/pricing";
 
 const FAQ = [
-  { question: "Qui édite REKOLLECTE ?", answer: "REKOLLECTE est édité par AKATech Studio, un studio de développement basé à Abidjan, en Côte d’Ivoire." },
+  { question: "Qui édite REKOLLECTE ?", answer: "REKOLLECTE est conçu et édité à Abidjan, en Côte d’Ivoire. Le détail figure dans les mentions légales et la page Crédits." },
   { question: "REKOLLECTE est-il lié à reCollect ?", answer: "Non. REKOLLECTE (avec un K) est un registre visiteurs par QR Code créé à Abidjan. Il n’a aucun lien avec l’application reCollect de suivi de médias ni avec d’autres produits au nom proche." },
-  { question: "Le visiteur doit-il installer une application ?", answer: "Non. Il scanne le QR Code avec l’appareil photo de son téléphone, le formulaire s’ouvre dans le navigateur, il le remplit et signe à l’écran. Aucun compte et aucune application ne sont nécessaires." },
   { question: "REKOLLECTE fonctionne-t-il sans internet ?", answer: "Oui. La tablette d’accueil continue d’enregistrer les visites hors ligne ; les fiches sont gardées sur l’appareil puis synchronisées automatiquement dès que la connexion revient." },
-  { question: "REKOLLECTE est-il payant ?", answer: "Pas avant le " + FREE_UNTIL_LABEL + " : le service est gratuit jusqu’à cette date. Ensuite, des offres payantes simples en FCFA sont détaillées sur la page d’accueil." },
+  { question: "REKOLLECTE est-il payant ?", answer: "Pas pendant le lancement : le service est gratuit. Ensuite, des offres payantes simples en FCFA sont détaillées sur la page d’accueil." },
 ];
 
 export const metadata = pageMeta({
   title: "À propos de REKOLLECTE : le registre visiteurs par QR Code conçu à Abidjan",
-  description: "REKOLLECTE est un registre visiteurs numérique par QR Code, conçu à Abidjan par AKATech Studio : le visiteur scanne, remplit et signe sans compte, même hors ligne. Voir comment il fonctionne et pour qui.",
+  description: "Le registre visiteurs numérique par QR Code conçu à Abidjan : le visiteur scanne, remplit et signe sans compte, même hors ligne. Pour qui, et comment.",
   path: "/a-propos",
 });
 
@@ -46,27 +44,25 @@ export default function AboutPage() {
       <JsonLd data={jsonLd} />
 
       <p>
-        <strong>REKOLLECTE est un registre visiteurs numérique par QR Code, conçu à Abidjan (Côte d’Ivoire) par AKATech Studio.</strong>{" "}
+        <strong>REKOLLECTE est un registre visiteurs numérique par QR Code, conçu à Abidjan (Côte d’Ivoire).</strong>{" "}
         Il remplace le cahier de visites papier des bureaux, restaurants, hôtels et accès chantier : le visiteur scanne un QR Code, remplit un
         formulaire et signe à l’écran, sans créer de compte, même sans connexion internet.
       </p>
 
       <h2>REKOLLECTE en bref</h2>
       <ul>
-        <li><strong>Éditeur :</strong> AKATech Studio, Abidjan (Côte d’Ivoire).</li>
         <li><strong>Type de produit :</strong> application web installable (PWA), utilisable sur téléphone, tablette et ordinateur.</li>
-        <li><strong>Pour qui :</strong> bureaux, restaurants, hôtels, chantiers et tout lieu qui accueille des visiteurs.</li>
         <li><strong>Côté visiteur :</strong> aucun compte, aucune application, signature à l’écran.</li>
         <li><strong>Hors ligne :</strong> oui, avec synchronisation automatique au retour de la connexion.</li>
-        <li><strong>Côté équipe :</strong> connexion avec un compte Google ; rôles Patron, Gérant et Staff.</li>
+        <li><strong>Côté équipe :</strong> connexion avec un compte Google ou Facebook ; rôles Patron, Gérant et Agent.</li>
         <li><strong>Données :</strong> registre consultable, statistiques de fréquentation et export CSV.</li>
         <li><strong>Langue :</strong> français.</li>
-        <li><strong>Prix :</strong> gratuit jusqu’au {FREE_UNTIL_LABEL}, puis des offres à partir de 0 FCFA (voir la page d’accueil).</li>
+        <li><strong>Prix :</strong> gratuit pendant le lancement, puis des offres à partir de 0 FCFA (voir la page d’accueil).</li>
       </ul>
 
       <h2>Comment ça marche</h2>
       <ul>
-        <li><strong>1. Créer l’espace.</strong> Le patron se connecte avec Google et renseigne le nom et le logo de son établissement.</li>
+        <li><strong>1. Créer l’espace.</strong> Le patron se connecte avec Google ou Facebook et renseigne le nom et le logo de son établissement.</li>
         <li><strong>2. Préparer le formulaire.</strong> Il part d’un modèle (bureau, restaurant, hôtel, chantier), ajuste les champs et génère un ou plusieurs QR Codes.</li>
         <li><strong>3. Accueillir.</strong> Le visiteur scanne le QR Code (ou utilise la tablette d’accueil), remplit le formulaire et signe.</li>
         <li><strong>4. Piloter.</strong> Le registre, les statistiques, l’export CSV et l’équipe se gèrent depuis le tableau de bord.</li>
@@ -75,9 +71,7 @@ export default function AboutPage() {
 
       <h2>REKOLLECTE et REKOLLECTE+</h2>
       <p>
-        <strong>REKOLLECTE</strong> est le registre visiteurs (niveau 1). <strong>REKOLLECTE+</strong> est le niveau 2, activable depuis les
-        paramètres : les visiteurs deviennent des fiches clients et l’établissement gère en plus ses ressources, ses réservations, ses encaissements
-        et ses rappels de fin de créneau. Voir la page <Link href="/rekollecte-plus">REKOLLECTE+</Link>.
+        <strong>REKOLLECTE</strong> est le registre visiteurs. <strong>REKOLLECTE+</strong> y ajoute les fiches clients, les ressources, les réservations, les encaissements et les rappels de fin de créneau ; il s’active depuis les paramètres. Voir la page <Link href="/rekollecte-plus">REKOLLECTE+</Link>.
       </p>
 
       <h2>Pour qui</h2>
@@ -90,9 +84,8 @@ export default function AboutPage() {
 
       <h2>Qui est derrière REKOLLECTE</h2>
       <p>
-        REKOLLECTE est conçu et développé par <a href="https://akatech.vercel.app" rel="noopener">AKATech Studio</a>, un studio de développement basé à
-        Abidjan. Le produit est pensé pour les réalités du terrain : accueil sur tablette, connexion instable et visiteurs qui n’ont pas le temps
-        d’installer quoi que ce soit.
+        REKOLLECTE est conçu et développé à Abidjan, pour les réalités du terrain : accueil sur tablette, connexion instable, visiteurs qui n’ont pas le temps d’installer
+        quoi que ce soit. Voir les <Link href="/credits">crédits</Link> et les <Link href="/mentions-legales">mentions légales</Link>.
       </p>
 
       <h2>Ne pas confondre</h2>

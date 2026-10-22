@@ -21,7 +21,7 @@ const TOAST_MS = 9000;
 const MAX_TOASTS = 3;
 const MAX_LIST = 30;
 
-// Géométrie de la cloche « gooey » (px). La goutte part du bouton et s'étire vers le bas ; le filtre SVG fait le pont entre les deux.
+// Géométrie de la cloche « gooey » (px). La goutte part du bouton et s’étire vers le bas ; le filtre SVG fait le pont entre les deux.
 const BELL = 36;
 const GAP = 12;
 /** La goutte dépasse un peu la cloche à droite : le centre du bouton tombe sur le bord plat du haut (pas dans le coin arrondi), là où le filtre fait le pont. */
@@ -51,7 +51,7 @@ function Toast({ alert, onClose }: { alert: VisitAlert; onClose: (id: string) =>
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold text-ink">{headline(alert)}</p>
         {details(alert) && <p className="truncate text-xs text-ink-soft">{details(alert)}</p>}
-        <p className="mt-0.5 text-[11px] text-ink-soft">{alert.for_you === "host" ? "Pour vous" : "Aucune personne désignée — l'équipe est prévenue"}</p>
+        <p className="mt-0.5 text-[11px] text-ink-soft">{alert.for_you === "host" ? "Pour vous" : "Aucune personne désignée — l’équipe est prévenue"}</p>
       </div>
       <button type="button" onClick={() => onClose(alert.id)} aria-label="Fermer la notification" className="shrink-0 rounded-full p-1 text-ink-soft hover:bg-canvas hover:text-ink"><X size={14} weight="bold" /></button>
     </div>
@@ -62,9 +62,9 @@ function Chip({ onClick, children }: { onClick: () => void; children: React.Reac
   return <button type="button" onClick={onClick} className="rounded-full bg-cta-ink/15 px-3 py-1.5 text-[11px] font-semibold leading-none text-cta-ink transition-colors hover:bg-cta-ink/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cta-ink">{children}</button>;
 }
 
-/** Cloche d'alerte de l'en-tête : prévient quand un visiteur arrive (pastille, notification, carillon) sans service externe.
+/** Cloche d’alerte de l’en-tête : prévient quand un visiteur arrive (pastille, notification, carillon) sans service externe.
  * Le patron et les gérants reçoivent les visites sans personne désignée ; un membre « visitable » reçoit celles où on le demande.
- * Le panneau est une goutte « gooey » : elle se détache du bouton et s'étire en liste (filtre SVG + GSAP). */
+ * Le panneau est une goutte « gooey » : elle se détache du bouton et s’étire en liste (filtre SVG + GSAP). */
 export default function VisitAlerts() {
   const { user } = useAuthContext();
   const eligible = Boolean(user && (user.role !== "STAFF" || user.is_visit_host));
@@ -97,10 +97,10 @@ export default function VisitAlerts() {
 
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => { openRef.current = open; }, [open]);
-  // `inert` retire le panneau fermé de l'ordre de tabulation (attribut posé à la main : React 18 ne le type pas).
+  // `inert` retire le panneau fermé de l’ordre de tabulation (attribut posé à la main : React 18 ne le type pas).
   useEffect(() => { contentRef.current?.toggleAttribute("inert", !open); }, [open, eligible]);
 
-  // GSAP ne se charge que pour les comptes concernés, hors du chemin critique (le panneau s'ouvre sans animation si le chargement échoue).
+  // GSAP ne se charge que pour les comptes concernés, hors du chemin critique (le panneau s’ouvre sans animation si le chargement échoue).
   useEffect(() => {
     if (!eligible || gsapRef.current) return undefined;
     let cancelled = false;
@@ -119,23 +119,23 @@ export default function VisitAlerts() {
       const { data } = await apiClient.get<VisitAlertsPayload>("/checkins/alerts/", cursorRef.current ? { params: { since: cursorRef.current } } : undefined);
       const firstCall = cursorRef.current === null;
       cursorRef.current = data.cursor;
-      if (firstCall) return; // le premier appel ne sert qu'à obtenir l'horloge du serveur : on ne rejoue pas l'historique
+      if (firstCall) return; // le premier appel ne sert qu’à obtenir l’horloge du serveur : on ne rejoue pas l’historique
       const fresh = data.items.filter((item) => !seenRef.current.has(item.id));
       fresh.forEach((item) => seenRef.current.add(item.id));
-      const skipped = Math.max(0, data.total - data.items.length); // plus de 20 arrivées d'un coup : les plus anciennes ne sont pas détaillées
+      const skipped = Math.max(0, data.total - data.items.length); // plus de 20 arrivées d’un coup : les plus anciennes ne sont pas détaillées
       if (skipped > 0) { setMissed((value) => value + skipped); setMissedUnread((value) => value + skipped); }
       if (fresh.length === 0) return;
       setEntries((current) => [...fresh.map((item) => ({ ...item, read: false })).reverse(), ...current].slice(0, MAX_LIST));
-      const live = fresh.filter((item) => !item.late); // une fiche synchronisée tardivement n'est pas une arrivée « en direct » : pastille seulement
+      const live = fresh.filter((item) => !item.late); // une fiche synchronisée tardivement n’est pas une arrivée « en direct » : pastille seulement
       if (live.length > 0) {
-        if (!openRef.current) setToasts((current) => [...current, ...live].slice(-MAX_TOASTS)); // le panneau ouvert montre déjà l'arrivée
+        if (!openRef.current) setToasts((current) => [...current, ...live].slice(-MAX_TOASTS)); // le panneau ouvert montre déjà l’arrivée
         if (currentVisitSoundState() === "ready") {
           if (!(await playChime())) syncSound(); // le navigateur a repris la main sur le son : on le dit dans le panneau
         } else if (readVisitSoundPreference()) syncSound();
         if (typeof navigator !== "undefined") navigator.vibrate?.(200);
       }
     } catch {
-      /* silencieux : une coupure réseau ou un serveur qui dort ne doit jamais s'afficher comme une erreur ; on réessaie au prochain tour */
+      /* silencieux : une coupure réseau ou un serveur qui dort ne doit jamais s’afficher comme une erreur ; on réessaie au prochain tour */
     } finally {
       busyRef.current = false;
     }
@@ -179,11 +179,11 @@ export default function VisitAlerts() {
     writeVisitSoundPreference(true);
     const ok = await unlockAudio(syncSound);
     syncSound();
-    if (ok) await playChime(); // un carillon de confirmation : on sait tout de suite si l'appareil sonne
+    if (ok) await playChime(); // un carillon de confirmation : on sait tout de suite si l’appareil sonne
   };
   const disableSound = () => { writeVisitSoundPreference(false); syncSound(); };
 
-  // --- Ouverture / fermeture : « lu » = vu dans le panneau (tout ce qui s'y trouvait est marqué lu à la fermeture) -------------
+  // --- Ouverture / fermeture : « lu » = vu dans le panneau (tout ce qui s’y trouvait est marqué lu à la fermeture) -------------
   const markAllRead = useCallback(() => {
     setEntries((current) => (current.some((item) => !item.read) ? current.map((item) => (item.read ? item : { ...item, read: true })) : current));
     setMissedUnread(0);
@@ -246,7 +246,7 @@ export default function VisitAlerts() {
       g.set(items, { opacity: 0, y: reduce ? 0 : 20, filter: reduce ? "none" : "blur(8px)" });
       const timeline = g.timeline({
         onComplete: () => {
-          // Une fois ouverte, la goutte suit la hauteur de la liste (arrivées, effacements) sans refaire toute l'animation.
+          // Une fois ouverte, la goutte suit la hauteur de la liste (arrivées, effacements) sans refaire toute l’animation.
           resizeRef.current?.disconnect();
           resizeRef.current = new ResizeObserver(() => g.to([blob, content], { height: fit(), duration: reduce ? 0 : 0.35, ease: "power2.out", overwrite: "auto" }));
           resizeRef.current.observe(inner);
@@ -281,7 +281,7 @@ export default function VisitAlerts() {
   const unread = unreadEntries + missedUnread;
   const readCount = entries.length - unreadEntries;
 
-  // Pastille dans le titre de l'onglet : on la voit même quand on est sur un autre onglet.
+  // Pastille dans le titre de l’onglet : on la voit même quand on est sur un autre onglet.
   useEffect(() => {
     const strip = (title: string) => title.replace(/^\(\d+\)\s/, "");
     if (unread > 0) document.title = `(${unread > 99 ? "99+" : unread}) ${strip(document.title)}`;
@@ -304,13 +304,13 @@ export default function VisitAlerts() {
           </defs>
         </svg>
 
-        {/* Couche filtrée : une pastille ancrée sous le bouton + la goutte qui s'étire. Hors écran tant que le panneau est fermé. */}
+        {/* Couche filtrée : une pastille ancrée sous le bouton + la goutte qui s’étire. Hors écran tant que le panneau est fermé. */}
         <div ref={gooeyRef} aria-hidden="true" className="rk-goo pointer-events-none absolute z-0" style={{ visibility: "hidden", left: -(PANEL_MAX_WIDTH + 30), top: -20, width: PANEL_MAX_WIDTH + BELL + 90, height: 640, ["--rk-goo" as string]: `url(#${GOO_ID})` }}>
           <div className="absolute rounded-full bg-cta" style={{ left: PANEL_MAX_WIDTH + 30, top: 20, width: BELL, height: BELL }} />
           <div ref={blobRef} className="absolute bg-cta" style={{ left: PANEL_MAX_WIDTH + 30, top: 20, width: BELL, height: BELL, borderRadius: RADIUS }} />
         </div>
 
-        {/* Contenu net (hors filtre) : même géométrie que la goutte, au-dessus d'elle. */}
+        {/* Contenu net (hors filtre) : même géométrie que la goutte, au-dessus d’elle. */}
         <div
           ref={contentRef}
           id="rk-visit-panel"
@@ -336,7 +336,7 @@ export default function VisitAlerts() {
             )}
 
             {entries.length === 0 && missed === 0 ? (
-              <p className="rk-vl-item py-3 text-center text-sm text-cta-ink/75">Aucune arrivée pour l'instant. Les nouvelles visites s'afficheront ici dès qu'elles sont enregistrées.</p>
+              <p className="rk-vl-item py-3 text-center text-sm text-cta-ink/75">Aucune arrivée pour l’instant. Les nouvelles visites s’afficheront ici dès qu’elles sont enregistrées.</p>
             ) : (
               <ul className="flex max-h-[min(280px,38vh)] flex-col gap-3 overflow-y-auto pr-1">
                 {missed > 0 && <li className="rk-vl-item text-xs text-cta-ink/75">+ {missed} {plural(missed, "autre arrivée plus ancienne", "autres arrivées plus anciennes")} — voir la liste des visiteurs.</li>}
@@ -363,15 +363,15 @@ export default function VisitAlerts() {
             </div>
 
             <div className="rk-vl-item">
-              {sound === "unsupported" && <p className="text-xs text-cta-ink/75">Le son d'alerte n'est pas disponible sur cet appareil : la pastille et les notifications restent actives.</p>}
-              {sound === "off" && <button type="button" onClick={() => void enableSound()} className="flex w-full items-center justify-center gap-2 rounded-full bg-cta-ink/15 px-3 py-2 text-xs font-semibold transition-colors hover:bg-cta-ink/25"><SpeakerHigh size={16} weight="bold" aria-hidden="true" /> Activer le son d'alerte</button>}
-              {sound === "ready" && <div className="flex items-center justify-between gap-3 text-xs"><span className="flex items-center gap-2 font-semibold"><SpeakerHigh size={16} weight="bold" aria-hidden="true" /> Son d'alerte activé</span><button type="button" onClick={disableSound} className="flex items-center gap-1 font-medium underline text-cta-ink/80 hover:text-cta-ink"><SpeakerSlash size={14} aria-hidden="true" /> Couper</button></div>}
+              {sound === "unsupported" && <p className="text-xs text-cta-ink/75">Le son d’alerte n’est pas disponible sur cet appareil : la pastille et les notifications restent actives.</p>}
+              {sound === "off" && <button type="button" onClick={() => void enableSound()} className="flex w-full items-center justify-center gap-2 rounded-full bg-cta-ink/15 px-3 py-2 text-xs font-semibold transition-colors hover:bg-cta-ink/25"><SpeakerHigh size={16} weight="bold" aria-hidden="true" /> Activer le son d’alerte</button>}
+              {sound === "ready" && <div className="flex items-center justify-between gap-3 text-xs"><span className="flex items-center gap-2 font-semibold"><SpeakerHigh size={16} weight="bold" aria-hidden="true" /> Son d’alerte activé</span><button type="button" onClick={disableSound} className="flex items-center gap-1 font-medium underline text-cta-ink/80 hover:text-cta-ink"><SpeakerSlash size={14} aria-hidden="true" /> Couper</button></div>}
               {sound === "blocked" && <button type="button" onClick={() => void enableSound()} className="flex w-full items-start gap-2 rounded-xl bg-cta-ink/15 px-3 py-2 text-left text-xs"><WarningCircle size={16} weight="bold" className="mt-0.5 shrink-0" aria-hidden="true" /><span><span className="font-semibold">Son bloqué par le navigateur.</span> Touchez ici pour le réactiver.</span></button>}
             </div>
           </div>
         </div>
 
-        {/* Bouton : par-dessus la goutte ; il prend la couleur de la goutte à l'ouverture pour que les deux fusionnent. */}
+        {/* Bouton : par-dessus la goutte ; il prend la couleur de la goutte à l’ouverture pour que les deux fusionnent. */}
         <button
           ref={buttonRef}
           type="button"
@@ -388,7 +388,7 @@ export default function VisitAlerts() {
         </button>
       </div>
 
-      {/* Notifications : dans <body>, car l'en-tête crée son propre empilement et passerait sous les fenêtres ouvertes. */}
+      {/* Notifications : dans <body>, car l’en-tête crée son propre empilement et passerait sous les fenêtres ouvertes. */}
       {mounted && createPortal(
         <div aria-live="polite" className="pointer-events-none fixed right-4 top-[4.25rem] z-[80] flex w-[min(22rem,calc(100vw-2rem))] flex-col gap-2">
           {toasts.map((alert) => <div key={alert.id} className="pointer-events-auto"><Toast alert={alert} onClose={dismiss} /></div>)}

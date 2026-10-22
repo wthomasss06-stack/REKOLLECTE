@@ -24,7 +24,7 @@ export default function OverviewPanel({ data, onOpenTraffic, onOpenFeedback }: {
             <div className="flex items-center gap-2 rounded-full bg-cta/10 px-3 py-1.5 text-sm font-semibold text-cta"><Pulse size={16} weight="bold" aria-hidden="true" />{live} en ligne</div>
           </div>
         </Panel>
-        <Panel title="À traiter" subtitle="Ce qui attend une action de ta part" action={<button type="button" onClick={onOpenFeedback} className={link}>Ouvrir les feedbacks<ArrowRight size={14} weight="bold" aria-hidden="true" /></button>}>
+        <Panel title="À traiter" subtitle="Ce qui attend une action de votre part" action={<button type="button" onClick={onOpenFeedback} className={link}>Ouvrir les feedbacks<ArrowRight size={14} weight="bold" aria-hidden="true" /></button>}>
           <p className="text-sm text-ink">{data.feedback_new > 0 ? <><strong className="font-heading text-2xl">{data.feedback_new}</strong> feedback{data.feedback_new > 1 ? "s" : ""} en attente de lecture.</> : "Rien en attente : tous les feedbacks sont traités."}</p>
         </Panel>
       </div>

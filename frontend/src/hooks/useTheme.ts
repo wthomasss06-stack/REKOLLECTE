@@ -9,7 +9,7 @@ function applyTheme(theme: Theme) {
 }
 
 /** Lit/ecrit le theme (localStorage + classe .dark sur <html>). Le script inline
- * dans layout.tsx applique déjà la bonne classe avant l'hydratation (anti-flash) ;
+ * dans layout.tsx applique déjà la bonne classe avant l’hydratation (anti-flash) ;
  * ce hook ne fait que garder React synchronisé avec cet état pour le toggle. */
 export function useTheme() {
   const [theme, setTheme] = useState<Theme>("light");
@@ -36,7 +36,7 @@ export function useTheme() {
   return { theme, toggle };
 }
 
-/** Script exécuté en inline, avant l'hydratation React (voir layout.tsx), pour
+/** Script exécuté en inline, avant l’hydratation React (voir layout.tsx), pour
  * éviter un flash du mauvais thème au chargement. */
 export const THEME_INIT_SCRIPT = `
 (function () {

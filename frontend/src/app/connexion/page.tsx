@@ -18,10 +18,10 @@ const CHIPS = [
   { icon: ShieldCheck, label: "Accès par rôle" },
 ];
 
-/** Délai d'apparition (animation d'entrée) : l'élément n°i arrive après i × 80 ms. */
+/** Délai d’apparition (animation d’entrée) : l’élément n°i arrive après i × 80 ms. */
 const reveal = (index: number) => ({ "--i": index }) as CSSProperties;
 
-/** Texte de la bulle de la scène : trois phrases qui tournent, remplacées par un message d'état pendant la connexion ou après une erreur.
+/** Texte de la bulle de la scène : trois phrases qui tournent, remplacées par un message d’état pendant la connexion ou après une erreur.
  * Sans animation (prefers-reduced-motion), la première phrase reste affichée. */
 function useBubble(status: SceneStatus): string {
   const [index, setIndex] = useState(0);
@@ -64,7 +64,7 @@ const GOOGLE_MIN_WIDTH = 200;
 const GOOGLE_MAX_WIDTH = 400; // bornes imposées par Google (200 à 400 px)
 const GOOGLE_NATIVE_HEIGHT = 40; // hauteur du bouton Google en size="large"
 const BUTTON_HEIGHT = 48; // h-12 : hauteur de tous les boutons de connexion
-// Au-delà, on considère que le script Google n'a pas pu se charger (bloqueur, réseau coupé).
+// Au-delà, on considère que le script Google n’a pas pu se charger (bloqueur, réseau coupé).
 const GOOGLE_LOAD_TIMEOUT_MS = 8_000;
 
 /** Logo « G » officiel en quatre couleurs. */
@@ -79,10 +79,10 @@ function GoogleGlyph() {
   );
 }
 
-/** Emplacement du bouton Google. Ce qu'on VOIT est un bouton au même gabarit que Facebook et Apple (SOCIAL_BUTTON_BASE) ;
+/** Emplacement du bouton Google. Ce qu’on VOIT est un bouton au même gabarit que Facebook et Apple (SOCIAL_BUTTON_BASE) ;
  * ce sur quoi on CLIQUE est le vrai bouton Google (iframe officielle, quasi transparente, étirée par-dessus à 48 px de haut).
  * Le jeton Google est donc toujours émis par Google : le flux et le serveur ne changent pas.
- * Squelette tant que Google charge son script (aucun trou, aucun saut de mise en page), message clair s'il ne s'affiche pas. */
+ * Squelette tant que Google charge son script (aucun trou, aucun saut de mise en page), message clair s’il ne s’affiche pas. */
 function GoogleSlot({ onCredential, onFailure, disabled }: { onCredential: (credential: string) => void; onFailure: () => void; disabled: boolean }) {
   const slotRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(GOOGLE_MAX_WIDTH);
@@ -115,7 +115,7 @@ function GoogleSlot({ onCredential, onFailure, disabled }: { onCredential: (cred
     <div className="w-full">
       <div className="group relative h-12 w-full">
         {!ready && !unavailable && <div aria-hidden="true" className="absolute inset-0 animate-pulse rounded-full bg-ink/10" />}
-        {/* Apparence : identique à Facebook / Apple. Survol et focus clavier viennent du conteneur (l'iframe est dedans). */}
+        {/* Apparence : identique à Facebook / Apple. Survol et focus clavier viennent du conteneur (l’iframe est dedans). */}
         <div
           aria-hidden="true"
           className={`${SOCIAL_BUTTON_BASE} pointer-events-none border border-border bg-white text-neutral-800 shadow-sm duration-300 group-hover:bg-neutral-100 group-focus-within:ring-2 group-focus-within:ring-cta group-focus-within:ring-offset-2 ${
@@ -144,7 +144,7 @@ function GoogleSlot({ onCredential, onFailure, disabled }: { onCredential: (cred
       </div>
       {unavailable && !ready && (
         <p role="status" className="mt-3 text-center text-xs leading-relaxed text-ink-soft">
-          Le bouton Google n’a pas pu se charger. Vérifie ta connexion, désactive ton bloqueur de publicités ou recharge la page.
+          Le bouton Google n’a pas pu se charger. Vérifiez votre connexion, désactivez votre bloqueur de publicités ou rechargez la page.
         </p>
       )}
     </div>
@@ -159,11 +159,11 @@ export default function LoginPage() {
   const providers = enabledProviders();
   const hasSocial = providers.includes("facebook") || providers.includes("apple");
 
-  // Message affiché : erreur de connexion en cours > échec du bouton Google > code renvoyé par le serveur dans l'URL.
+  // Message affiché : erreur de connexion en cours > échec du bouton Google > code renvoyé par le serveur dans l’URL.
   const message = error
     ? { tone: "error" as const, text: error }
     : googleFailed
-      ? { tone: "error" as const, text: "Google n’a pas pu valider ta connexion. Réessaie." }
+      ? { tone: "error" as const, text: "Google n’a pas pu valider votre connexion. Réessayez." }
       : notice
         ? { tone: notice.tone, text: notice.message }
         : null;
@@ -181,14 +181,14 @@ export default function LoginPage() {
             <div className="qr-login-loader__brand"><Logo size={52} /><span className="font-heading text-lg font-bold">REKOLLECTE</span></div>
             <div className="qr-login-loader__head"><span>Connexion sécurisée</span></div>
             <div className="qr-login-loader__track"><span /></div>
-            <p className="qr-login-loader__label">Connexion en cours… Préparation de ton espace.</p>
+            <p className="qr-login-loader__label">Connexion en cours… Préparation de votre espace.</p>
           </div>
         </div>
       )}
 
       <div className="lg-root">
         <div className="lg-frame">
-          {/* Volet scène : décoratif (la scène et la bulle sont masquées aux lecteurs d'écran). */}
+          {/* Volet scène : décoratif (la scène et la bulle sont masquées aux lecteurs d’écran). */}
           <aside ref={stageRef} className="lg-stage" aria-label="Présentation de REKOLLECTE">
             <i className="lg-blob lg-blob--b" aria-hidden="true" />
             <Link href="/" className="lg-brand" aria-label="REKOLLECTE, retour à l’accueil"><span aria-hidden="true"><Logo size={34} /></span><span aria-hidden="true">REKOLLECTE</span></Link>
@@ -212,7 +212,7 @@ export default function LoginPage() {
             <div className="lg-col">
               <div className="lg-main">
                 <div className="lg-reveal" style={reveal(0)}>
-                  <h1 className="text-balance text-[1.7rem] font-extrabold leading-tight tracking-tight text-ink sm:text-3xl">Connecte-toi à ton espace</h1>
+                  <h1 className="text-balance text-[1.7rem] font-extrabold leading-tight tracking-tight text-ink sm:text-3xl">Connectez-vous à votre espace</h1>
                 </div>
 
                 {message && (
@@ -251,17 +251,17 @@ export default function LoginPage() {
 
                 <p className="lg-reveal mt-6 text-balance text-center text-xs leading-relaxed text-ink-soft" style={reveal(2)}>
                   <CheckCircle size={14} weight="fill" className="mr-1.5 inline align-[-2px] text-success-text" aria-hidden="true" />
-                  Première visite ? Ton espace est créé automatiquement à ta première connexion.
+                  Première visite ? Votre espace est créé à la première connexion.
                 </p>
               </div>
 
               <footer className="lg-legal space-y-1.5">
                 <p>
-                  En continuant, tu acceptes nos{" "}
+                  En continuant, vous acceptez nos{" "}
                   <Link href="/cgu" className="underline underline-offset-2 hover:text-ink">CGU</Link> et notre{" "}
                   <Link href="/confidentialite" className="underline underline-offset-2 hover:text-ink">politique de confidentialité</Link>.
                 </p>
-                <p>Un souci pour te connecter ? <Link href="/aide" className="underline underline-offset-2 hover:text-ink">Consulte l’aide</Link>.</p>
+                <p>Un souci pour vous connecter ? <Link href="/aide" className="underline underline-offset-2 hover:text-ink">Consultez l’aide</Link>.</p>
               </footer>
             </div>
           </main>

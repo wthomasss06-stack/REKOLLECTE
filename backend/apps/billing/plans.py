@@ -18,20 +18,19 @@ class Entitlements:
     members: int
     history_days: int | None  # fenêtre d'AFFICHAGE du registre ; None = pas de limite. Ce n'est PAS une durée de conservation.
     export_csv: bool  # export récurrent. L'export de SORTIE (purpose=exit) reste toujours possible, quel que soit le plan.
-    ocr: bool  # OCR de pièce d'identité (formalité légale : retiré du formulaire public si le plan ne l'inclut pas)
-    phone: bool  # champ téléphone (idem)
+    phone: bool  # champ téléphone (formalité légale : retiré du formulaire public si le plan ne l'inclut pas)
     karnet: bool  # clients, réservations, rappels
     resources: int  # ressources réservables : palier à tester, affiché mais pas encore appliqué
 
 
 PLAN_ENTITLEMENTS = {
-    FREE: Entitlements(access_points=1, forms=1, members=2, history_days=30, export_csv=False, ocr=False, phone=False, karnet=False, resources=0),
-    ESSENTIEL: Entitlements(access_points=3, forms=3, members=5, history_days=365, export_csv=True, ocr=True, phone=True, karnet=False, resources=0),
-    PLUS: Entitlements(access_points=10, forms=10, members=15, history_days=365, export_csv=True, ocr=True, phone=True, karnet=True, resources=10),
-    ENTREPRISE: Entitlements(access_points=UNLIMITED, forms=UNLIMITED, members=UNLIMITED, history_days=None, export_csv=True, ocr=True, phone=True, karnet=True, resources=UNLIMITED),
+    FREE: Entitlements(access_points=1, forms=1, members=2, history_days=30, export_csv=False, phone=False, karnet=False, resources=0),
+    ESSENTIEL: Entitlements(access_points=3, forms=3, members=5, history_days=365, export_csv=True, phone=True, karnet=False, resources=0),
+    PLUS: Entitlements(access_points=10, forms=10, members=15, history_days=365, export_csv=True, phone=True, karnet=True, resources=10),
+    ENTREPRISE: Entitlements(access_points=UNLIMITED, forms=UNLIMITED, members=UNLIMITED, history_days=None, export_csv=True, phone=True, karnet=True, resources=UNLIMITED),
 }
 
-FLAG_FEATURES = ("export_csv", "ocr", "phone", "karnet")
+FLAG_FEATURES = ("export_csv", "phone", "karnet")
 LIMIT_FEATURES = ("access_points", "forms", "members")
 
 

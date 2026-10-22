@@ -16,7 +16,7 @@ const API_URL = typeof window !== "undefined"
   : (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1");
 
 // Rétablir la session : on réessaie tant que le serveur dort ou ne répond pas (chaque tour attend déjà le
-// réveil du serveur, jusqu'à 3 min). Après tous ces tours, on abandonne seulement si rien n'est à afficher.
+// réveil du serveur, jusqu’à 3 min). Après tous ces tours, on abandonne seulement si rien n’est à afficher.
 const MAX_RESTORE_ROUNDS = 12;
 const RESTORE_PAUSE_MS = 3_000;
 const LOGIN_TIMEOUT_MS = 45_000;
@@ -26,7 +26,7 @@ export const SESSION_EXPIRED_FLAG = "qr_session_expired";
 interface AuthContextValue {
   user: UserProfile | null;
   organization: Organization | null;
-  /** Vrai tant que la session n'est pas tranchée (connectée / déconnectée) : le dashboard affiche alors sa coque en squelette. */
+  /** Vrai tant que la session n’est pas tranchée (connectée / déconnectée) : le tableau de bord affiche alors sa coque en squelette. */
   loading: boolean;
   loggingIn: boolean;
   loggingOut: boolean;
@@ -44,7 +44,7 @@ function isPublicPath(pathname: string) {
   return pathname === "/" || pathname === "/connexion" || pathname === "/admin" || pathname.startsWith("/v/") || pathname.startsWith("/aide");
 }
 
-// Pages où l'on pré-chauffe le serveur : avec un peu de chance il est déjà réveillé quand la personne clique sur « Se connecter ».
+// Pages où l’on pré-chauffe le serveur : avec un peu de chance il est déjà réveillé quand la personne clique sur « Se connecter ».
 const isWarmPath = (pathname: string) => pathname === "/" || pathname === "/connexion";
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -55,7 +55,7 @@ const isGatewayFailure = (error: unknown) =>
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   // Ne jamais lire localStorage pendant le rendu : le serveur ne possède pas
-  // ce stockage et cela provoquait React #418 au rechargement du dashboard.
+  // ce stockage et cela provoquait React #418 au rechargement du tableau de bord.
   const [user, setUser] = useState<UserProfile | null>(null);
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [loading, setLoading] = useState(true);
@@ -69,7 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const loadProfileInBackground = useCallback(async () => {
     const [me, org] = await Promise.all([
       apiClient.get<UserProfile>("/auth/me/"),
-      // Un compte sans établissement (onboarding pas fini) n'a pas d'organisation : ce n'est pas une panne.
+      // Un compte sans établissement (onboarding pas fini) n’a pas d’organisation : ce n’est pas une panne.
       apiClient.get<Organization>("/org/me/").catch((requestError) => {
         if (axios.isAxiosError(requestError) && (requestError.response?.status === 404 || requestError.response?.status === 403)) return { data: null };
         throw requestError;
@@ -81,7 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const dropSession = useCallback((expired = true) => {
-    // Mémorise une session réellement expirée : la page de connexion l'explique au lieu d'un retour muet à l'accueil.
+    // Mémorise une session réellement expirée : la page de connexion l’explique au lieu d’un retour muet à l’accueil.
     if (expired && typeof window !== "undefined") {
       try { if (readSessionCache()?.user) window.sessionStorage.setItem(SESSION_EXPIRED_FLAG, "1"); } catch {}
     }
@@ -102,7 +102,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (outcome === "rejected") {
           // Seul un 401/403 CONFIRMÉ par le serveur sur le cookie de refresh arrive ici : une panne réseau
-          // ou un serveur endormi donne « unreachable » et n'efface jamais la session.
+          // ou un serveur endormi donne « unreachable » et n’efface jamais la session.
           dropSession();
           return false;
         }
@@ -121,7 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         // Serveur injoignable ou profil non chargé : on affiche la dernière session connue si elle existe
-        // (l'app apparaît, les pages se rafraîchissent d'elles-mêmes), sinon on garde la coque en squelette et on réessaie.
+        // (l’app apparaît, les pages se rafraîchissent d’elles-mêmes), sinon on garde la coque en squelette et on réessaie.
         const fallback = readSessionCache();
         if (fallback?.user) {
           setUser(fallback.user);
@@ -158,8 +158,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => { mounted = false; };
   }, [pathname, restoreSession]);
 
-  // Espace connecté ouvert : on garde le serveur éveillé (il s'endort après 15 min sans trafic) et on le réveille
-  // d'avance quand on revient sur un onglet resté longtemps en arrière-plan.
+  // Espace connecté ouvert : on garde le serveur éveillé (il s’endort après 15 min sans trafic) et on le réveille
+  // d’avance quand on revient sur un onglet resté longtemps en arrière-plan.
   const signedIn = Boolean(user);
   useEffect(() => (signedIn ? startKeepAlive() : undefined), [signedIn]);
 
@@ -167,14 +167,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoggingIn(true);
     setError(null);
     try {
-      // On réveille le serveur AVANT d'envoyer le jeton Google : la connexion part vers un serveur qui répond.
+      // On réveille le serveur AVANT d’envoyer le jeton Google : la connexion part vers un serveur qui répond.
       await waitForServer();
       const post = () => axios.post(`${API_URL}/auth/google/`, { credential }, { withCredentials: true, timeout: LOGIN_TIMEOUT_MS });
       let response;
       try {
         response = await post();
       } catch (firstError) {
-        // Le jeton Google reste valable environ une heure : si le serveur s'est rendormi entre-temps, on le laisse repartir puis on renvoie.
+        // Le jeton Google reste valable environ une heure : si le serveur s’est rendormi entre-temps, on le laisse repartir puis on renvoie.
         if (!isGatewayFailure(firstError)) throw firstError;
         markServerDown();
         if (!(await waitForServer())) throw firstError;
@@ -190,8 +190,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { isNew: Boolean(data.is_new), name: nextUser.full_name || nextUser.email || "" };
     } catch (requestError) {
       if (axios.isAxiosError(requestError) && requestError.response?.data?.error?.message) setError(requestError.response.data.error.message);
-      else if (isGatewayFailure(requestError)) setError("La connexion met plus de temps que prévu. Réessaie dans un instant.");
-      else setError("Connexion impossible. Réessaie.");
+      else if (isGatewayFailure(requestError)) setError("La connexion met plus de temps que prévu. Réessayez dans un instant.");
+      else setError("Connexion impossible. Réessayez.");
       throw requestError;
     } finally {
       setLoggingIn(false);

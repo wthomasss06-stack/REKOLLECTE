@@ -134,9 +134,6 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "anon": "60/min",
         "user": "300/min",
-        # Chaque appel fait tourner Tesseract côté serveur (CPU) — throttle
-        # dédié, bien plus strict que les autres endpoints publics.
-        "ocr": "6/min",
         # Connexion de l'administration de la plateforme (compte le plus puissant).
         "admin_login": "10/min",
         # Collecte du suivi de la vitrine (une requête par page vue ou clic d'action), limitée par adresse.
@@ -167,7 +164,7 @@ SIMPLE_JWT = {
 }
 
 # Taille maximale d'un corps de requête API (octets). Les endpoints publics sont anonymes : sans plafond, un seul
-# POST géant remplit la mémoire de l'instance. Le plus gros usage légitime est l'image OCR (~8 M de caractères base64).
+# POST géant remplit la mémoire de l'instance. Le plus gros usage légitime est une photo visiteur (data URL base64).
 API_MAX_BODY_BYTES = int(os.environ.get("API_MAX_BODY_BYTES", str(24 * 1024 * 1024)))
 # Documentation OpenAPI et admin Django : exposés seulement en développement (ou sur demande explicite).
 EXPOSE_API_DOCS = DEBUG or os.environ.get("EXPOSE_API_DOCS", "").strip().lower() in {"true", "1", "yes"}

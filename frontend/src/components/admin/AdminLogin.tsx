@@ -5,7 +5,7 @@ import { CircleNotch, Eye, EyeSlash, LockKey, WarningCircle } from "@phosphor-ic
 import Logo from "@/components/Logo";
 import { inputClass, primaryButton } from "@/components/admin/ui";
 
-/** Porte de l'administration : un seul compte, configuré côté serveur. Le logo ramène à l'accueil du site. */
+/** Porte de l’administration : un seul compte, configuré côté serveur. Le logo ramène à l’accueil du site. */
 export default function AdminLogin({ onSubmit, error }: { onSubmit: (email: string, password: string) => Promise<void>; error: string }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

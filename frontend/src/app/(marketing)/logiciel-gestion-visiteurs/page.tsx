@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import SeoPage, { SeoTable, type SeoFaq, type SeoLink } from "@/components/marketing/SeoPage";
-import { FREE_UNTIL_LABEL } from "@/lib/pricing";
 import { pageMeta } from "@/lib/seo";
 
 const PATH = "/logiciel-gestion-visiteurs";
@@ -10,9 +9,9 @@ const H1 = "Logiciel de gestion des visiteurs : comment bien choisir son outil";
 const FAQ: SeoFaq[] = [
   { question: "Qu’est-ce qu’un logiciel de gestion des visiteurs ?", answer: "C’est un outil qui enregistre les personnes qui se présentent à l’accueil d’un établissement (qui, quand, pour qui, pourquoi) et conserve ces informations dans un registre numérique consultable et exportable. Il remplace le cahier de visites papier et sert aussi de logiciel de suivi des visiteurs." },
   { question: "Quelle différence entre un logiciel de gestion des visiteurs et un registre papier ?", answer: "Le logiciel garde un historique lisible et filtrable, protège les données de chaque visiteur (personne ne lit les lignes des autres) et produit des statistiques et des exports. Le cahier papier reste utilisable, mais il est difficile à relire, à rechercher et à archiver." },
-  { question: "Faut-il un logiciel de gestion de l’accueil complet ou un simple registre ?", answer: "Cela dépend du besoin. Si l’objectif est de savoir qui est entré et pourquoi, un registre numérique suffit. Si l’établissement veut aussi gérer ses clients, ses ressources (chambre, table, salle) et ses réservations, il lui faut un niveau supérieur : c’est le rôle de REKOLLECTE+, activable depuis les paramètres." },
-  { question: "REKOLLECTE est-il adapté aux entreprises ivoiriennes ?", answer: "Oui, il a été conçu à Abidjan par AKATech Studio : interface en français, utilisation sur téléphone, tablette ou ordinateur, et fonctionnement hors ligne avec synchronisation automatique quand le réseau est instable." },
-  { question: "Combien coûte REKOLLECTE ?", answer: "REKOLLECTE est gratuit jusqu’au " + FREE_UNTIL_LABEL + ". Les offres payantes qui suivent sont détaillées sur la page d’accueil ; elles et les conditions d’utilisation restent la référence." },
+  { question: "Faut-il un logiciel de gestion de l’accueil complet ou un simple registre ?", answer: "Cela dépend du besoin. Si l’objectif est de savoir qui est entré et pourquoi, un registre numérique suffit. Si l’établissement veut aussi gérer ses clients, ses ressources (chambre, table, salle) et ses réservations, il lui faut REKOLLECTE+, qui s’active depuis les paramètres." },
+  { question: "REKOLLECTE est-il adapté aux entreprises ivoiriennes ?", answer: "Oui, il est conçu à Abidjan : interface en français, utilisation sur téléphone, tablette ou ordinateur, et fonctionnement hors ligne avec synchronisation automatique quand le réseau est instable." },
+  { question: "Combien coûte REKOLLECTE ?", answer: "REKOLLECTE est gratuit pendant le lancement. Les offres payantes qui suivent sont détaillées dans la section Tarifs de la page d’accueil." },
   { question: "Un logiciel de gestion des visiteurs suffit-il pour être en règle sur les données personnelles ?", answer: "Non. L’établissement qui tient le registre est le responsable du traitement et doit effectuer ses propres formalités (en Côte d’Ivoire, auprès de l’ARTCI) et informer ses visiteurs. Le logiciel est l’outil de collecte, pas une garantie de conformité. Ces repères sont informatifs et ne constituent pas un avis juridique." },
 ];
 
@@ -44,7 +43,7 @@ export default function LogicielGestionVisiteursPage() {
         <p>
           <strong>Un logiciel de gestion des visiteurs enregistre qui se présente à l’accueil, quand, pour qui et pourquoi, puis garde tout dans un registre
           numérique que l’on peut rechercher, filtrer et exporter.</strong> Il remplace le cahier de visites papier. <Link href="/a-propos" className="underline underline-offset-4">REKOLLECTE</Link> est
-          un logiciel de gestion des visiteurs par QR Code, conçu à Abidjan : le visiteur scanne, remplit et signe sans créer de compte, même sans internet. Il est gratuit jusqu’au {FREE_UNTIL_LABEL}.
+          un logiciel de gestion des visiteurs par QR Code, conçu à Abidjan : le visiteur scanne, remplit et signe sans créer de compte, même sans internet.
         </p>
       }
     >
@@ -67,21 +66,20 @@ export default function LogicielGestionVisiteursPage() {
           ["Compte visiteur", "Chaque étape ralentit la file d’attente.", "Aucun compte ni application : scan, formulaire, signature."],
           ["Hors ligne", "Le réseau n’est pas garanti à l’entrée d’un bureau ou d’un chantier.", "Les visites restent sur l’appareil puis se synchronisent au retour de la connexion."],
           ["Formulaire adaptable", "Un hôtel, un restaurant et un chantier ne demandent pas la même chose.", "Modèles par secteur (bureau, restaurant, hôtel, chantier), champs modifiables à tout moment."],
-          ["Rôles et accès", "Le patron voit tout, l’accueil enregistre.", "Rôles Patron, Gérant et Staff avec des permissions distinctes."],
+          ["Rôles et accès", "Le patron voit tout, l’accueil enregistre.", "Rôles Patron, Gérant et Agent avec des permissions distinctes."],
           ["Export et statistiques", "Pour archiver, contrôler et comprendre l’affluence.", "Export CSV (Patron et Gérant), courbe horaire, motifs fréquents."],
-          ["Mise en route", "Un outil trop long à configurer n’est jamais déployé.", "Connexion avec Google, formulaire choisi, QR Code affiché : quelques minutes."],
-          ["Coût", "Un registre doit rester accessible aux petites structures.", `Gratuit jusqu’au ${FREE_UNTIL_LABEL}.`],
+          ["Mise en route", "Un outil trop long à configurer n’est jamais déployé.", "Connexion avec Google ou Facebook, formulaire choisi, QR Code affiché : quelques minutes."],
+          ["Coût", "Un registre doit rester accessible aux petites structures.", "Gratuit pendant le lancement."],
         ]}
       />
       <p>
-        Selon votre besoin, vérifiez aussi les fonctions qui ne figurent pas dans REKOLLECTE aujourd’hui : impression de badges, pré-enregistrement des
-        invités ou contrôle biométrique (REKOLLECTE n’en collecte aucune donnée). Il est centré sur un registre rapide, sans contrainte pour le visiteur.
+        Vérifiez aussi ce que REKOLLECTE ne propose pas aujourd’hui : impression de badges, pré-enregistrement des invités, contrôle biométrique (aucune donnée
+        biométrique n’est collectée). Il est centré sur un registre rapide, sans contrainte pour le visiteur.
       </p>
 
       <h2>Gestion des visiteurs en entreprise et par secteur</h2>
       <p>
-        La gestion des visiteurs en entreprise ne se limite pas aux grands sièges. Elle sert partout où des personnes extérieures entrent dans un lieu
-        qu’il faut pouvoir retracer :
+        Partout où des personnes extérieures entrent dans un lieu qu’il faut pouvoir retracer, pas seulement dans les grands sièges :
       </p>
       <ul>
         <li><strong>Bureaux et agences :</strong> nom, société, personne visitée, motif. Le logiciel de gestion de l’accueil remplace le cahier posé sur le comptoir.</li>
@@ -92,24 +90,16 @@ export default function LogicielGestionVisiteursPage() {
 
       <h2>Un logiciel de registre des visiteurs en Côte d’Ivoire</h2>
       <p>
-        REKOLLECTE est conçu à Abidjan par AKATech Studio, avec les contraintes locales en tête : une interface en français, un usage mobile d’abord, un
-        fonctionnement hors ligne quand la connexion est instable et un accès gratuit jusqu’au {FREE_UNTIL_LABEL}. Pour la protection des données, la loi n° 2013-450 du
-        19 juin 2013 encadre les données à caractère personnel sous le contrôle de l’ARTCI : l’établissement qui tient le registre est le responsable du traitement.
-        Le <Link href="/guide/registre-visiteurs-numerique">guide du registre numérique</Link> détaille ces repères.
-      </p>
-      <p>
-        <em>Ces repères sont informatifs et ne constituent pas un avis juridique : vérifiez vos obligations auprès de l’ARTCI ou d’un conseil juridique.</em>
+        REKOLLECTE est conçu à Abidjan : interface en français, usage mobile d’abord, fonctionnement hors ligne quand la connexion est instable. La loi n° 2013-450 du
+        19 juin 2013 encadre les données à caractère personnel sous le contrôle de l’ARTCI ; l’établissement qui tient le registre en est le responsable du traitement.
+        Le <Link href="/guide/registre-visiteurs-numerique">guide du registre numérique</Link> détaille ces repères, à titre informatif et sans valeur d’avis juridique.
       </p>
 
       <h2>Mettre en place un logiciel de gestion des visiteurs en 5 étapes</h2>
-      <ol>
-        <li><strong>Créer l’espace :</strong> connexion avec Google, nom et logo de l’établissement.</li>
-        <li><strong>Choisir le formulaire :</strong> partir d’un modèle (bureau, restaurant, hôtel, chantier) puis garder uniquement les champs utiles.</li>
-        <li><strong>Inviter l’équipe :</strong> attribuer les rôles Patron, Gérant ou Staff.</li>
-        <li><strong>Afficher le QR Code :</strong> imprimé à l’entrée ou formulaire ouvert sur une tablette d’accueil, comme expliqué dans la page{" "}
-          <Link href="/gestion-visiteurs-qr-code">gestion des visiteurs par QR Code</Link>.</li>
-        <li><strong>Suivre le registre :</strong> consulter les visites, les statistiques et exporter en CSV.</li>
-      </ol>
+      <p>
+        Créer l’espace, choisir le formulaire, inviter l’équipe, afficher le QR Code, suivre le registre : quelques minutes suffisent. Chaque étape est détaillée dans le{" "}
+        <Link href="/guide/registre-visiteurs-numerique">guide du registre numérique</Link> et dans la page <Link href="/gestion-visiteurs-qr-code">gestion des visiteurs par QR Code</Link>.
+      </p>
     </SeoPage>
   );
 }

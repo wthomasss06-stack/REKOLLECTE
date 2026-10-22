@@ -19,7 +19,7 @@ import type { CheckInRecord, KarnetClientDetail, KarnetReservation, PaginatedRes
  * historique des passages) — sans chrome de page ni bouton retour, pour être
  * rendu aussi bien dans la page dédiée (/dashboard/karnet/clients/[id]) que
  * dans le modal ouvert depuis la liste REKOLLECTE+. Charge ses propres données à
- * partir du seul `clientId` : les deux appelants n'ont rien d'autre à gérer.
+ * partir du seul `clientId` : les deux appelants n’ont rien d’autre à gérer.
  */
 export default function ClientHistoryPanel({ clientId }: { clientId: string }) {
   const { organization } = useAuthContext();

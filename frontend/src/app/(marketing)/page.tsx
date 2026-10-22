@@ -7,7 +7,7 @@ import { JSON_LD } from "@/lib/landingData";
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 // Page serveur : le JSON-LD (éditeur, site, applications, FAQ) part dans le HTML initial ;
-// toute l'interactivité (Lenis, GSAP) vit dans <Landing /> côté client.
+// toute l’interactivité (Lenis, GSAP) vit dans <Landing /> côté client.
 export default function LandingPage() {
   return (
     <>

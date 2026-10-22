@@ -17,7 +17,7 @@ const CRAWLER = /bot|crawl|spider|slurp|lighthouse|prerender|pagespeed/i;
 
 interface View { open: boolean; mode: "intro" | "custom"; fromUser: boolean }
 
-/** Modal cookies : apparaît une fois (après une courte pause) sur les pages publiques tant que la personne n'a pas choisi, et à la demande
+/** Modal cookies : apparaît une fois (après une courte pause) sur les pages publiques tant que la personne n’a pas choisi, et à la demande
  * depuis « Gérer les cookies » en pied de page. Accepter et refuser pèsent autant ; « Plus tard » (croix ou Échap) ne choisit rien. */
 export default function CookieConsent() {
   const pathname = usePathname();
@@ -26,7 +26,7 @@ export default function CookieConsent() {
 
   useEffect(() => { setChoice(readConsent()); }, []);
 
-  // Ouverture automatique : pages publiques seulement, jamais pour les robots d'indexation, et pas de harcèlement après un « Plus tard ».
+  // Ouverture automatique : pages publiques seulement, jamais pour les robots d’indexation, et pas de harcèlement après un « Plus tard ».
   useEffect(() => {
     if (!isTrackablePath(pathname) || readConsent() || CRAWLER.test(navigator.userAgent)) return undefined;
     try { if (window.sessionStorage.getItem(SNOOZE_KEY)) return undefined; } catch { /* stockage indisponible : on affiche */ }
@@ -63,14 +63,14 @@ function CookieModal({ initialMode, fromUser, choice, onDecide, onLater }: { ini
   const textId = `${uid}-text`;
   useEffect(() => { laterRef.current = onLater; }, [onLater]);
 
-  // Sort du bouton « Gérer les cookies » s'il a ouvert la fenêtre, sinon du bas de l'écran.
+  // Sort du bouton « Gérer les cookies » s’il a ouvert la fenêtre, sinon du bas de l’écran.
   useGooey(cardRef, { fallback: "bottom", ignoreClick: !fromUser });
 
   // Fond figé, focus piégé dans la carte, Échap = « Plus tard » ; le focus revient où il était.
   useEffect(() => {
     const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const unlockScroll = lockScroll();
-    cardRef.current?.focus({ preventScroll: true }); // ni « Accepter » ni « Refuser » n'est pré-sélectionné : un Entrée distrait ne choisit rien
+    cardRef.current?.focus({ preventScroll: true }); // ni « Accepter » ni « Refuser » n’est pré-sélectionné : un Entrée distrait ne choisit rien
     const onKeyDown = (event: KeyboardEvent) => {
       const dialogs = document.querySelectorAll('[role="dialog"][aria-modal="true"], [role="alertdialog"][aria-modal="true"]');
       if (dialogs[dialogs.length - 1] !== cardRef.current) return;
@@ -105,7 +105,7 @@ function CookieModal({ initialMode, fromUser, choice, onDecide, onLater }: { ini
           {!custom ? (
             <>
               <h2 id={titleId} className="rk-cookie__title">Un petit cookie ?</h2>
-              <p id={textId} className="rk-cookie__text">Avec ton accord, REKOLLECTE mesure les pages visitées sur ce site pour l’améliorer. Pas de publicité, pas de revente, aucune adresse IP conservée. Tu peux changer d’avis à tout moment depuis le pied de page.</p>
+              <p id={textId} className="rk-cookie__text">Avec votre accord, REKOLLECTE mesure les pages visitées sur ce site pour l’améliorer. Pas de publicité, pas de revente, aucune adresse IP conservée. Vous pouvez changer d’avis à tout moment depuis le pied de page.</p>
               <div className="rk-cookie__actions">
                 <button type="button" className="rk-cookie__btn rk-cookie__btn--primary" onClick={() => onDecide(true)}>Accepter</button>
                 <button type="button" className="rk-cookie__btn rk-cookie__btn--outline" onClick={() => onDecide(false)}>Refuser</button>
@@ -117,11 +117,11 @@ function CookieModal({ initialMode, fromUser, choice, onDecide, onLater }: { ini
             </>
           ) : (
             <>
-              <h2 id={titleId} className="rk-cookie__title">Tes préférences</h2>
-              <p id={textId} className="rk-cookie__text">Choisis ce que REKOLLECTE peut mesurer. Refuser ne change rien à ton usage du site.</p>
+              <h2 id={titleId} className="rk-cookie__title">Vos préférences</h2>
+              <p id={textId} className="rk-cookie__text">Choisissez ce que REKOLLECTE peut mesurer. Refuser ne change rien à votre usage du site.</p>
               <div className="rk-cookie__rows">
                 <div className="rk-cookie__row">
-                  <div><strong>Indispensables</strong><span className="rk-cookie__hint">Connexion, sécurité, thème clair ou sombre, mode hors-ligne. Toujours actifs, ils ne mesurent rien.</span></div>
+                  <div><strong>Indispensables</strong><span className="rk-cookie__hint">Connexion, sécurité, thème clair ou sombre, mode hors ligne. Toujours actifs, ils ne mesurent rien.</span></div>
                   <button type="button" className="rk-switch" role="switch" aria-checked="true" aria-label="Cookies indispensables, toujours actifs" disabled />
                 </div>
                 <div className="rk-cookie__row">

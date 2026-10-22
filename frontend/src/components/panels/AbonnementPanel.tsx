@@ -76,7 +76,6 @@ export default function AbonnementPanel() {
         ] as const).map(([label, value]) => <div key={label} className="flex items-center justify-between gap-4 p-4"><dt className="text-ink-soft">{label}</dt><dd className="text-right font-medium text-ink">{value}</dd></div>)}
         {([
           ["Export CSV du registre", ent.export_csv],
-          ["Lecture des pièces d’identité", ent.ocr],
           ["Champ téléphone", ent.phone],
           ["REKOLLECTE+ (clients, réservations, rappels)", ent.karnet],
         ] as const).map(([label, included]) => <div key={label} className="flex items-center justify-between gap-4 p-4"><dt className="text-ink-soft">{label}</dt><dd className="text-right font-medium"><Flag included={included} /></dd></div>)}

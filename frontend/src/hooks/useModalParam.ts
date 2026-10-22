@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
-/** Rubrique ouverte dans une fenêtre, pilotée aussi par l'adresse : `?open=<id>` ouvre la fenêtre (liens profonds, anciens liens redirigés,
- * « Mon profil » du header). Le paramètre `open` est retiré dès qu'il est lu ; les autres (`client`, `new`, `auth_error`…) restent
+/** Rubrique ouverte dans une fenêtre, pilotée aussi par l’adresse : `?open=<id>` ouvre la fenêtre (liens profonds, anciens liens redirigés,
+ * « Mon profil » du header). Le paramètre `open` est retiré dès qu’il est lu ; les autres (`client`, `new`, `auth_error`…) restent
  * pour que la rubrique les lise, et sont nettoyés à la fermeture pour ne pas filtrer la prochaine ouverture.
  * À utiliser sous une frontière <Suspense> (useSearchParams). */
 export function useModalParam<T extends string>(valid: readonly T[]) {
@@ -21,7 +21,7 @@ export function useModalParam<T extends string>(valid: readonly T[]) {
       url.searchParams.delete("open");
       window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}`);
     } catch {
-      // L'adresse garde son paramètre : sans conséquence.
+      // L’adresse garde son paramètre : sans conséquence.
     }
   }, [wanted, valid]);
 

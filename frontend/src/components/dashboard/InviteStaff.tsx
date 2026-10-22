@@ -22,7 +22,7 @@ export default function InviteStaff({ viewerRole = "BOSS" }: { viewerRole?: "BOS
       tone: "warning",
       mood: "smug",
       title: "Inviter un Gérant ?",
-      message: <><strong>{email}</strong> pourra gérer les formulaires, exporter le registre et inviter du staff.</>,
+      message: <><strong>{email}</strong> pourra gérer les formulaires, exporter le registre et inviter un Agent.</>,
       confirmLabel: "Inviter",
     }))) return;
     setSending(true);
@@ -38,7 +38,7 @@ export default function InviteStaff({ viewerRole = "BOSS" }: { viewerRole?: "BOS
       } else if (axios.isAxiosError(err) && err.response?.status === 400) {
         setError(err.response.data?.error?.message ?? "Requête invalide.");
       } else {
-        setError("Impossible d'envoyer l'invitation. Réessaie.");
+        setError("Impossible d’envoyer l’invitation. Réessayez.");
       }
     } finally {
       setSending(false);
@@ -48,8 +48,8 @@ export default function InviteStaff({ viewerRole = "BOSS" }: { viewerRole?: "BOS
   return (
     <div className="max-w-md rounded-xl border border-border bg-surface p-6">
       <p className="mb-4 text-sm text-ink-soft">
-        Ajoute l&apos;email de la personne à inviter. Dès qu&apos;elle se connectera avec ce compte Google,
-        elle sera automatiquement rattachée à ton établissement.
+        Ajoutez l’e-mail de la personne à inviter. Dès qu’elle se connectera avec cette adresse e-mail,
+        elle sera automatiquement rattachée à votre établissement.
       </p>
       <form onSubmit={handleInvite} className="space-y-3">
         <input
@@ -57,7 +57,7 @@ export default function InviteStaff({ viewerRole = "BOSS" }: { viewerRole?: "BOS
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="staff@exemple.com"
+          placeholder="agent@exemple.com"
           className="w-full rounded-md border border-border bg-canvas p-2.5 text-sm text-ink outline-none focus:border-ink"
         />
 
@@ -65,7 +65,7 @@ export default function InviteStaff({ viewerRole = "BOSS" }: { viewerRole?: "BOS
           <div className="space-y-2 text-sm text-ink">
             {(["STAFF", "GERANT"] as InviteRole[]).map((candidate) => {
               const isStaff = candidate === "STAFF";
-              const label = isStaff ? "Staff (registre et accueil)" : "Gérant (formulaires et accueil)";
+              const label = isStaff ? "Agent (registre et accueil)" : "Gérant (formulaires et accueil)";
               return <div key={candidate}>
                 <div className="flex items-center justify-between gap-2 rounded-lg border border-border px-3 py-2">
                   <label className="flex min-w-0 items-center gap-1.5"><input type="radio" checked={role === candidate} onChange={() => setRole(candidate)} className="accent-cta" /><span className="truncate">{label}</span></label>
@@ -75,7 +75,7 @@ export default function InviteStaff({ viewerRole = "BOSS" }: { viewerRole?: "BOS
           </div>
         ) : (
           <div>
-            <p className="text-xs text-ink-soft">Invité en tant que Staff — seul le Patron peut désigner un Gérant.</p>
+            <p className="text-xs text-ink-soft">Invité en tant que Agent — seul le Patron peut désigner un Gérant.</p>
           </div>
         )}
 

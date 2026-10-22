@@ -7,7 +7,7 @@ import { LockSimple } from "@phosphor-icons/react";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import type { LockableFeature } from "@/types";
 
-/** Affiche `children` si la fonction est incluse dans le plan ; sinon un cadenas et un lien vers l'abonnement. */
+/** Affiche `children` si la fonction est incluse dans le plan ; sinon un cadenas et un lien vers l’abonnement. */
 export default function LockedFeature({ feature, title, children }: { feature: LockableFeature; title: string; children: ReactNode }) {
   const { isLocked, requiredPlanLabel } = useEntitlements();
   if (!isLocked(feature)) return <>{children}</>;

@@ -30,7 +30,6 @@ logger = logging.getLogger("qr_register.billing")
 
 FEATURE_LABELS = {
     "export_csv": "L’export CSV du registre",
-    "ocr": "La lecture des pièces d’identité",
     "phone": "Le champ téléphone du formulaire",
     "karnet": "REKOLLECTE+ (clients, réservations, rappels)",
     "access_points": "Les points d’accueil supplémentaires",
@@ -176,14 +175,12 @@ def _is_phone_field(field: dict) -> bool:
 
 
 def blocked_field_ids(fields, organization) -> set[str]:
-    """Champs du formulaire que le plan n'autorise pas (OCR de pièce, téléphone) : ils déclenchent une formalité légale."""
+    """Champs du formulaire que le plan n'autorise pas (téléphone) : ils déclenchent une formalité légale."""
     blocked: set[str] = set()
     for field in fields or []:
         if not isinstance(field, dict) or not field.get("id"):
             continue
-        if field.get("type") == "document_scan" and not feature_available(organization, "ocr"):
-            blocked.add(field["id"])
-        elif _is_phone_field(field) and not feature_available(organization, "phone"):
+        if _is_phone_field(field) and not feature_available(organization, "phone"):
             blocked.add(field["id"])
     return blocked
 

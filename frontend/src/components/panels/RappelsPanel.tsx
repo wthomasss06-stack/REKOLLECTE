@@ -17,7 +17,7 @@ export default function RappelsPanel() {
   // sur TOUS les onglets REKOLLECTE+, pas seulement ici. Cette page affiche et traite.
   const { due, loaded, sound, wakeLockSupported, keepAwake, refresh, enableSound, disableSound, testSound, setKeepAwake, setBannerHidden } = useReminders();
   const { confirm } = useDialog();
-  // Cette fenêtre montre déjà les créneaux terminés : la bannière de la page REKOLLECTE+ s'efface tant qu'elle est ouverte.
+  // Cette fenêtre montre déjà les créneaux terminés : la bannière de la page REKOLLECTE+ s’efface tant qu’elle est ouverte.
   useEffect(() => { setBannerHidden(true); return () => setBannerHidden(false); }, [setBannerHidden]);
   const [active, setActive] = useState<KarnetReservation[]>([]);
   const [resolvingId, setResolvingId] = useState<string | null>(null);
@@ -26,7 +26,7 @@ export default function RappelsPanel() {
 
   const loadActive = useCallback(async () => {
     try {
-      // has_slot=true couvre les ressources à l'heure ET au jour ; une ressource à l'unité n'a pas de créneau, donc jamais de rappel.
+      // has_slot=true couvre les ressources à l’heure ET au jour ; une ressource à l’unité n’a pas de créneau, donc jamais de rappel.
       const res = await apiClient.get<KarnetReservation[]>("/karnet/reservations/", { params: { status: "en_cours", has_slot: "true" } });
       setActive(res.data);
     } catch {
@@ -41,7 +41,7 @@ export default function RappelsPanel() {
   }, [loadActive]);
   useEffect(() => { void loadActive(); }, [due.length, loadActive]);
 
-  // « Payé » ferme le créneau et solde aussi l'encaissement pour les rares réservations héritées qui ne l'étaient pas.
+  // « Payé » ferme le créneau et solde aussi l’encaissement pour les rares réservations héritées qui ne l’étaient pas.
   const resolve = async (r: KarnetReservation, outcome: "terminee" | "annulee") => {
     if (outcome === "annulee") {
       const ok = await confirm({
@@ -61,7 +61,7 @@ export default function RappelsPanel() {
       try {
         await apiClient.patch(`/karnet/reservations/${r.id}/`, { reminder_acknowledged: true, status: outcome, is_paid: true });
       } catch {
-        setError("Impossible d’enregistrer. Vérifie la connexion puis réessaie.");
+        setError("Impossible d’enregistrer. Vérifiez la connexion puis réessayez.");
         setResolvingId(null);
         return;
       }
@@ -79,7 +79,7 @@ export default function RappelsPanel() {
 
   return (
     <div className="space-y-6">
-      {/* ── Sonnerie : l'état affiché est l'état RÉEL du navigateur, pas seulement notre préférence ── */}
+      {/* ── Sonnerie : l’état affiché est l’état RÉEL du navigateur, pas seulement notre préférence ── */}
       <section aria-label="Sonnerie" className="space-y-3 rounded-xl border border-border bg-surface p-4">
         {sound === "unsupported" && (
           <p className="text-sm text-ink-soft">Cet appareil ne permet pas la sonnerie. Les rappels restent signalés ici, dans la bannière et dans le titre de l’onglet.</p>
@@ -107,15 +107,15 @@ export default function RappelsPanel() {
             <button type="button" onClick={() => void enableSound()} className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-cta px-5 text-sm font-semibold text-cta-ink transition hover:bg-cta-hover"><SpeakerHigh size={18} weight="bold" /> Réactiver le son</button>
           </div>
         )}
-        {testResult === "blocked" && <p role="status" className="text-xs font-medium text-error-text">Le son est resté bloqué : vérifie le volume et le mode silencieux de l’appareil, puis réessaie.</p>}
-        {testResult === "ok" && sound === "ready" && <p role="status" className="text-xs text-ink-soft">Si tu as entendu trois bips, l’appareil est prêt.</p>}
+        {testResult === "blocked" && <p role="status" className="text-xs font-medium text-error-text">Le son est resté bloqué : vérifiez le volume et le mode silencieux de l’appareil, puis réessayez.</p>}
+        {testResult === "ok" && sound === "ready" && <p role="status" className="text-xs text-ink-soft">Si vous avez entendu trois bips, l’appareil est prêt.</p>}
         {wakeLockSupported && sound !== "unsupported" && (
           <label className="flex min-h-[44px] cursor-pointer items-center gap-3 text-sm text-ink">
             <input type="checkbox" checked={keepAwake} onChange={(e) => setKeepAwake(e.target.checked)} className="h-5 w-5 accent-[rgb(var(--c-cta))]" />
             Garder l’écran allumé tant que cette page est ouverte
           </label>
         )}
-        <p className="text-xs text-ink-soft">Une tablette en veille ne sonne pas : laisse cet écran allumé (ou active l’option ci-dessus) pendant les heures de service.</p>
+        <p className="text-xs text-ink-soft">Une tablette en veille ne sonne pas : laissez cet écran allumé (ou activez l’option ci-dessus) pendant les heures de service.</p>
       </section>
 
       {error && <p role="alert" className="text-sm font-medium text-error-text">{error}</p>}

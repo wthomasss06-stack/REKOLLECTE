@@ -14,15 +14,15 @@ const WAKE_ROUNDS = 3;
 /**
  * - `waking` : appareil en ligne, rien en cache, serveur muet (Render dort) → on attend son réveil et on réessaie seul.
  * - `never_cached` : appareil hors ligne et formulaire jamais chargé.
- * - `unavailable` : le serveur n'a pas répondu après le réveil (bouton « Réessayer »).
+ * - `unavailable` : le serveur n’a pas répondu après le réveil (bouton « Réessayer »).
  */
 export type PublicFormStatus = "loading" | "waking" | "ready" | "not_found" | "never_cached" | "unavailable";
 
 type FetchResult = { kind: "ok"; data: PublicFormData } | { kind: "not_found" } | { kind: "unavailable" };
 
 /**
- * Seul un 404 est une réponse définitive (QR désactivé ou inconnu). Un 5xx du proxy, un 429, une page HTML d'attente
- * ou un timeout ne disent RIEN du QR Code : ce n'est jamais « QR invalide » (un visiteur qui scanne pendant que le
+ * Seul un 404 est une réponse définitive (QR désactivé ou inconnu). Un 5xx du proxy, un 429, une page HTML d’attente
+ * ou un timeout ne disent RIEN du QR Code : ce n’est jamais « QR invalide » (un visiteur qui scanne pendant que le
  * serveur dort ne doit pas lire que le QR Code est cassé).
  */
 async function fetchForm(qrToken: string, timeout: number): Promise<FetchResult> {
@@ -42,7 +42,7 @@ async function fetchForm(qrToken: string, timeout: number): Promise<FetchResult>
   }
 }
 
-/** Range le formulaire (champs, logo ET motifs de visite) pour qu'une tablette hors ligne l'affiche à l'identique. */
+/** Range le formulaire (champs, logo ET motifs de visite) pour qu’une tablette hors ligne l’affiche à l’identique. */
 async function cacheForm(qrToken: string, form: PublicFormData) {
   try {
     await db.formCache.put({
@@ -55,7 +55,7 @@ async function cacheForm(qrToken: string, form: PublicFormData) {
       cached_at: new Date().toISOString(),
     });
   } catch {
-    // Cache local indisponible (navigation privée, quota) : le formulaire s'affiche quand même.
+    // Cache local indisponible (navigation privée, quota) : le formulaire s’affiche quand même.
   }
 }
 
@@ -63,7 +63,7 @@ export type RefreshResult = "updated" | "offline";
 
 /**
  * Formulaire visiteur "kiosque" : tente le réseau avec un timeout court, puis
- * retombe sur le cache local (IndexedDB) si l'appareil est hors-ligne ou si le serveur ne répond pas.
+ * retombe sur le cache local (IndexedDB) si l’appareil est hors ligne ou si le serveur ne répond pas.
  * Sans cache, un serveur qui dort est attendu (réveil automatique) plutôt que présenté comme une erreur.
  */
 export function usePublicForm(qrToken: string) {
@@ -116,7 +116,7 @@ export function usePublicForm(qrToken: string) {
         return;
       }
 
-      // Rien en cache. Appareil hors ligne : inutile d'attendre. En ligne mais serveur muet : il se réveille.
+      // Rien en cache. Appareil hors ligne : inutile d’attendre. En ligne mais serveur muet : il se réveille.
       if (typeof navigator !== "undefined" && navigator.onLine === false) return setStatus("never_cached");
       setStatus("waking");
       for (let attempt = 0; attempt < WAKE_ROUNDS; attempt += 1) {
@@ -138,7 +138,7 @@ export function usePublicForm(qrToken: string) {
   }, [qrToken, round]);
 
   /**
-   * Recharge le formulaire et ses motifs SANS repasser par l'écran de chargement (bouton « Actualiser les motifs »).
+   * Recharge le formulaire et ses motifs SANS repasser par l’écran de chargement (bouton « Actualiser les motifs »).
    * Hors ligne ou serveur muet : la dernière liste connue reste affichée et on le dit (« offline »).
    */
   const refresh = useCallback(async (): Promise<RefreshResult> => {

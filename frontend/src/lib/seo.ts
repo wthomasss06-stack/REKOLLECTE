@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { OG_IMAGE, SITE_NAME } from "@/lib/site";
 
-/** Métadonnées d'une page indexable : titre complet (sans le suffixe du gabarit), description, canonique, Open Graph. */
+/** Métadonnées d’une page indexable : titre complet (sans le suffixe du gabarit), description, canonique, Open Graph. */
 export function pageMeta({ title, description, path, type = "website" }: { title: string; description: string; path: string; type?: "website" | "article" }): Metadata {
   return {
     title: { absolute: title },

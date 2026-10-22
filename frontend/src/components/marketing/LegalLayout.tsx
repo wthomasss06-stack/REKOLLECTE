@@ -1,4 +1,4 @@
-export const LEGAL_LAST_UPDATED = "17 octobre 2026";
+export const LEGAL_LAST_UPDATED = "21 octobre 2026";
 
 export default function LegalLayout({
   title,

@@ -57,18 +57,18 @@ export default function QRCodeManager({ qrToken, orgName, logoUrl = "", canRegen
     await confirm({
       tone: "warning",
       title: "Régénérer le QR ?",
-      message: "L’ancien QR cessera immédiatement de fonctionner. Pense à remplacer ceux déjà affichés ou imprimés.",
+      message: "L’ancien QR cessera immédiatement de fonctionner. Pensez à remplacer ceux déjà affichés ou imprimés.",
       confirmLabel: "Régénérer",
       runningLabel: "Génération…",
       run: async () => { const { data } = await apiClient.post("/org/me/regenerate-qr/"); setToken(data.qr_secure_token); },
       successTitle: "Nouveau QR prêt",
-      successMessage: "Télécharge-le et remplace l’ancien partout où il est affiché.",
+      successMessage: "Téléchargez-le et remplacez l’ancien partout où il est affiché.",
       errorTitle: "Régénération impossible",
     });
   };
   return <div className="flex w-full max-w-sm flex-col items-center gap-5 rounded-xl border border-border bg-surface p-4 sm:p-6">
     <div ref={containerRef} className="aspect-square w-full overflow-hidden rounded-xl border border-border bg-white p-3 sm:p-4" style={{ maxWidth: size + 34 }}><QRCodeCanvas value={publicUrl} size={size} level="H" includeMargin className="block" style={{ width: "100%", height: "100%" }} imageSettings={qrLogo ? { src: qrLogo, height: Math.round(size * 0.2), width: Math.round(size * 0.2), excavate: true } : undefined} /><div className="sr-only" aria-hidden="true"><QRCodeCanvas data-download-qr value={publicUrl} size={size} level="H" includeMargin /></div></div>
-    <p className="text-center text-sm text-ink-soft">Affiche ce QR à l’accueil ou sur la tablette.</p>
+    <p className="text-center text-sm text-ink-soft">Affichez ce QR à l’accueil ou sur la tablette.</p>
     <div className="flex flex-wrap justify-center gap-3"><button onClick={download} className="flex items-center gap-2 rounded-full bg-cta px-5 py-2.5 text-sm font-medium text-white"><DownloadSimple size={16} weight="bold" /> Télécharger</button>{canRegenerate && <button onClick={regenerate} className="flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-medium text-ink"><ArrowsClockwise size={16} weight="bold" /> Régénérer</button>}</div>
   </div>;
 }

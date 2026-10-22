@@ -43,9 +43,9 @@ function toEditDraft(r: KarnetResource): EditDraft {
 /**
  * Créateur/éditeur de ressources REKOLLECTE+ — même expérience que la création de
  * formulaire (voir /dashboard/parametres/formulaire) : un petit modal "Nom +
- * Repartir d'un modèle" pour démarrer vite depuis un catalogue qui couvre
- * plusieurs métiers (pas figé sur l'hôtellerie), puis un modal plus large pour
- * peaufiner (capacité, code, emplacement...). Le Staff voit la même grille de
+ * Repartir d’un modèle" pour démarrer vite depuis un catalogue qui couvre
+ * plusieurs métiers (pas figé sur l’hôtellerie), puis un modal plus large pour
+ * peaufiner (capacité, code, emplacement...). L’Agent voit la même grille de
  * ressources, en lecture seule ; créer/modifier/supprimer reste réservé à
  * Patron/Gérant (règle vérifiée côté API, pas seulement ici).
  */
@@ -63,7 +63,7 @@ export default function ResourceBuilder({ autoOpenCreate = false }: Props) {
   // Accordéon : une seule catégorie dépliée à la fois, repliée par défaut.
   const [expandedCategory, setExpandedCategory] = useState<KarnetResourceCategory | null>(null);
   // Id du modèle en cours de création : désactive juste sa carte le temps de
-  // l'appel, pas tout le modal (on garde la vue prête pour enchaîner un autre
+  // l’appel, pas tout le modal (on garde la vue prête pour enchaîner un autre
   // sous-type après avoir personnalisé le premier).
   const [creatingPresetId, setCreatingPresetId] = useState<string | null>(null);
   const [createError, setCreateError] = useState("");
@@ -85,7 +85,7 @@ export default function ResourceBuilder({ autoOpenCreate = false }: Props) {
 
   useEffect(() => {
     if (autoOpenCreate && canManage) openCreate();
-    // Ne se déclenche qu'au montage (arrivée depuis l'activation de REKOLLECTE+) —
+    // Ne se déclenche qu’au montage (arrivée depuis l’activation de REKOLLECTE+) —
     // pas à chaque changement de canManage/openCreate.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoOpenCreate]);
@@ -107,8 +107,8 @@ export default function ResourceBuilder({ autoOpenCreate = false }: Props) {
   };
 
   // Un sous-type suffit à créer la ressource : nom = celui du modèle (ex.
-  // "Studio"), prix à 0 et inactive tant qu'elle n'est pas personnalisée —
-  // l'éditeur qui s'ouvre juste après sert à fixer le vrai prix et l'activer
+  // "Studio"), prix à 0 et inactive tant qu’elle n’est pas personnalisée —
+  // l’éditeur qui s’ouvre juste après sert à fixer le vrai prix et l’activer
   // (voir validate() côté API : une ressource inactive peut avoir un prix nul,
   // une ressource active non). Plus besoin de ressaisir un nom au préalable.
   const createFromPreset = async (preset: ResourcePreset) => {
@@ -140,7 +140,7 @@ export default function ResourceBuilder({ autoOpenCreate = false }: Props) {
     event.preventDefault();
     if (!editing || !editDraft) return;
     if (!editDraft.name.trim()) return setEditError("Donne un nom à cette ressource.");
-    if (!editDraft.price || Number(editDraft.price) <= 0) return setEditError("Indique un prix supérieur à 0.");
+    if (!editDraft.price || Number(editDraft.price) <= 0) return setEditError("Indiquez un prix supérieur à 0.");
     if (editDraft.capacity && Number(editDraft.capacity) <= 0) return setEditError("La capacité doit être supérieure à 0.");
     setSaving(true); setEditError("");
     try {
@@ -185,7 +185,7 @@ export default function ResourceBuilder({ autoOpenCreate = false }: Props) {
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-ink-soft">Configuration REKOLLECTE+</p>
           <h1 className="mt-1 text-2xl font-bold text-ink">Mes ressources</h1>
-          <p className="mt-2 max-w-2xl text-sm text-ink-soft">Crée les espaces ou équipements que tes clients pourront réserver — hôtel, salon, coworking, restaurant, parking, sport… Chaque ressource est enregistrée dès que tu la valides.</p>
+          <p className="mt-2 max-w-2xl text-sm text-ink-soft">Créez les espaces ou équipements que vos clients pourront réserver — hôtel, salon, coworking, restaurant, parking, sport… Chaque ressource est enregistrée dès que vous la validez.</p>
         </div>
         {canManage && (
           <button type="button" onClick={openCreate} className="inline-flex items-center justify-center gap-2 rounded-full bg-cta px-5 py-3 text-sm font-semibold text-white hover:bg-cta-hover">
@@ -201,7 +201,7 @@ export default function ResourceBuilder({ autoOpenCreate = false }: Props) {
           <Cube size={38} className="mx-auto text-ink-soft" />
           <h2 className="mt-4 text-lg font-semibold text-ink">Aucune ressource pour le moment</h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-ink-soft">
-            {canManage ? "Choisis un modèle, puis crée ta première ressource pour commencer à configurer les réservations." : "Patron ou Gérant n’a pas encore configuré de ressource."}
+            {canManage ? "Choisissez un modèle, puis créez votre première ressource pour commencer à configurer les réservations." : "Patron ou Gérant n’a pas encore configuré de ressource."}
           </p>
           {canManage && <button type="button" onClick={openCreate} className="mt-5 inline-flex items-center gap-2 rounded-full bg-cta px-5 py-3 text-sm font-semibold text-white hover:bg-cta-hover"><Plus size={17} /> Créer ma première ressource</button>}
         </div>
@@ -238,7 +238,7 @@ export default function ResourceBuilder({ autoOpenCreate = false }: Props) {
 
       {/* Étape 1 : type de ressource en accordéon → un clic sur un sous-type crée
           la ressource directement (nom = sous-type), sans ressaisie. */}
-      <Modal open={createOpen} onClose={() => setCreateOpen(false)} title="Ajouter une ressource" description="Choisis un type pour déplier ses sous-types, puis clique sur un sous-type : la ressource est créée aussitôt, à personnaliser dans l’éditeur." wide>
+      <Modal open={createOpen} onClose={() => setCreateOpen(false)} title="Ajouter une ressource" description="Choisissez un type pour déplier ses sous-types, puis cliquez sur un sous-type : la ressource est créée aussitôt, à personnaliser dans l’éditeur." wide>
         <div className="space-y-4">
           <div className="relative">
             <MagnifyingGlass size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-soft" />
@@ -292,7 +292,7 @@ export default function ResourceBuilder({ autoOpenCreate = false }: Props) {
       </Modal>
 
       {/* Étape 2 : éditeur complet, comme le modal de modification de formulaire */}
-      <Modal open={Boolean(editing && editDraft)} onClose={() => setEditing(null)} title={`Modifier « ${editing?.name || "la ressource"} »`} description="Modifie les informations puis enregistre les changements." wide>
+      <Modal open={Boolean(editing && editDraft)} onClose={() => setEditing(null)} title={`Modifier « ${editing?.name || "la ressource"} »`} description="Modifiez les informations puis enregistrez les changements." wide>
         {editDraft && (
           <form onSubmit={submitEdit} className="space-y-5">
             <div className="grid gap-4 sm:grid-cols-2">
@@ -320,7 +320,7 @@ export default function ResourceBuilder({ autoOpenCreate = false }: Props) {
               <Field label="Emplacement" icon={<MapPin size={16} />}><input value={editDraft.location} onChange={(e) => updateDraft("location", e.target.value)} placeholder="Ex. 2e étage, aile B" className={inputClass} /></Field>
               <Field label="Durée habituelle" icon={<Clock size={16} />}><input value={editDraft.duration_label} onChange={(e) => updateDraft("duration_label", e.target.value)} placeholder="Ex. 60 minutes, 1 nuit" className={inputClass} /></Field>
             </div>
-            <Field label="Description"><textarea value={editDraft.description} onChange={(e) => updateDraft("description", e.target.value)} rows={3} placeholder="Décris brièvement cette ressource…" className={`${inputClass} resize-y`} /></Field>
+            <Field label="Description"><textarea value={editDraft.description} onChange={(e) => updateDraft("description", e.target.value)} rows={3} placeholder="Décrivez brièvement cette ressource…" className={`${inputClass} resize-y`} /></Field>
             <Field label="Équipements et caractéristiques"><input value={editDraft.equipment} onChange={(e) => updateDraft("equipment", e.target.value)} placeholder="Ex. Climatisation, Wi-Fi, télévision" className={inputClass} /></Field>
             <label className="flex items-center gap-3 rounded-xl border border-border bg-canvas/60 p-4">
               <input type="checkbox" checked={editDraft.is_active} onChange={(e) => updateDraft("is_active", e.target.checked)} className="h-4 w-4 accent-cta" />

@@ -2,7 +2,7 @@ import type { ElementType } from "react";
 
 /**
  * Ecran "bientot disponible" pour une sous-section REKOLLECTE+ dont le modele metier
- * n'existe pas encore dans le produit. Volontairement honnete sur son statut plutot
+ * n’existe pas encore dans le produit. Volontairement honnete sur son statut plutot
  * que de simuler une fonctionnalite : `active` distingue "deja debloque pour cet
  * etablissement, interface a venir" de "pas encore debloque".
  */
@@ -26,8 +26,8 @@ export default function KarnetComingSoon({
       <p className="mx-auto mt-2 max-w-md text-sm text-ink-soft">{description}</p>
       <p className="mt-4 text-xs font-medium text-ink-soft">
         {active
-          ? "Activé pour ton établissement — l’interface arrive très prochainement."
-          : "Pas encore disponible pour ton établissement."}
+          ? "Activé pour votre établissement — l’interface arrive très prochainement."
+          : "Pas encore disponible pour votre établissement."}
       </p>
     </div>
   );

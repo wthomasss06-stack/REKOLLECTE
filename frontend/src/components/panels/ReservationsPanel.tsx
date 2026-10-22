@@ -27,7 +27,7 @@ export default function ReservationsPanel() {
   const [saving, setSaving] = useState(false);
 
   // Phase 8 — parcours de réservation depuis Clients : sélectionner un client
-  // existant est l'étape principale (préremplie quand on arrive depuis sa
+  // existant est l’étape principale (préremplie quand on arrive depuis sa
   // fiche) ; "+ Nouveau client" reste disponible comme parcours de secours.
   const [clientChoice, setClientChoice] = useState(preselectedClientId || NEW_CLIENT);
   const [newClientName, setNewClientName] = useState("");
@@ -79,8 +79,8 @@ export default function ReservationsPanel() {
   const estimatedTotal = selectedResource ? Number(selectedResource.price) * quantity : 0;
 
   // Contrôle du créneau côté UX : le serveur bloque déjà le conflit à 409, mais
-  // on prévient avant l'envoi pour une ressource à créneau (chambre, table à
-  // l'heure) déjà occupée par une réservation en cours.
+  // on prévient avant l’envoi pour une ressource à créneau (chambre, table à
+  // l’heure) déjà occupée par une réservation en cours.
   const activeConflict = useMemo(() => {
     if (!selectedResource || selectedResource.unit === "unite") return null;
     const occupying = reservations.find((r) => r.resource === selectedResource.id && r.status === "en_cours");
@@ -138,7 +138,7 @@ export default function ReservationsPanel() {
   return (
     <div className="space-y-6">
       {resources.length === 0 ? (
-        <p className="rounded-xl border border-border bg-surface p-4 text-sm text-ink-soft">Ajoute d’abord une ressource (onglet Ressources) avant de créer une réservation.</p>
+        <p className="rounded-xl border border-border bg-surface p-4 text-sm text-ink-soft">Ajoutez d’abord une ressource (onglet Ressources) avant de créer une réservation.</p>
       ) : (
         <form onSubmit={submit} className="space-y-3 rounded-xl border border-border bg-surface p-4">
           {preselectedClient && (
@@ -195,7 +195,7 @@ export default function ReservationsPanel() {
           {activeConflict && (
             <p className="rounded-lg bg-error-bg px-3 py-2 text-xs font-medium text-error-text">
               {selectedResource?.name} est déjà occupée par {activeConflict.client_name}
-              {activeConflict.ends_at ? ` jusqu’au ${formatDateTime(activeConflict.ends_at)}` : ""}. Termine ou annule cette réservation avant d’en créer une nouvelle sur ce créneau.
+              {activeConflict.ends_at ? ` jusqu’au ${formatDateTime(activeConflict.ends_at)}` : ""}. Terminez ou annulez cette réservation avant d’en créer une nouvelle sur ce créneau.
             </p>
           )}
         </form>

@@ -18,7 +18,7 @@ const label = "block space-y-1 text-xs font-semibold text-ink-soft";
 const toLocalInput = (value: string | null) => (value ? new Date(new Date(value).getTime() - new Date(value).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : "");
 const fromLocalInput = (value: string) => (value ? new Date(value).toISOString() : null);
 
-/** Administration plateforme : abonnement d'un établissement et bouton « Enregistrer un paiement » (idempotent sur la référence). */
+/** Administration plateforme : abonnement d’un établissement et bouton « Enregistrer un paiement » (idempotent sur la référence). */
 export default function OrganizationBillingDialog({ organization, onClose }: { organization: { id: string; name: string }; onClose: () => void }) {
   const base = `/admin/billing/organizations/${organization.id}/`;
   const [data, setData] = useState<AdminBilling | null>(null);

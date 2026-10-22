@@ -1,5 +1,5 @@
 /**
- * Collines en couches (SVG) — l'équivalent maison de la colline fleurie du hero Flowa.
+ * Collines en couches (SVG) — l’équivalent maison de la colline fleurie du hero Flowa.
  * Chaque couche porte data-hill : le parallaxe de la landing les décale à des vitesses
  * différentes. Aucune image distante, aucun poids : trois paths et quelques points.
  */

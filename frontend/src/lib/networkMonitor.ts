@@ -18,7 +18,7 @@ class NetworkMonitor {
     if (typeof window !== "undefined" && !navigator.onLine) return false;
     try {
       const response = await fetch(`${API_BASE}/health/`, { method: "GET", cache: "no-store", credentials: "omit", signal: AbortSignal.timeout(5000) });
-      // « Joignable » = l'API a répondu en JSON. La page d'attente de Render (HTML, 200) ou une erreur 5xx du proxy
+      // « Joignable » = l’API a répondu en JSON. La page d’attente de Render (HTML, 200) ou une erreur 5xx du proxy
       // ne comptent pas : sinon la synchronisation partirait vers un serveur encore endormi et brûlerait ses essais.
       const apiAnswered = (response.ok || response.status === 429) && isApiJsonResponse(response);
       this.status = { browserOnline: true, apiReachable: apiAnswered, lastChecked: Date.now() };

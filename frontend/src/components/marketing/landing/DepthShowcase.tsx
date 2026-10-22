@@ -18,10 +18,10 @@ const CARDS = [
 ];
 
 /**
- * « Effet Profondeur » (réf. gemini-code-1791015137629) : la section s'épingle, l'affiche
+ * « Effet Profondeur » (réf. gemini-code-1791015137629) : la section s’épingle, l’affiche
  * grandit au scroll (cadre arrondi -> pleine hauteur), le mot géant en arrière-plan monte et
- * la carte flottante s'efface. Scrub lissé, branché sur Lenis via ScrollTrigger.
- * Adaptation : les affiches sont carrées et portent du texte jusqu'aux bords, donc le zoom
+ * la carte flottante s’efface. Scrub lissé, branché sur Lenis via ScrollTrigger.
+ * Adaptation : les affiches sont carrées et portent du texte jusqu’aux bords, donc le zoom
  * garde leur ratio (carré) au lieu de recadrer en plein écran 100vw x 100vh.
  */
 export default function DepthShowcase() {

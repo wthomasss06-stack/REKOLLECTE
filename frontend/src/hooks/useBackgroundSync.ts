@@ -8,13 +8,13 @@ import { SYNCING_STALE_MS, db, markCheckInSynced, purgeSyncedCheckIns, toSyncPay
 import { networkMonitor, type NetworkStatus } from "@/lib/networkMonitor";
 
 const BATCH_SIZE = 20;
-// Une fiche peut embarquer des photos de pièces d'identité (plusieurs Mo) : on découpe aussi par poids pour rester
-// sous le plafond du serveur (24 Mo par requête) et d'un délai raisonnable sur un réseau mobile.
+// Une fiche peut embarquer des photos de pièces d’identité (plusieurs Mo) : on découpe aussi par poids pour rester
+// sous le plafond du serveur (24 Mo par requête) et d’un délai raisonnable sur un réseau mobile.
 const BATCH_MAX_CHARS = 8_000_000;
 const MAX_RETRIES = 5;
 const RETRY_BASE_MS = 5_000;
-// Tant qu'il reste des visites en attente, on revérifie le serveur régulièrement : sans ça, une visite
-// enregistrée pendant que le serveur dormait n'était renvoyée qu'au prochain changement d'onglet.
+// Tant qu’il reste des visites en attente, on revérifie le serveur régulièrement : sans ça, une visite
+// enregistrée pendant que le serveur dormait n’était renvoyée qu’au prochain changement d’onglet.
 const PENDING_TICK_MS = 20_000;
 
 /** Réponses serveur définitives : renvoyer la même fiche ne changera rien, on ne boucle pas dessus. */
@@ -69,12 +69,12 @@ async function selectEligible(includeFailed: boolean): Promise<OfflineCheckIn[]>
     .toArray();
   return rows
     .filter((item) => {
-      if (item.sync_status === "failed") return true; // uniquement quand l'utilisateur demande « Réessayer »
+      if (item.sync_status === "failed") return true; // uniquement quand l’utilisateur demande « Réessayer »
       if (item.sync_status === "syncing") return !item.last_attempt_at || now - Date.parse(item.last_attempt_at) > SYNCING_STALE_MS;
       if ((item.retry_count || 0) >= MAX_RETRIES) return false;
       return !item.next_retry_at || Date.parse(item.next_retry_at) <= now;
     })
-    // « Réessayer » repart de zéro : sans ça, une fiche en échec (retry_count >= MAX) n'était jamais renvoyée.
+    // « Réessayer » repart de zéro : sans ça, une fiche en échec (retry_count >= MAX) n’était jamais renvoyée.
     .map((item) => (item.sync_status === "failed" ? { ...item, retry_count: 0, next_retry_at: null } : item))
     .sort((a, b) => a.created_at_client.localeCompare(b.created_at_client));
 }
@@ -122,7 +122,7 @@ export function useBackgroundSync(): SyncController {
             { checkins: batch.map(toSyncPayload) },
             { timeout: 15000 },
           );
-          // Une réponse sans `processed` (page HTML d'attente, proxy) n'est pas une réponse de l'API : même chemin qu'un échec réseau.
+          // Une réponse sans `processed` (page HTML d’attente, proxy) n’est pas une réponse de l’API : même chemin qu’un échec réseau.
           if (!data || !Array.isArray(data.processed)) throw new Error("not-api-response");
           const processed = new Map(data.processed.map((result) => [result.idempotency_key, result]));
           await Promise.all(batch.map(async (item) => {
@@ -179,7 +179,7 @@ export function useBackgroundSync(): SyncController {
     const onOnline = () => { void networkMonitor.check(); };
     const onVisibility = () => { if (document.visibilityState === "visible") void networkMonitor.check(); };
     const onExternalUpdate = () => { void refreshState(); };
-    // Reprise automatique : tant que des visites attendent, on sonde l'API et on renvoie dès qu'elle répond.
+    // Reprise automatique : tant que des visites attendent, on sonde l’API et on renvoie dès qu’elle répond.
     const tick = window.setInterval(() => {
       if (document.visibilityState !== "visible" || syncingRef.current || pendingRef.current === 0) return;
       void networkMonitor.check().then((reachable) => { if (reachable) void syncPending(false); });
@@ -198,7 +198,7 @@ export function useBackgroundSync(): SyncController {
     };
   }, [refreshState, syncPending]);
 
-  // « Réessayer » sonde d'abord l'API : l'état réseau en mémoire peut être périmé (serveur réveillé entre-temps).
+  // « Réessayer » sonde d’abord l’API : l’état réseau en mémoire peut être périmé (serveur réveillé entre-temps).
   const retryNow = useCallback(async () => {
     const reachable = await networkMonitor.check();
     if (reachable) await syncPending(true);

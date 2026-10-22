@@ -12,7 +12,7 @@ const DEVICE_COLORS = ["bg-cta", "bg-mk-sage", "bg-mk-lime"];
 
 const shortDay = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
 
-/** Visites par jour : une barre par jour, la hauteur suit le nombre de visites. Le détail est dans l'infobulle et le résumé lu aux lecteurs d'écran. */
+/** Visites par jour : une barre par jour, la hauteur suit le nombre de visites. Le détail est dans l’infobulle et le résumé lu aux lecteurs d’écran. */
 function DailyChart({ daily }: { daily: PlatformTraffic["daily"] }) {
   const max = Math.max(1, ...daily.map((day) => day.sessions));
   const total = daily.reduce((sum, day) => sum + day.sessions, 0);
@@ -91,7 +91,7 @@ export default function TrafficPanel({ data, days, onDays, loading, error, onRet
   onRetry: () => void;
   updatedAt: number | null;
 }) {
-  // Les « il y a … » avancent d'eux-mêmes sans nouvel appel au serveur.
+  // Les « il y a … » avancent d’eux-mêmes sans nouvel appel au serveur.
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => { const timer = window.setInterval(() => setNow(Date.now()), 20_000); return () => window.clearInterval(timer); }, []);
   const refreshed = updatedAt ? ago(updatedAt, now) : null;

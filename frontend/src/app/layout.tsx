@@ -45,7 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr" className={sans.variable} suppressHydrationWarning>
       <body>
-        {/* Applique la classe .dark avant l'hydratation React : evite un flash du
+        {/* Applique la classe .dark avant l’hydratation React : evite un flash du
             mauvais theme au chargement (lit localStorage puis prefers-color-scheme). */}
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <Providers>{children}</Providers>

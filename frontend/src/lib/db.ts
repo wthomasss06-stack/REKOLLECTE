@@ -14,8 +14,8 @@ export interface OfflineCheckIn {
   synced_at?: string | null;
 }
 
-// Cache du FORMULAIRE lui-meme (pas seulement des soumissions) : c'est ce qui
-// permet a une tablette d'accueil restee offline plusieurs jours d'afficher quand
+// Cache du FORMULAIRE lui-meme (pas seulement des soumissions) : c’est ce qui
+// permet a une tablette d’accueil restee offline plusieurs jours d’afficher quand
 // meme le bon formulaire pour continuer a enregistrer des visiteurs.
 export interface CachedForm {
   qr_token: string;
@@ -24,7 +24,7 @@ export interface CachedForm {
   fields_schema: unknown;
   /** Motifs de visite : sans eux, une tablette hors ligne affichait une liste de motifs vide. */
   visit_reasons?: string[];
-  /** Mention d'information : une tablette hors ligne doit l'afficher à l'identique. */
+  /** Mention d’information : une tablette hors ligne doit l’afficher à l’identique. */
   privacy_notice?: unknown;
   cached_at: string;
 }
@@ -52,12 +52,12 @@ class QRFormDatabase extends Dexie {
 
 export const db = new QRFormDatabase();
 
-/** Une visite « en cours d'envoi » depuis plus de 2 min est orpheline (onglet fermé, plantage) : on la reprend. */
+/** Une visite « en cours d’envoi » depuis plus de 2 min est orpheline (onglet fermé, plantage) : on la reprend. */
 export const SYNCING_STALE_MS = 2 * 60_000;
-/** Durée de conservation locale d'une visite déjà synchronisée (juste de quoi afficher « dernière synchro »). */
+/** Durée de conservation locale d’une visite déjà synchronisée (juste de quoi afficher « dernière synchro »). */
 const SYNCED_RETENTION_MS = 7 * 24 * 3_600_000;
 
-/** Champs réellement attendus par `POST /checkins/sync/` (pas les métadonnées locales de file d'attente). */
+/** Champs réellement attendus par `POST /checkins/sync/` (pas les métadonnées locales de file d’attente). */
 export function toSyncPayload(item: OfflineCheckIn) {
   return {
     idempotency_key: item.idempotency_key,
@@ -70,7 +70,7 @@ export function toSyncPayload(item: OfflineCheckIn) {
 
 /**
  * Visite confirmée par le serveur : on garde la trace (statut, date) mais on efface les données personnelles
- * (réponses, signature) de l'appareil — c'est souvent une tablette d'accueil partagée.
+ * (réponses, signature) de l’appareil — c’est souvent une tablette d’accueil partagée.
  */
 export async function markCheckInSynced(key: string): Promise<void> {
   const now = new Date().toISOString();

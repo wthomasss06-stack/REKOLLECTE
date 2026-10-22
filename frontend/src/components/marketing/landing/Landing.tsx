@@ -58,7 +58,7 @@ export default function Landing() {
           .from(".hero-fade", { y: 22, opacity: 0, duration: 0.9, stagger: 0.1, ease: "power3.out" }, "-=0.8")
           .from(".hero-chip", { scale: 0.85, opacity: 0, duration: 0.8, stagger: 0.15, ease: "back.out(1.6)" }, "-=0.55");
 
-        // 2. Hero au scroll : la carte se resserre, le texte s'efface légèrement.
+        // 2. Hero au scroll : la carte se resserre, le texte s’efface légèrement.
         const heroScroll = { trigger: ".lp-hero-wrap", start: 0, end: "bottom top", scrub: true };
         gsap.to(".lp-hero", { scale: 0.95, transformOrigin: "50% 0%", ease: "none", scrollTrigger: heroScroll });
         gsap.to(".hero-content", { yPercent: -10, opacity: 0.25, ease: "none", scrollTrigger: heroScroll });
@@ -77,7 +77,7 @@ export default function Landing() {
           );
         });
 
-        // 5. Révélations à l'entrée dans le viewport.
+        // 5. Révélations à l’entrée dans le viewport.
         gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) => {
           const dir = el.dataset.reveal;
           gsap.from(el, {
@@ -163,15 +163,14 @@ export default function Landing() {
               </span>
             </h1>
             <p className="hero-fade mt-6 max-w-xl text-[0.95rem] leading-relaxed text-white/90 sm:text-base">
-              REKOLLECTE est le logiciel de gestion des visiteurs par QR Code qui remplace le registre papier des bureaux,
-              restaurants, hôtels et accès chantier : le visiteur scanne, remplit, signe. Sans compte, même hors-ligne.
+              Logiciel de gestion des visiteurs par QR Code : le visiteur scanne, remplit, signe. Sans compte, même hors ligne.
             </p>
             <div className="hero-fade mt-8 flex flex-wrap items-center justify-center gap-3">
               <Link href="/connexion" className="lp-glass lp-glass--primary">Se connecter <ArrowUpRight size={14} /></Link>
               <Link href="/#comment-ca-marche" className="lp-glass">Voir comment ça marche <ArrowDownRight size={14} /></Link>
             </div>
             <p className="hero-fade mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] font-bold text-white/85">
-              <span className="inline-flex items-center gap-1.5"><CheckMark size={12} /> Hors-ligne</span>
+              <span className="inline-flex items-center gap-1.5"><CheckMark size={12} /> Hors ligne</span>
               <span className="inline-flex items-center gap-1.5"><CheckMark size={12} /> Sans carte bancaire</span>
               <span className="inline-flex items-center gap-1.5"><CheckMark size={12} /> Prêt en 2 minutes</span>
             </p>
@@ -184,7 +183,7 @@ export default function Landing() {
           </div>
           <div className="hero-chip absolute bottom-[34%] right-[5%] z-10 hidden items-center gap-2.5 rounded-2xl border border-white/50 bg-white/20 px-3.5 py-2.5 text-left shadow-xl backdrop-blur-md md:flex" data-speed="0.86">
             <WifiSlash size={22} weight="bold" className="text-[#d6e7a8]" />
-            <div><p className="text-xs font-bold leading-none">Hors-ligne</p><p className="mt-1 text-[10px] leading-none text-white/75">3 visites en attente de synchro</p></div>
+            <div><p className="text-xs font-bold leading-none">Hors ligne</p><p className="mt-1 text-[10px] leading-none text-white/75">3 visites en attente de synchro</p></div>
           </div>
         </div>
       </section>
@@ -212,8 +211,8 @@ export default function Landing() {
             <h2 className="mt-4 text-[clamp(2rem,4.6vw,3.3rem)] font-bold leading-[1.06] tracking-[-0.03em] text-ink">Fait pour le terrain.</h2>
           </div>
           <p className="max-w-md text-sm leading-relaxed text-ink-soft lg:justify-self-end">
-            Un cahier à 1000 FCFA reste imbattable sur le terrain, jusqu&apos;à ce qu&apos;il faille relire l&apos;écriture de
-            quelqu&apos;un. REKOLLECTE garde la simplicité du cahier et ajoute ce qu&apos;il ne pourra jamais faire.
+            Un cahier à 1000 FCFA reste imbattable sur le terrain, jusqu’à ce qu’il faille relire l’écriture de
+            quelqu’un. REKOLLECTE garde la simplicité du cahier et ajoute ce qu’il ne pourra jamais faire.
           </p>
         </div>
 
@@ -267,8 +266,8 @@ export default function Landing() {
       <section id="fonctionnalites" data-lenis-duration="1.8" className="mx-auto w-full max-w-[1180px] px-4 py-14 sm:px-6 sm:py-24">
         <SectionHead
           label="Fonctionnalités"
-          title={<>Tout ce dont l&apos;accueil<br />a besoin.</>}
-          lead="Un registre, des accès, des réservations : tout au même endroit, du scan du visiteur jusqu'au dashboard."
+          title={<>Tout ce dont l’accueil<br />a besoin.</>}
+          lead="Un registre, des accès, des réservations : tout au même endroit, du scan du visiteur jusqu’au tableau de bord."
         />
         <div className="mt-14 space-y-5">
           {FEATURE_ROWS.map((row, i) => {
@@ -306,8 +305,8 @@ export default function Landing() {
       <section id="comment-ca-marche" className="mx-auto w-full max-w-[1180px] px-4 py-14 sm:px-6 sm:py-24">
         <SectionHead
           label="Le parcours"
-          title={<>Du scan<br />au dashboard.</>}
-          lead="Quatre étapes, pensées pour un accueil qui n'a pas le temps d'expliquer une application à chaque visiteur."
+          title={<>Du scan<br />au tableau de bord.</>}
+          lead="Quatre étapes, pensées pour un accueil qui n’a pas le temps d’expliquer une application à chaque visiteur."
         />
         <div className="mt-8 flex justify-center" data-reveal>
           <LevelTabs value={level} onChange={setLevel} />
@@ -329,9 +328,9 @@ export default function Landing() {
       </section>
 
       {/* ——— Sur le terrain (bandes défilantes) ——— */}
-      <section className="lp-promises py-14 sm:py-24" aria-label="Ce que l'accueil gagne">
+      <section className="lp-promises py-14 sm:py-24" aria-label="Ce que l’accueil gagne">
         <div className="px-4">
-          <SectionHead label="Sur le terrain" title={<>Ce que l&apos;accueil gagne<br />dès le premier jour.</>} lead="Des promesses simples, tenues par le produit — pas par une équipe de support." />
+          <SectionHead label="Sur le terrain" title={<>Ce que l’accueil gagne<br />dès le premier jour.</>} lead="Des promesses simples, tenues par le produit — pas par une équipe de support." />
         </div>
         <div className="mt-12 space-y-4">
           {[0, 1].map((row) => {
@@ -359,7 +358,7 @@ export default function Landing() {
           <div>
             <Label>Questions fréquentes</Label>
             <h2 className="mt-5 text-3xl font-bold leading-[1.05] tracking-[-0.03em] text-ink sm:text-4xl">Tout savoir avant de commencer.</h2>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-ink-soft">Les réponses aux questions que se posent les équipes d&apos;accueil avant de remplacer leur registre papier.</p>
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-ink-soft">Les réponses aux questions que se posent les équipes d’accueil avant de remplacer leur registre papier.</p>
             <Link href="/connexion" className="lp-btn mt-7">Créer mon espace <ArrowUpRight size={14} /></Link>
           </div>
           <div className="divide-y divide-border border-y border-border">
@@ -414,19 +413,19 @@ export default function Landing() {
           <div className="flex flex-col items-center px-6 pb-6 pt-14 text-center sm:pt-20">
             <span className="lp-label lp-label--fixed">Prêt à ranger le cahier ?</span>
             <h2 className="mt-5 max-w-xl text-balance text-[clamp(2rem,4.8vw,3.4rem)] font-bold leading-[1.06] tracking-[-0.03em]">
-              Ton registre numérique, prêt en quelques secondes.
+              Votre registre numérique, prêt en quelques secondes.
             </h2>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-[#12231a]/70">
-              Connecte-toi avec Google : ton espace, ton QR et ton premier formulaire sont prêts tout de suite.
+              Connectez-vous avec Google ou Facebook : votre espace, votre QR et votre premier formulaire sont prêts tout de suite.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Link href="/connexion" className="lp-btn-dark">Se connecter <ArrowUpRight size={14} /></Link>
-              <Link href="/aide" className="lp-btn-ghost">Lire l&apos;aide</Link>
+              <Link href="/aide" className="lp-btn-ghost">Lire l’aide</Link>
             </div>
           </div>
           <div className="relative aspect-[940/1672] w-full [mask-image:linear-gradient(180deg,transparent,#000_7%)] md:aspect-[1672/941]">
             <ArtImage desktop={CTA_BG.desktop} mobile={CTA_BG.mobile} desktopSizes="1180px" />
-            {/* Le bouton dessiné dans l'affiche devient cliquable (zones calées sur chaque version). */}
+            {/* Le bouton dessiné dans l’affiche devient cliquable (zones calées sur chaque version). */}
             <Link
               href="/connexion"
               aria-label="Accéder à votre espace REKOLLECTE+"

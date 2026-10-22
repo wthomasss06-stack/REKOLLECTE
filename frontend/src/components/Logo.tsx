@@ -7,7 +7,7 @@ interface LogoProps {
   back?: boolean;
 }
 
-/** Marque officielle (fournie par l'utilisateur) — PNG transparent, jamais recréée en texte. */
+/** Marque officielle (fournie par l’utilisateur) — PNG transparent, jamais recréée en texte. */
 export default function Logo({ size = 32, className = "", back }: LogoProps) {
   const content = (
     <Image
@@ -22,7 +22,7 @@ export default function Logo({ size = 32, className = "", back }: LogoProps) {
 
   if (back) {
     return (
-      <Link href="/" aria-label="Retour à l'accueil" className="inline-block transition-transform hover:scale-105">
+      <Link href="/" aria-label="Retour à l’accueil" className="inline-block transition-transform hover:scale-105">
         {content}
       </Link>
     );

@@ -226,5 +226,5 @@ class IdentityUnlinkView(APIView):
         try:
             unlink_identity(request.user, provider)
         except LastIdentityError:
-            return Response({"error": {"message": "Impossible de retirer ta dernière méthode de connexion.", "code": "last_identity", "retryable": False}}, status=400)
+            return Response({"error": {"message": "Impossible de retirer votre dernière méthode de connexion.", "code": "last_identity", "retryable": False}}, status=400)
         return Response(status=204)

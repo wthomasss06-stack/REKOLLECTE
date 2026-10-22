@@ -20,7 +20,7 @@ const RELATED: SeoLink[] = [
   { href: "/gestion-visiteurs-qr-code", title: "Gestion des visiteurs par QR Code", text: "Le parcours du visiteur, l’emplacement du QR Code et le fonctionnement hors ligne." },
   { href: "/logiciel-gestion-visiteurs", title: "Logiciel de gestion des visiteurs", text: "Les critères pour choisir son outil, par secteur, et la mise en place." },
   { href: "/rekollecte-plus", title: "REKOLLECTE+", text: "Quand le registre doit aussi gérer clients, ressources et réservations." },
-  { href: "/a-propos", title: "Qu’est-ce que REKOLLECTE ?", text: "Définition, public visé et éditeur." },
+  { href: "/a-propos", title: "Qu’est-ce que REKOLLECTE ?", text: "Définition et public visé." },
 ];
 
 const DESCRIPTION = "Registre numérique des visiteurs : pourquoi quitter le cahier papier, comment choisir son outil et le mettre en place en 5 étapes avec un QR Code.";
@@ -53,13 +53,10 @@ export default function GuidePage() {
       }
     >
       <h2>Pourquoi le cahier de visites papier atteint ses limites</h2>
-      <ul>
-        <li><strong>Illisible ou incomplet :</strong> écritures difficiles à relire, champs oubliés, motifs jamais renseignés.</li>
-        <li><strong>Confidentialité :</strong> chaque visiteur voit les noms et numéros de ceux qui l’ont précédé.</li>
-        <li><strong>Introuvable :</strong> retrouver une visite d’il y a trois semaines oblige à feuilleter tout le cahier.</li>
-        <li><strong>Aucune vue d’ensemble :</strong> pas de statistiques sur les heures d’affluence ni sur les motifs fréquents.</li>
-        <li><strong>Fragile :</strong> un cahier perdu, mouillé ou plein, et l’historique disparaît.</li>
-      </ul>
+      <p>
+        Écritures illisibles, champs oubliés, visiteurs qui lisent les lignes précédentes, visite introuvable, cahier perdu ou plein : le papier donne vite une image
+        incomplète de l’accueil, sans aucune vue d’ensemble sur l’affluence.
+      </p>
 
       <h2>Cahier papier ou registre de visite en ligne : le comparatif</h2>
       <SeoTable
@@ -90,7 +87,7 @@ export default function GuidePage() {
 
       <h2>Remplacer le cahier en 5 étapes avec REKOLLECTE</h2>
       <ol>
-        <li><strong>Créer l’espace.</strong> Connexion avec Google, puis nom et logo de l’établissement.</li>
+        <li><strong>Créer l’espace.</strong> Connexion avec Google ou Facebook, puis nom et logo de l’établissement.</li>
         <li><strong>Choisir un modèle de formulaire.</strong> Bureau, restaurant, hôtel ou chantier : un point de départ prêt à l’emploi.</li>
         <li><strong>Ajuster les champs.</strong> Texte, téléphone, e-mail, nombre, date, liste, case à cocher et signature.</li>
         <li><strong>Afficher le QR Code.</strong> Imprimé à l’entrée, ou formulaire ouvert sur une tablette d’accueil dédiée. Le détail est dans la page{" "}
@@ -104,21 +101,16 @@ export default function GuidePage() {
 
       <h2>Quels champs demander aux visiteurs ?</h2>
       <p>
-        Le bon réflexe est de n’exiger que le nécessaire. Un formulaire court accélère l’accueil et limite les données personnelles à protéger. En
-        général : nom et prénom, entreprise, personne ou service visité, motif de la visite, et un numéro de téléphone uniquement si l’établissement
-        doit pouvoir rappeler la personne. Un chantier ajoutera plutôt une société et une zone d’accès ; un restaurant ou un hôtel, un contact pour
-        la réservation.
+        N’exiger que le nécessaire : un formulaire court accélère l’accueil et limite les données à protéger. En général : nom et prénom, entreprise, personne ou service
+        visité, motif, et un téléphone uniquement si l’établissement doit rappeler la personne. Un chantier ajoutera une société et une zone d’accès ; un restaurant ou un
+        hôtel, un contact pour la réservation.
       </p>
 
       <h2>Et la protection des données en Côte d’Ivoire ?</h2>
       <p>
-        En Côte d’Ivoire, la loi n° 2013-450 du 19 juin 2013 encadre la protection des données à caractère personnel, sous le contrôle de l’ARTCI.
-        Un établissement qui tient un registre de visiteurs est le « responsable du traitement » : c’est à lui d’effectuer les formalités prévues
-        auprès de l’autorité et d’informer ses visiteurs. REKOLLECTE fournit l’outil de collecte ; il ne remplace pas ces démarches.
-      </p>
-      <p>
-        <em>Ces repères sont informatifs et ne constituent pas un avis juridique : vérifiez les obligations qui s’appliquent à votre activité auprès de
-        l’ARTCI ou d’un conseil juridique.</em>
+        La loi n° 2013-450 du 19 juin 2013 encadre la protection des données à caractère personnel, sous le contrôle de l’ARTCI. Un établissement qui tient un registre de
+        visiteurs est le « responsable du traitement » : il effectue les formalités prévues auprès de l’autorité et informe ses visiteurs. REKOLLECTE fournit l’outil de
+        collecte, pas ces démarches. Repères informatifs, sans valeur d’avis juridique.
       </p>
     </SeoPage>
   );

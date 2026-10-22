@@ -1,7 +1,7 @@
 /**
- * Réduit une photo (côté le plus long ≤ maxSide, JPEG) avant de la ranger dans la file hors-ligne.
- * Une photo de téléphone fait 3 à 8 Mo : sans réduction elle sature IndexedDB, dépasse le plafond d'envoi du serveur
- * et ralentit la synchronisation sur une connexion faible. Si le navigateur ne sait pas la décoder, on renvoie l'original.
+ * Réduit une photo (côté le plus long ≤ maxSide, JPEG) avant de la ranger dans la file hors ligne.
+ * Une photo de téléphone fait 3 à 8 Mo : sans réduction elle sature IndexedDB, dépasse le plafond d’envoi du serveur
+ * et ralentit la synchronisation sur une connexion faible. Si le navigateur ne sait pas la décoder, on renvoie l’original.
  */
 export function readFileAsDataUrl(file: Blob): Promise<string> {
   return new Promise((resolve, reject) => {

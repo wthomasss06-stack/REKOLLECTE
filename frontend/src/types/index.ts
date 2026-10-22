@@ -1,5 +1,5 @@
 /** `host` = « Qui venez-vous voir ? » : le visiteur le reçoit comme une liste déroulante des personnes visitables (voir checkins/alerts.py). */
-export type FieldType = "text" | "phone" | "email" | "number" | "date" | "select" | "checkbox" | "signature" | "photo" | "document_scan" | "host";
+export type FieldType = "text" | "phone" | "email" | "number" | "date" | "select" | "checkbox" | "signature" | "photo" | "host";
 
 export interface FormField {
   id: string;
@@ -8,13 +8,9 @@ export interface FormField {
   required: boolean;
   identity_role?: "full_name" | "phone" | "email" | null;
   options?: string[];
-  document_type?: "cni" | "passport" | "free";
-  extract_fields?: ("last_name" | "first_names" | "document_number" | "birth_date" | "nationality" | "expiry_date")[];
-  requires_agent_validation?: boolean;
-  retain_document_image?: boolean;
 }
 
-/** Mention d'information affichée sous le formulaire (construite par le serveur : responsable, finalité, durée, droits…). */
+/** Mention d’information affichée sous le formulaire (construite par le serveur : responsable, finalité, durée, droits…). */
 export interface PrivacyNotice {
   controller: string;
   contact: string;
@@ -76,17 +72,17 @@ export interface UserProfile {
   organization_id: string;
   organization_name: string;
   is_active: boolean;
-  /** Apparaît dans « Qui venez-vous voir ? » et reçoit l'alerte d'arrivée (choisi par le patron). */
+  /** Apparaît dans « Qui venez-vous voir ? » et reçoit l’alerte d’arrivée (choisi par le patron). */
   is_visit_host: boolean;
   access_revoked_at: string | null;
   access_revoked_reason: string;
-  /** Conditions d'utilisation acceptées : version et date, tracées sur le compte. */
+  /** Conditions d’utilisation acceptées : version et date, tracées sur le compte. */
   terms_version?: string;
   terms_accepted_at?: string | null;
   terms_current_version?: string;
 }
 
-/** Une arrivée à signaler (GET /checkins/alerts/). Jamais la fiche complète : seulement ce qu'affiche une notification. */
+/** Une arrivée à signaler (GET /checkins/alerts/). Jamais la fiche complète : seulement ce qu’affiche une notification. */
 export interface VisitAlert {
   id: string;
   visitor_name: string;
@@ -95,7 +91,7 @@ export interface VisitAlert {
   /** `host` : on te demande toi ; `team` : aucune personne désignée, le patron et les gérants sont prévenus. */
   for_you: "host" | "team";
   arrived_at: string;
-  /** Synchronisée longtemps après l'arrivée (tablette restée hors ligne) : pas une arrivée « en direct ». */
+  /** Synchronisée longtemps après l’arrivée (tablette restée hors ligne) : pas une arrivée « en direct ». */
   late: boolean;
 }
 export interface VisitAlertsPayload { now: string; cursor: string; total: number; items: VisitAlert[]; }
@@ -105,7 +101,7 @@ export interface TeamAccess { members: UserProfile[]; invitations: StaffInvitati
 export interface AuditEvent { id: string; action: string; actor_name: string | null; actor_email: string | null; target_name: string | null; target_email: string | null; metadata: Record<string, unknown>; created_at: string; }
 
 /** Calculee cote serveur uniquement (Organization.capabilities) — le frontend ne fait
- * jamais ce calcul lui-meme, il ne fait que refleter ce que l'API renvoie. */
+ * jamais ce calcul lui-meme, il ne fait que refleter ce que l’API renvoie. */
 export interface OrganizationCapabilities {
   registration: boolean;
   karnet: boolean;
@@ -116,7 +112,7 @@ export interface OrganizationCapabilities {
 
 export type PlanId = "free" | "essentiel" | "plus" | "entreprise";
 export type PlanState = "free" | "trialing" | "active" | "grace" | "expired" | "founder";
-export type LockableFeature = "export_csv" | "ocr" | "phone" | "karnet";
+export type LockableFeature = "export_csv" | "phone" | "karnet";
 
 export interface PlanEntitlements {
   access_points: number;
@@ -124,13 +120,12 @@ export interface PlanEntitlements {
   members: number;
   history_days: number | null;
   export_csv: boolean;
-  ocr: boolean;
   phone: boolean;
   karnet: boolean;
   resources: number;
 }
 
-/** Plan en vigueur (calculé par le serveur). `locked` n'est vrai que quand les plans s'appliquent vraiment (`enforcement` = « enforce »). */
+/** Plan en vigueur (calculé par le serveur). `locked` n’est vrai que quand les plans s’appliquent vraiment (`enforcement` = « enforce »). */
 export interface OrganizationBilling {
   plan: PlanId;
   plan_label: string;
@@ -163,7 +158,7 @@ export interface BillingPayment {
   period_end: string;
   paid_at: string;
   fne_reference: string;
-  /** « Reçu interne, non fiscal » tant qu'il n'y a pas de référence FNE ; jamais « facture » sans elle. */
+  /** « Reçu interne, non fiscal » tant qu’il n’y a pas de référence FNE ; jamais « facture » sans elle. */
   document_label: string;
   note: string;
 }
@@ -179,7 +174,6 @@ export interface Organization {
   billing?: OrganizationBilling;
   retention_visits_days?: number | null;
   restrict_visit_reasons?: boolean;
-  store_document_number?: boolean;
   privacy_contact?: string;
   created_at: string;
 }
@@ -198,7 +192,7 @@ export interface KarnetClient {
 }
 
 /** Renvoyé uniquement par GET /karnet/clients/{id}/ — la fiche client complète
- * (phase 7) ajoute des compteurs calculés côté serveur à l'en-tête. */
+ * (phase 7) ajoute des compteurs calculés côté serveur à l’en-tête. */
 export interface KarnetClientDetail extends KarnetClient {
   checkins_count: number;
   reservations_count: number;
@@ -214,7 +208,7 @@ export interface KarnetResource {
   is_active: boolean;
   created_at: string;
   /** Champs ResourceBuilder (catalogue par catégorie/type) — `unit` reste dérivé
-   * de `billing_unit` côté serveur, jamais l'inverse (voir apps/karnet/models.py). */
+   * de `billing_unit` côté serveur, jamais l’inverse (voir apps/karnet/models.py). */
   category: KarnetResourceCategory;
   category_display: string;
   resource_type: string;
@@ -232,8 +226,8 @@ export type KarnetReservationStatus = "en_cours" | "terminee" | "annulee";
 
 export interface KarnetReservation {
   id: string;
-  /** Numéro lisible, séquentiel par établissement (1, 2, 3…) — celui que l'équipe
-   * dicte au téléphone ou retrouve dans l'historique d'un client. */
+  /** Numéro lisible, séquentiel par établissement (1, 2, 3…) — celui que l’équipe
+   * dicte au téléphone ou retrouve dans l’historique d’un client. */
   number: number;
   client: string;
   client_name: string;

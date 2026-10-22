@@ -4,8 +4,8 @@ import { useAuthContext } from "@/context/AuthContext";
 import type { LockableFeature, PlanId } from "@/types";
 
 /**
- * Droits du plan, tels que calculés par le SERVEUR. L'interface ne décide jamais : elle ne fait qu'afficher le cadenas.
- * `isLocked` n'est vrai que quand les plans s'appliquent vraiment ; avant, aucune limite ne s'affiche (mode « observer »).
+ * Droits du plan, tels que calculés par le SERVEUR. L’interface ne décide jamais : elle ne fait qu’afficher le cadenas.
+ * `isLocked` n’est vrai que quand les plans s’appliquent vraiment ; avant, aucune limite ne s’affiche (mode « observer »).
  */
 export function useEntitlements() {
   const { organization } = useAuthContext();

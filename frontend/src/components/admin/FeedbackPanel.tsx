@@ -11,7 +11,7 @@ const STATUSES: { value: string; label: string }[] = [
   { value: "archived", label: "Archivé" },
 ];
 
-/** Adresse de la page d'où vient le retour, ramenée à son chemin (jamais de paramètres) pour l'affichage. */
+/** Adresse de la page d’où vient le retour, ramenée à son chemin (jamais de paramètres) pour l’affichage. */
 function pathOf(url: string): string {
   try { return new URL(url).pathname || "/"; } catch { return ""; }
 }

@@ -11,7 +11,7 @@ const API_URL = typeof window !== "undefined"
   ? "/api/v1"
   : (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1");
 // Une requête tenue par un Render endormi peut attendre plusieurs dizaines de secondes : on lui laisse
-// le temps, puis serverWake prend le relais (sonde + rejeu) au lieu d'afficher une erreur.
+// le temps, puis serverWake prend le relais (sonde + rejeu) au lieu d’afficher une erreur.
 const REQUEST_TIMEOUT_MS = 30_000;
 // Combien de fois une même requête est rejouée après un réveil de serveur.
 const MAX_WAKE_REPLAYS = 3;
@@ -122,8 +122,8 @@ apiClient.interceptors.response.use(
 
     originalRequest._retry = true;
 
-    // Le jeton a peut-etre deja ete renouvele depuis l'envoi de cette requete (autre requete
-    // du meme onglet, ou autre onglet) : on rejoue avec le jeton courant au lieu d'ouvrir un
+    // Le jeton a peut-etre deja ete renouvele depuis l’envoi de cette requete (autre requete
+    // du meme onglet, ou autre onglet) : on rejoue avec le jeton courant au lieu d’ouvrir un
     // refresh de plus, qui risquerait de croiser le premier.
     const sentToken = String(originalRequest.headers?.Authorization || "").replace(/^Bearer\s+/i, "");
     const currentToken = getAccessToken();

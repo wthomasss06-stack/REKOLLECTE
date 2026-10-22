@@ -52,36 +52,32 @@ export default function GestionVisiteursQrCodePage() {
         <li><strong>Scanner.</strong> Le visiteur scanne le QR Code affiché à l’entrée, ou trouve le formulaire déjà ouvert sur la tablette d’accueil.</li>
         <li><strong>Remplir.</strong> Nom, contact, motif : uniquement les champs que l’établissement a choisis.</li>
         <li><strong>Signer.</strong> La signature se fait au doigt, directement à l’écran.</li>
-        <li><strong>Synchroniser.</strong> La visite part vers le registre dès que l’appareil a une connexion. Le patron la voit depuis son tableau de bord.</li>
+        <li><strong>Synchroniser.</strong> La visite part vers le registre dès que l’appareil a une connexion. Le Patron la voit depuis son tableau de bord.</li>
       </ol>
 
       <h2>Où afficher le QR Code ?</h2>
       <ul>
         <li><strong>À l’entrée ou au comptoir d’accueil,</strong> imprimé, à hauteur des yeux et bien éclairé.</li>
         <li><strong>Sur une tablette d’accueil dédiée,</strong> avec le formulaire ouvert en permanence : pratique quand les visiteurs n’ont pas leur téléphone.</li>
-        <li><strong>Un QR Code par entrée ou par activité :</strong> un établissement peut avoir plusieurs formulaires et plusieurs QR Codes.</li>
-        <li><strong>Régénérable à tout moment :</strong> si le QR Code est abîmé ou ne doit plus servir, le Patron en génère un nouveau depuis son espace.</li>
       </ul>
 
       <h2>Le formulaire d’accueil numérique</h2>
       <p>
-        Le QR Code ouvre un formulaire d’accueil numérique adapté à l’activité. REKOLLECTE propose des modèles pour le bureau, le restaurant, l’hôtel et le
-        chantier, que l’on modifie ensuite. Les champs disponibles sont le texte, le téléphone, l’e-mail, le nombre, la date, la liste, la case à cocher et la signature.
-      </p>
-      <p>
-        Le bon réflexe : n’en garder que quelques-uns. Un formulaire court accélère l’accueil et limite les données personnelles à protéger. Pour des repères
-        sur les champs à demander, voir le <Link href="/guide/registre-visiteurs-numerique">guide du registre numérique des visiteurs</Link>.
+        Le QR Code ouvre un formulaire adapté à l’activité : modèles pour le bureau, le restaurant, l’hôtel et le chantier, modifiables ensuite. Champs disponibles : texte, téléphone,
+        e-mail, nombre, date, liste, case à cocher et signature. Un formulaire court accélère l’accueil et limite les données à protéger ; voir le{" "}
+        <Link href="/guide/registre-visiteurs-numerique">guide du registre numérique des visiteurs</Link>.
       </p>
 
       <h2>Et sans réseau ?</h2>
+
       <p>
-        À l’accueil d’un bureau ou d’un chantier, la connexion n’est jamais garantie. Quand le réseau coupe, le formulaire continue d’enregistrer les visites sur
-        l’appareil. Elles sont envoyées automatiquement au retour de la connexion : l’accueil ne dépend pas du réseau.
+        La connexion n’est jamais garantie à l’accueil d’un bureau ou d’un chantier : quand le réseau coupe, le formulaire continue d’enregistrer les visites sur l’appareil,
+        puis les envoie au retour de la connexion.
       </p>
 
       <h2>Ce que voit l’établissement</h2>
       <ul>
-        <li><strong>Le registre du jour</strong> et l’historique, consultables par l’équipe selon son rôle (Patron, Gérant, Staff).</li>
+        <li><strong>Le registre du jour</strong> et l’historique, consultables par l’équipe selon son rôle (Patron, Gérant, Agent).</li>
         <li><strong>Des statistiques :</strong> courbe horaire de fréquentation et motifs de visite les plus fréquents.</li>
         <li><strong>L’export CSV,</strong> réservé au Patron et au Gérant, pour archiver ou contrôler.</li>
       </ul>
@@ -104,12 +100,8 @@ export default function GestionVisiteursQrCodePage() {
 
       <h2>Sécurité et données personnelles</h2>
       <p>
-        Le visiteur ne crée aucun compte et le formulaire ne demande que les champs choisis par l’établissement. REKOLLECTE ne collecte aucune donnée
-        biométrique. L’établissement reste le responsable du traitement : en Côte d’Ivoire, c’est à lui d’effectuer les formalités auprès de l’ARTCI et
-        d’informer ses visiteurs. Ces repères sont informatifs et ne constituent pas un avis juridique.
-      </p>
-      <p>
-        Pour choisir l’outil qui convient à votre accueil, voir la page <Link href="/logiciel-gestion-visiteurs">logiciel de gestion des visiteurs</Link>.
+        Le visiteur ne crée aucun compte et ne renseigne que les champs choisis par l’établissement. Aucune donnée biométrique n’est collectée. L’établissement reste
+        responsable du traitement : en Côte d’Ivoire, il effectue les formalités auprès de l’ARTCI et informe ses visiteurs. Repères informatifs, sans valeur d’avis juridique.
       </p>
     </SeoPage>
   );

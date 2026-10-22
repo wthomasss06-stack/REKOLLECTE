@@ -22,17 +22,17 @@ export function normalizeApiError(error: unknown): AppError {
     : payload?.code || `http_${status}`;
   return {
     message: payload?.message || (transientRefreshFailure
-      ? "La connexion au serveur est temporairement indisponible. Ta session n’a pas pu être vérifiée ; vérifie le réseau puis réessaie."
+      ? "La connexion au serveur est temporairement indisponible. Votre session n’a pas pu être vérifiée ; vérifiez le réseau puis réessayez."
       : status === 401
-      ? "La session a expiré. Reconnecte-toi pour continuer."
+      ? "La session a expiré. Reconnectez-vous pour continuer."
       : status === 403
-        ? "Tu n’as pas l’autorisation d’effectuer cette action."
+        ? "Vous n’avez pas l’autorisation d’effectuer cette action."
         : code === "timeout"
-          ? "Le serveur met trop de temps à répondre. Vérifie ta connexion puis réessaie."
+          ? "Le serveur met trop de temps à répondre. Vérifiez votre connexion puis réessayez."
           : code === "network"
-            ? "Le serveur est injoignable. Vérifie ta connexion Internet puis réessaie."
+            ? "Le serveur est injoignable. Vérifiez votre connexion Internet puis réessayez."
             : status !== null && status >= 500
-              ? "Le service est temporairement indisponible. Réessaie dans quelques instants."
+              ? "Le service est temporairement indisponible. Réessayez dans quelques instants."
               : "La requête n’a pas pu être traitée."),
     code,
     retryable: payload?.retryable ?? (transientRefreshFailure || status === null || Boolean(status && status >= 500)),

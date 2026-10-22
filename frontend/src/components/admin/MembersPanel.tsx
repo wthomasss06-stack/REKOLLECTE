@@ -29,7 +29,7 @@ export default function MembersPanel({ data, organizations, onCreate, onUpdate, 
     event.preventDefault();
     if (!email.trim() || !organizationId || busy) return;
     setBusy(true);
-    try { await onCreate({ email: email.trim(), organization_id: organizationId, role }); setEmail(""); } catch { /* l'erreur est déjà annoncée par la page : on garde la saisie */ } finally { setBusy(false); }
+    try { await onCreate({ email: email.trim(), organization_id: organizationId, role }); setEmail(""); } catch { /* l’erreur est déjà annoncée par la page : on garde la saisie */ } finally { setBusy(false); }
   };
 
   const orgSelect = (member: PlatformMember) => (
@@ -39,7 +39,7 @@ export default function MembersPanel({ data, organizations, onCreate, onUpdate, 
   );
   const roleSelect = (member: PlatformMember) => (
     <select aria-label={`Rôle de ${member.full_name || member.email}`} value={member.role} onChange={(event) => onUpdate(member, { role: event.target.value })} className={selectClass}>
-      <option value="BOSS">Patron</option><option value="GERANT">Gérant</option><option value="STAFF">Staff</option>
+      <option value="BOSS">Patron</option><option value="GERANT">Gérant</option><option value="STAFF">Agent</option>
     </select>
   );
   const stateButton = (member: PlatformMember) => (
@@ -54,16 +54,16 @@ export default function MembersPanel({ data, organizations, onCreate, onUpdate, 
       <form onSubmit={submit} className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,14rem)_9rem_auto]">
         <label className="sm:col-span-2 lg:col-span-1"><span className="sr-only">Email du membre</span><input required type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="Email du membre" className={inputClass} /></label>
         <label><span className="sr-only">Entreprise</span><select required value={organizationId} onChange={(event) => setOrganizationId(event.target.value)} className={`${inputClass} pr-2`}><option value="">Entreprise</option>{organizations.map((org) => <option key={org.id} value={org.id}>{org.name}</option>)}</select></label>
-        <label><span className="sr-only">Rôle</span><select value={role} onChange={(event) => setRole(event.target.value)} className={`${inputClass} pr-2`}><option value="STAFF">Staff</option><option value="GERANT">Gérant</option><option value="BOSS">Patron</option></select></label>
+        <label><span className="sr-only">Rôle</span><select value={role} onChange={(event) => setRole(event.target.value)} className={`${inputClass} pr-2`}><option value="STAFF">Agent</option><option value="GERANT">Gérant</option><option value="BOSS">Patron</option></select></label>
         <button type="submit" disabled={busy || !email.trim() || !organizationId} className={`${primaryButton} sm:col-span-2 lg:col-span-1`}><UserPlus size={16} weight="bold" aria-hidden="true" />Ajouter</button>
       </form>
       <div className="flex flex-wrap gap-2">
         <SearchField value={query} onChange={setQuery} placeholder={`Rechercher parmi ${data.length} compte${data.length > 1 ? "s" : ""}`} label="Rechercher un compte" />
-        <label><span className="sr-only">Filtrer par rôle</span><select value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)} className="h-11 rounded-full border border-border bg-surface px-4 text-sm text-ink outline-none focus:border-cta"><option value="">Tous les rôles</option><option value="BOSS">Patrons</option><option value="GERANT">Gérants</option><option value="STAFF">Staff</option></select></label>
+        <label><span className="sr-only">Filtrer par rôle</span><select value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)} className="h-11 rounded-full border border-border bg-surface px-4 text-sm text-ink outline-none focus:border-cta"><option value="">Tous les rôles</option><option value="BOSS">Patrons</option><option value="GERANT">Gérants</option><option value="STAFF">Agent</option></select></label>
       </div>
 
       {rows.length === 0 ? (
-        <EmptyState icon={UsersThree} title={data.length ? "Aucun compte ne correspond" : "Aucun compte pour l’instant"}>{data.length ? "Change la recherche ou le filtre." : "Ajoute le premier membre avec le formulaire ci-dessus."}</EmptyState>
+        <EmptyState icon={UsersThree} title={data.length ? "Aucun compte ne correspond" : "Aucun compte pour l’instant"}>{data.length ? "Change la recherche ou le filtre." : "Ajoutez le premier membre avec le formulaire ci-dessus."}</EmptyState>
       ) : (
         <>
           <div className="hidden overflow-x-auto rounded-2xl border border-border bg-surface md:block">

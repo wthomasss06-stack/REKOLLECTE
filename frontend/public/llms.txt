@@ -20,7 +20,7 @@
 - Type : application web installable (PWA), en français, utilisable sur téléphone, tablette et ordinateur.
 - Visiteur : aucun compte, aucune application ; il scanne le QR Code, remplit le formulaire et signe à l'écran.
 - Hors ligne : oui. Les visites sont gardées sur l'appareil puis synchronisées automatiquement au retour de la connexion.
-- Équipe : connexion avec un compte Google ; rôles Patron, Gérant et Staff.
+- Équipe : connexion avec un compte Google ou Facebook ; rôles Patron, Gérant et Staff.
 - Formulaires : modèles par secteur (bureau, restaurant, hôtel, chantier), champs modifiables (texte, téléphone, e-mail, nombre, date, liste, case à cocher, signature).
 - Registre : statistiques de fréquentation (courbe horaire, motifs fréquents) et export CSV (Patron et Gérant).
 - Prix : gratuit à ce jour.

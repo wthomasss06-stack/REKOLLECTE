@@ -1,20 +1,20 @@
 import { faqPage } from "@/lib/jsonld";
 import { IDS, PUBLISHER, SITE_NAME, SITE_URL } from "@/lib/site";
-import { FREE_UNTIL_ISO, FREE_UNTIL_LABEL } from "@/lib/pricing";
+import { FREE_UNTIL_ISO } from "@/lib/pricing";
 
-/** Données éditoriales de la landing — une seule source pour l'affichage et le JSON-LD. */
+/** Données éditoriales de la landing — une seule source pour l’affichage et le JSON-LD. */
 
 export const FAQS = [
-  { question: "Qu’est-ce que REKOLLECTE ?", answer: "REKOLLECTE est un registre visiteurs numérique par QR Code, conçu à Abidjan par AKATech Studio. Il remplace le cahier de visites papier des bureaux, restaurants, hôtels et accès chantier : le visiteur scanne un QR Code, remplit un formulaire et signe à l’écran, sans créer de compte, même sans connexion internet." },
-  { question: "REKOLLECTE est-il un logiciel de gestion des visiteurs ?", answer: "Oui. REKOLLECTE est un logiciel de gestion des visiteurs par QR Code : un registre numérique des visiteurs qui remplace le cahier de visites papier, avec formulaire d’accueil adapté à l’activité, rôles Patron, Gérant et Staff, statistiques de fréquentation et export CSV. Il est gratuit jusqu’au " + FREE_UNTIL_LABEL + "." },
-  { question: "Combien coûte REKOLLECTE ?", answer: "REKOLLECTE est gratuit jusqu’au " + FREE_UNTIL_LABEL + ". Ensuite : un plan Gratuit à 0 FCFA, Essentiel à 3 000 FCFA par mois, REKOLLECTE+ à 7 000 FCFA par mois et une offre Entreprise sur devis. Vos données restent intactes et l’enregistrement des visiteurs n’est jamais bloqué par un plan." },
-  { question: "Quelle différence entre REKOLLECTE et REKOLLECTE+ ?", answer: "REKOLLECTE est le registre visiteurs (niveau 1). REKOLLECTE+ est le niveau 2, activable depuis les paramètres : les visiteurs deviennent des fiches clients et l’établissement gère en plus ses ressources (chambre, table, salle…), ses réservations, ses encaissements et ses rappels de fin de créneau." },
-  { question: "Le visiteur doit-il créer un compte ?", answer: "Non. Il scanne simplement le QR Code, remplit le formulaire depuis son téléphone ou la tablette d’accueil, puis signe. Aucune application ni inscription n’est nécessaire." },
-  { question: "Est-ce que REKOLLECTE fonctionne sans connexion ?", answer: "Oui. Le formulaire continue d’enregistrer les visites hors-ligne sur l’appareil. Les données se synchronisent automatiquement dès que la connexion revient." },
-  { question: "Puis-je adapter le formulaire à mon activité ?", answer: "Oui. Tu peux choisir les champs utiles à ton établissement — bureau, restaurant, hôtel, chantier ou autre — puis les modifier à tout moment depuis les paramètres." },
-  { question: "Qui peut consulter les visites enregistrées ?", answer: "Tu contrôles les accès depuis ton espace. Le patron peut gérer l’ensemble du registre et inviter un gérant ou un membre du staff avec des permissions adaptées à son rôle." },
-  { question: "Que deviennent les données des visiteurs ?", answer: "Elles sont enregistrées dans l’espace sécurisé de ton établissement et restent accessibles depuis ton dashboard. Tu peux consulter le registre, suivre les motifs de visite et exporter les données en CSV." },
-  { question: "Combien de temps faut-il pour commencer ?", answer: "Quelques minutes suffisent. Connecte-toi avec Google, renseigne ton établissement, choisis ton formulaire et affiche le QR Code à l’accueil. Tu peux compléter la configuration plus tard." },
+  { question: "Qu’est-ce que REKOLLECTE ?", answer: "REKOLLECTE est un registre visiteurs numérique par QR Code, conçu à Abidjan. Il remplace le cahier de visites des bureaux, restaurants, hôtels et accès chantier : le visiteur scanne, remplit le formulaire et signe à l’écran, sans compte, même sans connexion internet." },
+  { question: "REKOLLECTE est-il un logiciel de gestion des visiteurs ?", answer: "Oui. C’est un logiciel de gestion des visiteurs par QR Code : formulaire adapté à l’activité, rôles Patron, Gérant et Agent, statistiques de fréquentation et export CSV. Il est gratuit pendant le lancement." },
+  { question: "Combien coûte REKOLLECTE ?", answer: "REKOLLECTE est gratuit pendant le lancement. Ensuite : Gratuit à 0 FCFA, Essentiel à 3 000 FCFA par mois, REKOLLECTE+ à 7 000 FCFA par mois, Entreprise sur devis. L’enregistrement des visiteurs n’est jamais bloqué par un plan." },
+  { question: "Quelle différence entre REKOLLECTE et REKOLLECTE+ ?", answer: "REKOLLECTE est le registre visiteurs. REKOLLECTE+ y ajoute les fiches clients, les ressources (chambre, table, salle…), les réservations, les encaissements et les rappels de fin de créneau. Il s’active depuis les paramètres ; après le lancement, il faut le plan REKOLLECTE+." },
+  { question: "Le visiteur doit-il créer un compte ?", answer: "Non. Il scanne le QR Code, remplit le formulaire sur son téléphone ou la tablette d’accueil, puis signe. Aucune application ni inscription n’est nécessaire." },
+  { question: "Est-ce que REKOLLECTE fonctionne sans connexion ?", answer: "Oui. Le formulaire continue d’enregistrer les visites sur l’appareil, hors ligne. Les données se synchronisent automatiquement dès que la connexion revient." },
+  { question: "Puis-je adapter le formulaire à mon activité ?", answer: "Oui. Vous choisissez les champs utiles à votre établissement (bureau, restaurant, hôtel, chantier…) et vous les modifiez à tout moment depuis les paramètres." },
+  { question: "Qui peut consulter les visites enregistrées ?", answer: "Vous contrôlez les accès. Le Patron gère l’ensemble du registre et invite un Gérant ou un Agent, avec des permissions adaptées à chaque rôle." },
+  { question: "Que deviennent les données des visiteurs ?", answer: "Elles sont enregistrées dans l’espace sécurisé de votre établissement et consultables depuis votre tableau de bord. Vous suivez les motifs de visite et exportez le registre en CSV." },
+  { question: "Combien de temps faut-il pour commencer ?", answer: "Quelques minutes. Connectez-vous avec Google ou Facebook, renseignez votre établissement, choisissez un formulaire et affichez le QR Code à l’accueil. Le reste peut attendre." },
 ];
 
 const FEATURES_BASE = [
@@ -23,7 +23,7 @@ const FEATURES_BASE = [
   "Signature à l’écran",
   "Fonctionne hors ligne avec synchronisation automatique",
   "Formulaires adaptés au secteur (bureau, restaurant, hôtel, chantier)",
-  "Rôles Patron, Gérant et Staff",
+  "Rôles Patron, Gérant et Agent",
   "Export CSV et statistiques de fréquentation",
 ];
 
@@ -39,7 +39,7 @@ const FREE = { "@type": "Offer", price: "0", priceCurrency: "XOF", priceValidUnt
 const AREA = { "@type": "Country", name: "Côte d’Ivoire" };
 
 // Graphe relié par @id (éditeur -> site -> applications) : Google et les moteurs de réponse comprennent
-// qu'il s'agit d'UNE entité « REKOLLECTE » éditée par AKATech Studio, distincte des homonymes (ex. reCollect).
+// qu’il s’agit d’UNE entité « REKOLLECTE » éditée par AKATech Studio, distincte des homonymes (ex. reCollect).
 // Aucune note, aucun avis ni aucune distinction inventée : uniquement des faits vérifiables sur le produit.
 export const JSON_LD = {
   "@context": "https://schema.org",
@@ -86,7 +86,7 @@ export const JSON_LD = {
       applicationCategory: "BusinessApplication",
       operatingSystem: "Web (application installable PWA)",
       inLanguage: "fr",
-      description: "REKOLLECTE+ est le niveau 2 de REKOLLECTE : fiches clients, ressources, réservations, encaissements et rappels, activable depuis les paramètres.",
+      description: "REKOLLECTE+ complète REKOLLECTE : fiches clients, ressources, réservations, encaissements et rappels, activable depuis les paramètres.",
       featureList: FEATURES_PLUS,
       isAccessibleForFree: true,
       offers: FREE,
@@ -101,34 +101,34 @@ export const JSON_LD = {
 export const SECTORS = ["Bureaux", "Restaurants", "Hôtels", "Salles & événements", "Accès chantier", "Cliniques & cabinets", "Écoles", "Agences"];
 
 export const WHY = [
-  { n: "01", title: "Aucun compte à créer", body: "Il scanne le QR affiché à l'accueil, remplit le formulaire, signe du doigt. Aucun compte, aucune donnée mobile à lui demander." },
-  { n: "02", title: "Hors-ligne, vraiment", body: "La tablette d'accueil continue d'enregistrer même sans réseau pendant plusieurs jours. Tout part vers le dashboard dès que la connexion revient." },
-  { n: "03", title: "Un formulaire par métier", body: "Bureau, restaurant, hôtel, accès chantier — un modèle de départ pour chaque secteur, entièrement modifiable ensuite." },
-  { n: "04", title: "Un dashboard qui s'adapte", body: "Le tableau de bord affiche automatiquement les champs choisis. Export CSV et régénération du QR en un clic." },
+  { n: "01", title: "Aucun compte à créer", body: "Le visiteur scanne le QR, remplit le formulaire et signe du doigt. Aucun compte à créer, aucune application à installer." },
+  { n: "02", title: "Hors ligne, vraiment", body: "La tablette d’accueil continue d’enregistrer sans réseau. Tout part vers le tableau de bord dès que la connexion revient." },
+  { n: "03", title: "Un formulaire par métier", body: "Bureau, restaurant, hôtel, chantier : un modèle de départ par secteur, entièrement modifiable." },
+  { n: "04", title: "Un tableau de bord sur mesure", body: "Il affiche les champs que vous avez choisis. Export CSV et régénération du QR en un clic." },
 ];
 
 export const STEPS = [
-  { n: "01", title: "Scanner", body: "Le visiteur scanne le QR affiché à l'accueil, ou trouve le formulaire déjà ouvert sur la tablette dédiée." },
-  { n: "02", title: "Remplir", body: "Nom, contact, motif — uniquement les champs que le patron a choisis pour son établissement." },
-  { n: "03", title: "Signer", body: "Signature au doigt, comme dans une application de lecture PDF." },
-  { n: "04", title: "Synchroniser", body: "Envoi automatique dès que l'appareil retrouve une connexion. Le patron voit tout depuis son dashboard." },
+  { n: "01", title: "Scanner", body: "Le visiteur scanne le QR affiché à l’accueil, ou ouvre le formulaire déjà affiché sur la tablette." },
+  { n: "02", title: "Remplir", body: "Nom, contact, motif : uniquement les champs choisis par le Patron." },
+  { n: "03", title: "Signer", body: "Signature au doigt, directement à l’écran." },
+  { n: "04", title: "Synchroniser", body: "Envoi automatique dès que l’appareil retrouve une connexion. Le Patron voit tout dans son tableau de bord." },
 ];
 
 export const STEPS_PLUS = [
-  { n: "01", title: "Activer", body: "Depuis les paramètres, active REKOLLECTE+ pour ton établissement — le registre continue de tourner sans interruption." },
-  { n: "02", title: "Créer une ressource", body: "Choisis un type, un sous-type : la ressource est prête. Le prix s'ajuste ensuite, en un clic." },
-  { n: "03", title: "Réserver", body: "Le client réserve une ressource ; la réservation est numérotée et déjà réglée, sans calcul à faire." },
-  { n: "04", title: "Être alerté", body: "À la fin du créneau, une sonnerie prévient l'équipe. Un geste suffit pour valider ou annuler." },
+  { n: "01", title: "Activer", body: "Dans les paramètres, activez REKOLLECTE+ : le registre continue de tourner sans interruption." },
+  { n: "02", title: "Créer une ressource", body: "Choisissez un type et un sous-type : la ressource est prête. Le prix s’ajuste ensuite en un clic." },
+  { n: "03", title: "Réserver", body: "Le client réserve une ressource ; la réservation est numérotée, sans conflit de créneaux." },
+  { n: "04", title: "Être alerté", body: "À la fin du créneau, une sonnerie prévient l’équipe. Un geste suffit pour valider ou annuler." },
 ];
 
 export const PROMISES: { text: string; tag: string }[] = [
   { text: "Zéro compte, zéro friction pour le visiteur.", tag: "Accueil" },
-  { text: "Hors-ligne par défaut, pas en option.", tag: "Terrain" },
+  { text: "Hors ligne par défaut, pas en option.", tag: "Terrain" },
   { text: "Un formulaire adapté à chaque secteur.", tag: "Formulaires" },
-  { text: "Export CSV et QR régénérable à tout moment.", tag: "Dashboard" },
-  { text: "Le patron voit tout, le staff enregistre.", tag: "Rôles" },
-  { text: "Prêt en quelques minutes, avec ton compte Google.", tag: "Démarrage" },
-  { text: "Réservations numérotées, déjà réglées d'avance.", tag: "REKOLLECTE+" },
+  { text: "Export CSV et QR régénérable à tout moment.", tag: "Tableau de bord" },
+  { text: "Le Patron voit tout, l’Agent enregistre.", tag: "Rôles" },
+  { text: "Prêt en quelques minutes, avec Google ou Facebook.", tag: "Démarrage" },
+  { text: "Réservations numérotées, sans conflit de créneaux.", tag: "REKOLLECTE+" },
   { text: "Une sonnerie en fin de créneau, un geste pour valider.", tag: "REKOLLECTE+" },
 ];
 
@@ -137,32 +137,32 @@ export const FEATURE_ROWS = [
     id: "registre",
     image: { src: "/landing-images/offlinnnnnnne.webp", alt: "Accueille, enregistre, avance : un visiteur signe le registre REKOLLECTE sur une tablette", w: 1254, h: 1254 },
     title: "Un registre qui se remplit au scan",
-    body: "Chaque visite est enregistrée proprement, lisible par tous, sans relire l'écriture de quelqu'un. Le visiteur n'a rien à installer.",
-    checks: ["Aucun compte à créer pour le visiteur", "Signature au doigt, directement à l'écran", "Les champs que tu as choisis, rien de plus"],
+    body: "Chaque visite est enregistrée proprement, lisible par tous. Le visiteur n’a rien à installer.",
+    checks: ["Aucun compte à créer pour le visiteur", "Signature au doigt, directement à l’écran", "Uniquement les champs que vous avez choisis"],
     cta: { label: "Créer mon espace", href: "/connexion" },
   },
   {
     id: "hors-ligne",
-    image: { src: "/landing-images/offline.webp", alt: "Sans réseau, pas de problème : les fiches restent enregistrées sur l'appareil", w: 1254, h: 1254 },
-    title: "Hors-ligne, puis synchro automatique",
-    body: "Le réseau coupe, l'accueil continue. Les visites restent sur l'appareil et partent seules vers le dashboard au retour de la connexion.",
-    checks: ["Enregistre des jours durant sans réseau", "Synchronise dès que la connexion revient", "Rien ne se perd en route"],
+    image: { src: "/landing-images/offline.webp", alt: "Sans réseau, pas de problème : les fiches restent enregistrées sur l’appareil", w: 1254, h: 1254 },
+    title: "Hors ligne, puis synchro automatique",
+    body: "Le réseau coupe, l’accueil continue. Les visites restent sur l’appareil et partent seules vers le tableau de bord au retour de la connexion.",
+    checks: ["Enregistre sans réseau", "Synchronise dès que la connexion revient", "Chaque fiche reste sur l’appareil jusqu’à sa synchronisation"],
     cta: { label: "Voir comment ça marche", href: "/#comment-ca-marche" },
   },
   {
     id: "roles",
     image: { src: "/landing-images/securite-carre.webp", alt: "Vos visiteurs, vos données, votre contrôle : des accès adaptés à chaque rôle", w: 1920, h: 1920 },
-    title: "Chacun voit ce qu'il doit voir",
-    body: "Invite un gérant ou un membre du staff avec des permissions adaptées à son rôle. Le patron garde la main sur l'ensemble du registre.",
-    checks: ["Patron, gérant, staff : trois niveaux d'accès", "Export CSV et régénération du QR en un clic", "Données dans l'espace sécurisé de ton établissement"],
-    cta: { label: "Lire l'aide", href: "/aide" },
+    title: "Chacun voit ce qu’il doit voir",
+    body: "Invitez un Gérant ou un Agent avec des permissions adaptées à son rôle. Le Patron garde la main sur l’ensemble du registre.",
+    checks: ["Patron, Gérant, Agent : trois rôles distincts", "Export CSV et régénération du QR en un clic", "Données dans l’espace sécurisé de votre établissement"],
+    cta: { label: "Lire l’aide", href: "/aide" },
   },
   {
     id: "plus",
-    image: { src: "/landing-images/offline+.webp", alt: "REKOLLECTE+ : réservations, clients et ressources pour toute l'équipe", w: 1254, h: 1254 },
+    image: { src: "/landing-images/offline+.webp", alt: "REKOLLECTE+ : réservations, clients et ressources pour toute l’équipe", w: 1254, h: 1254 },
     title: "REKOLLECTE+ : du visiteur au client",
-    body: "Quand un visiteur réserve, consomme et doit payer, le deuxième cahier disparaît aussi. Active REKOLLECTE+ depuis tes paramètres.",
-    checks: ["Fiches clients avec tout l'historique", "Ressources : chambre, table ou salle", "Réservations numérotées, paiements et rappels"],
+    body: "Quand un visiteur réserve, consomme et doit payer, le deuxième cahier disparaît aussi. Activez REKOLLECTE+ depuis vos paramètres.",
+    checks: ["Fiches clients avec tout l’historique", "Ressources : chambre, table ou salle", "Réservations numérotées, paiements et rappels"],
     cta: { label: "Activer REKOLLECTE+", href: "/connexion" },
   },
 ];
@@ -172,7 +172,7 @@ type Visual = { src: string; alt: string; w: number; h: number };
 /** Aperçu sous le hero : une affiche par niveau (bascule REKOLLECTE / REKOLLECTE+). */
 export const SHOTS: Visual[] = [
   { src: "/landing-images/hero.webp", alt: "Formulaire REKOLLECTE sur tablette, badge visiteur avec QR Code", w: 1920, h: 1920 },
-  { src: "/landing-images/Hero+.webp", alt: "REKOLLECTE+ : fini le surbooking, des réservations claires pour l'équipe", w: 1254, h: 1254 },
+  { src: "/landing-images/Hero+.webp", alt: "REKOLLECTE+ : fini le surbooking, des réservations claires pour l’équipe", w: 1254, h: 1254 },
 ];
 
 /** Fonds photo : une version PC (paysage) et une version mobile (portrait). */

@@ -27,7 +27,7 @@ function Avatar({ name, url, size }: { name: string; url?: string; size: number 
   );
 }
 
-/** En-tête de l'espace connecté : la marque du palier actif à gauche (REKOLLECTE, ou REKOLLECTE+ au Niveau 2), le profil à droite.
+/** En-tête de l’espace connecté : la marque du palier actif à gauche (REKOLLECTE, ou REKOLLECTE+ au Niveau 2), le profil à droite.
  * Sur téléphone seulement, le menu du profil porte aussi le mode clair/sombre et la déconnexion (sur ordinateur, ils restent dans la barre latérale). */
 export default function AppHeader() {
   const { user, organization } = useAuthContext();

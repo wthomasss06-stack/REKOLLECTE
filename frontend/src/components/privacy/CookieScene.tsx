@@ -3,8 +3,8 @@
 import { useId } from "react";
 
 /** Biscuit du modal cookies (SVG animé, sans image ni script) : un cookie croqué qui cligne des yeux, avec un bouclier « coché » qui se
- * dessine — le message du modal : on ne mesure que si tu es d'accord. Styles : cookie-consent.css (`ck-*`). Sans animation
- * (prefers-reduced-motion), l'image reste fixe. `calm` coupe le mouvement continu (panneau « Personnaliser »). */
+ * dessine — le message du modal : on ne mesure que si tu es d’accord. Styles : cookie-consent.css (`ck-*`). Sans animation
+ * (prefers-reduced-motion), l’image reste fixe. `calm` coupe le mouvement continu (panneau « Personnaliser »). */
 export function CookieScene({ className = "", calm = false }: { className?: string; calm?: boolean }) {
   const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const id = (name: string) => `ck-${name}-${uid}`;

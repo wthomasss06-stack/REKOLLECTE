@@ -12,17 +12,17 @@ type SubmitStatus = "idle" | "saving" | "saved_offline" | "synced";
 type ProcessedItem = { idempotency_key: string; status: string; message?: string };
 
 const RETRY_IN_MS = 10_000;
-// Appareil en ligne mais serveur muet (Render dort) : on le réveille et on renvoie dès qu'il répond, tant que la page reste ouverte.
+// Appareil en ligne mais serveur muet (Render dort) : on le réveille et on renvoie dès qu’il répond, tant que la page reste ouverte.
 const WAKE_WAIT_MS = 90_000;
 
 /**
- * Endpoint public (pas d'auth) : on utilise axios brut, pas apiClient
- * (reserve au dashboard authentifie) — separation volontaire des deux mondes.
+ * Endpoint public (pas d’auth) : on utilise axios brut, pas apiClient
+ * (reserve au tableau de bord authentifie) — separation volontaire des deux mondes.
  */
 export function useSubmitForm(qrToken: string) {
   const [status, setStatus] = useState<SubmitStatus>("idle");
-  // Numéro de la saisie en cours. Sur une tablette on remet le formulaire à zéro pour le visiteur suivant : l'envoi
-  // de la fiche précédente peut encore être en vol, et sa réponse ne doit PAS rouvrir un « Merci » sur la saisie d'après.
+  // Numéro de la saisie en cours. Sur une tablette on remet le formulaire à zéro pour le visiteur suivant : l’envoi
+  // de la fiche précédente peut encore être en vol, et sa réponse ne doit PAS rouvrir un « Merci » sur la saisie d’après.
   const run = useRef(0);
 
   const reset = useCallback(() => {

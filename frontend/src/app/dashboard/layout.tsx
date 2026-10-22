@@ -20,7 +20,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { loading, user, organization, isAuthenticated } = useAuthContext();
   const { alert } = useDialog();
 
-  // Filet de sécurité : si une fenêtre s'est mal refermée, le défilement ne reste jamais figé après un changement de page.
+  // Filet de sécurité : si une fenêtre s’est mal refermée, le défilement ne reste jamais figé après un changement de page.
   useEffect(() => { releaseStaleScrollLock(); }, [pathname]);
 
   useEffect(() => {
@@ -39,21 +39,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       const firstName = firstNameOf(info.name);
       const isKarnet = Boolean(organization?.capabilities?.karnet);
       void alert(info.isNew
-        ? { tone: "brand", mood: "excited", title: `Bienvenue${firstName ? `, ${firstName}` : ""} !`, message: "Ton espace est prêt. Tu peux commencer par consulter le registre ou ouvrir les paramètres.", okLabel: "Commencer" }
+        ? { tone: "brand", mood: "excited", title: `Bienvenue${firstName ? `, ${firstName}` : ""} !`, message: "Votre espace est prêt. Consultez le registre ou ouvrez les paramètres.", okLabel: "Commencer" }
         : isKarnet
-          ? { tone: "brand", mood: "cheeky", title: `Bon retour${firstName ? `, ${firstName}` : ""} !`, message: "Ton établissement est au Niveau 2 : les visiteurs deviennent des clients, puis REKOLLECTE+ prend le relais pour les ressources, réservations et paiements.", okLabel: "C’est parti" }
-          : { tone: "brand", mood: "cheeky", title: `Bon retour${firstName ? `, ${firstName}` : ""} !`, message: "Content de te revoir. Ton registre t’attend.", okLabel: "C’est parti" });
+          ? { tone: "brand", mood: "cheeky", title: `Bon retour${firstName ? `, ${firstName}` : ""} !`, message: "REKOLLECTE+ est actif : vos visiteurs deviennent des clients, avec ressources, réservations et paiements.", okLabel: "C’est parti" }
+          : { tone: "brand", mood: "cheeky", title: `Bon retour${firstName ? `, ${firstName}` : ""} !`, message: "Content de vous revoir. Votre registre vous attend.", okLabel: "C’est parti" });
     } catch {
       // Une donnée de session corrompue ne doit pas bloquer l’espace.
     }
   }, [loading, isAuthenticated, router, alert]);
 
   // Pendant que la session se rétablit (ou que le serveur se réveille), seul le chargement REKOLLECTE est affiché.
-  if (loading && !user) return <Loader label="Ouverture de ton espace…" />;
+  if (loading && !user) return <Loader label="Ouverture de votre espace…" />;
   if (!user) return null;
 
-  // Les rappels de fin de créneau (sonnerie + bannière) tournent sur TOUT le dashboard dès que REKOLLECTE+ est actif :
-  // avant, ils n'existaient que sur la page REKOLLECTE+, donc un agent resté sur « Accueil » n'entendait jamais l'alarme.
+  // Les rappels de fin de créneau (sonnerie + bannière) tournent sur TOUT le tableau de bord dès que REKOLLECTE+ est actif :
+  // avant, ils n’existaient que sur la page REKOLLECTE+, donc un agent resté sur « Accueil » n’entendait jamais l’alarme.
   const reminders = Boolean(organization?.capabilities?.karnet);
   return (
     <div className="min-h-screen bg-canvas">

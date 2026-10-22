@@ -13,7 +13,7 @@ export interface NavItem {
   /** Libellé court de la barre du bas (téléphone) : 7 caractères au plus pour tenir sur un écran de 320 px. */
   short?: string;
   icon: ElementType;
-  /** Entrée qui change de page. Sans `href`, c'est un bouton (l'appelant gère l'onglet via `onSelect`). */
+  /** Entrée qui change de page. Sans `href`, c’est un bouton (l’appelant gère l’onglet via `onSelect`). */
   href?: string;
   exact?: boolean;
   also?: string[];
@@ -22,9 +22,9 @@ export interface NavItem {
 }
 
 /**
- * Navigation commune de l'espace connecté ET de l'administration : barre latérale repliable sur ordinateur, barre arrondie en bas sur téléphone.
+ * Navigation commune de l’espace connecté ET de l’administration : barre latérale repliable sur ordinateur, barre arrondie en bas sur téléphone.
  * Les deux espaces ont ainsi exactement la même ergonomie, le même repli mémorisé et les mêmes états actifs.
- * Pages (`href`) : l'entrée active vient de l'adresse. Onglets (sans `href`) : elle vient de `activeKey`.
+ * Pages (`href`) : l’entrée active vient de l’adresse. Onglets (sans `href`) : elle vient de `activeKey`.
  */
 export default function AppNav({ items, activeKey, onSelect, brand, eyebrow, title, onLogout }: {
   items: NavItem[];
@@ -53,7 +53,7 @@ export default function AppNav({ items, activeKey, onSelect, brand, eyebrow, tit
     try {
       localStorage.setItem(SIDEBAR_COLLAPSED_KEY, collapsed ? "1" : "0");
     } catch {
-      // Le choix reste appliqué à l'écran pour cette session.
+      // Le choix reste appliqué à l’écran pour cette session.
     }
   }, [collapsed, preferenceLoaded]);
 

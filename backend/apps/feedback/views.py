@@ -84,7 +84,7 @@ class PublicFeedbackView(APIView):
             user=request.user if request.user.is_authenticated else None,
             organization=request.user.organization if request.user.is_authenticated and request.user.organization_id else None,
         )
-        return Response({"id": str(feedback.id), "detail": "Merci pour ton retour."}, status=status.HTTP_201_CREATED)
+        return Response({"id": str(feedback.id), "detail": "Merci pour votre retour."}, status=status.HTTP_201_CREATED)
 
 
 class PlatformOverviewView(APIView):

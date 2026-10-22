@@ -4,10 +4,10 @@ import { useEffect, useLayoutEffect, useRef, type RefObject } from "react";
 
 /**
  * Effet « gooey » partagé : toute fenêtre ou fenêtre volante (réglages, confirmation, formulaire, menu, cookies…) sort du bouton
- * qui l'a ouverte comme une goutte, et s'y résorbe à la fermeture.
+ * qui l’a ouverte comme une goutte, et s’y résorbe à la fermeture.
  *
  *  - `<GooeyProvider />` (monté une fois dans Providers) retient le dernier bouton cliqué et définit le filtre SVG commun.
- *  - `useGooey(ref)` s'appelle dans le composant de la fenêtre : au montage, une goutte part du bouton vers la carte ; au démontage,
+ *  - `useGooey(ref)` s’appelle dans le composant de la fenêtre : au montage, une goutte part du bouton vers la carte ; au démontage,
  *    un « fantôme » de la carte se résorbe dans le bouton. Rien à ajouter sur les boutons eux-mêmes.
  *
  * Mouvement réduit, navigateur sans WAAPI, ou fenêtre ouverte sans clic récent : aucune animation, la fenêtre apparaît comme avant.
@@ -26,7 +26,7 @@ let lastOrigin: Origin | null = null;
 const toRect = (r: DOMRect): Rect => ({ left: r.left, top: r.top, width: r.width, height: r.height });
 const centerOf = (r: Rect) => ({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-/** Pseudo-aléatoire déterministe : les gouttes tombent toujours au même endroit (pas de scintillement d'une ouverture à l'autre). */
+/** Pseudo-aléatoire déterministe : les gouttes tombent toujours au même endroit (pas de scintillement d’une ouverture à l’autre). */
 const noise = (i: number) => { const x = Math.sin(i * 12.9898 + 4.1414) * 43758.5453; return x - Math.floor(x); };
 
 export function GooeyProvider() {
@@ -101,13 +101,13 @@ function buildLayer(from: Rect, to: Rect, color: string, radius: number, reverse
     { ...pose(1, 1, `${radius}px`), offset: 0.76, easing: ease },
     { ...pose(1, 1, `${radius}px`), offset: 1 },
   ];
-  // À la fermeture, même trajet à l'envers ; les courbes par image sont retirées (la courbe globale de l'appelant s'applique).
+  // À la fermeture, même trajet à l’envers ; les courbes par image sont retirées (la courbe globale de l’appelant s’applique).
   const blobFrames = reverse ? [...frames].reverse().map(({ easing: _easing, ...frame }) => ({ ...frame, offset: 1 - (frame.offset as number) })) : frames;
 
   const dropEls: { el: HTMLElement; frames: Keyframe[]; delay: number }[] = [];
   const vx = tc.x - fc.x, vy = tc.y - fc.y;
   const dist = Math.hypot(vx, vy) || 1;
-  const nx = -vy / dist, ny = vx / dist; // perpendiculaire : les gouttes s'écartent de l'axe bouton → carte
+  const nx = -vy / dist, ny = vx / dist; // perpendiculaire : les gouttes s’écartent de l’axe bouton → carte
   for (let i = 0; i < drops; i += 1) {
     const size = 13 + noise(i + 1) * 17;
     const el = document.createElement("div");
@@ -132,17 +132,17 @@ function buildLayer(from: Rect, to: Rect, color: string, radius: number, reverse
 
 type Kind = "dialog" | "popover";
 export interface GooeyOptions {
-  /** Élément stylé (fond, rayon) à l'intérieur de la ref, si la ref est un conteneur. */
+  /** Élément stylé (fond, rayon) à l’intérieur de la ref, si la ref est un conteneur. */
   selector?: string;
   /** `dialog` : le calque se glisse derrière la carte, dans son fond. `popover` : calque au-dessus de la page, carte révélée à la fin. */
   kind?: Kind;
-  /** Si la fenêtre s'ouvre sans clic récent : `bottom` la fait sortir du bas de l'écran, `none` garde l'apparition d'origine. */
+  /** Si la fenêtre s’ouvre sans clic récent : `bottom` la fait sortir du bas de l’écran, `none` garde l’apparition d’origine. */
   fallback?: "bottom" | "none";
-  /** Ignore le dernier clic (fenêtre qui s'ouvre seule). */
+  /** Ignore le dernier clic (fenêtre qui s’ouvre seule). */
   ignoreClick?: boolean;
 }
 
-/** Panneau volant (menu, bulle d'aide, mini-formulaire) : même effet que `useGooey(ref, { kind: "popover" })`, sans écrire de ref. */
+/** Panneau volant (menu, bulle d’aide, mini-formulaire) : même effet que `useGooey(ref, { kind: "popover" })`, sans écrire de ref. */
 export function GooeyPanel({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   const ref = useRef<HTMLDivElement>(null);
   useGooey(ref, { kind: "popover" });
@@ -162,7 +162,7 @@ export function useGooey(ref: RefObject<HTMLElement | null>, options: GooeyOptio
     if (!from) return undefined;
 
     // 1) Entrée ---------------------------------------------------------------------------------------------------------------------
-    card.dataset.gooey = "on"; // neutralise l'animation d'apparition CSS de la carte (voir globals.css) avant de mesurer sa vraie place
+    card.dataset.gooey = "on"; // neutralise l’animation d’apparition CSS de la carte (voir globals.css) avant de mesurer sa vraie place
     const to = toRect(card.getBoundingClientRect());
     if (to.width < 8 || to.height < 8) { delete card.dataset.gooey; return undefined; }
     const { color, radius } = cardColors(card);
@@ -176,7 +176,7 @@ export function useGooey(ref: RefObject<HTMLElement | null>, options: GooeyOptio
     const running: Animation[] = [];
     running.push(entering.blob.animate(entering.blobFrames, { duration: DURATION, easing: "linear", fill: "both" })); // les courbes sont dans les images clés
     entering.dropEls.forEach(({ el, frames, delay }) => running.push(el.animate(frames, { duration: DURATION * 0.92, delay, easing: "cubic-bezier(0.3, 0.7, 0.3, 1)", fill: "both" })));
-    // La carte n'apparaît que lorsque la goutte a pris sa taille : elle se fond alors dans la forme déjà en place.
+    // La carte n’apparaît que lorsque la goutte a pris sa taille : elle se fond alors dans la forme déjà en place.
     running.push(card.animate([{ opacity: 0 }, { opacity: 1 }], { delay: DURATION * 0.56, duration: DURATION * 0.36, easing: "ease-out", fill: "backwards" }));
     const fade = entering.layer.animate([{ opacity: 1 }, { opacity: 1, offset: 0.9 }, { opacity: 0 }], { duration: DURATION + 120, fill: "forwards" });
     running.push(fade);
@@ -194,7 +194,7 @@ export function useGooey(ref: RefObject<HTMLElement | null>, options: GooeyOptio
       entering.layer.remove();
       delete card.dataset.gooey;
       const snapshot = lastCard;
-      // En développement (mode strict) React démonte puis remonte aussitôt : tant que la carte est dans le document, ce n'est pas une fermeture.
+      // En développement (mode strict) React démonte puis remonte aussitôt : tant que la carte est dans le document, ce n’est pas une fermeture.
       queueMicrotask(() => {
         if (card.isConnected) return;
         const target = origin && origin.el.isConnected ? toRect(origin.el.getBoundingClientRect()) : from;
@@ -208,7 +208,7 @@ export function useGooey(ref: RefObject<HTMLElement | null>, options: GooeyOptio
         done.onfinish = () => leaving.layer.remove();
       });
     };
-    // Les options sont lues une seule fois, à l'ouverture.
+    // Les options sont lues une seule fois, à l’ouverture.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }

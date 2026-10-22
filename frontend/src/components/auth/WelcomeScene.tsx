@@ -4,8 +4,8 @@ import { useId } from "react";
 
 export type SceneStatus = "idle" | "busy" | "error";
 
-/* QR code décoratif : 21×21 modules, trois repères d'angle et des modules pseudo-aléatoires. La graine est fixe, donc le tracé
-   est identique côté serveur et côté navigateur (aucune hydratation décalée). Ce n'est pas un vrai QR : il n'encode rien. */
+/* QR code décoratif : 21×21 modules, trois repères d’angle et des modules pseudo-aléatoires. La graine est fixe, donc le tracé
+   est identique côté serveur et côté navigateur (aucune hydratation décalée). Ce n’est pas un vrai QR : il n’encode rien. */
 const GRID = 21;
 const MODULE = 4.4;
 
@@ -38,7 +38,7 @@ const QR = qrPath();
 const SPARKS = [[-62, -30], [-38, -54], [0, -62], [40, -52], [66, -26], [70, 12]] as const;
 
 /** Scène de bienvenue (SVG animé, sans image ni script) : un visiteur scanne le QR, remplit sa fiche, signe, et reçoit « Bienvenue ».
- * Le mouvement est une boucle CSS de 10 s ; sans animation (prefers-reduced-motion) la scène reste sur l'image finale.
+ * Le mouvement est une boucle CSS de 10 s ; sans animation (prefers-reduced-motion) la scène reste sur l’image finale.
  * `status` la fait réagir : « busy » accélère le scan, « error » secoue le téléphone. Styles : auth-stage.css. */
 export function WelcomeScene({ status = "idle", className = "" }: { status?: SceneStatus; className?: string }) {
   const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
@@ -86,7 +86,7 @@ export function WelcomeScene({ status = "idle", className = "" }: { status?: Sce
           </g></g>
         </g>
 
-        {/* Chevalet QR de l'accueil : le trait de scan le balaie, les repères pulsent. */}
+        {/* Chevalet QR de l’accueil : le trait de scan le balaie, les repères pulsent. */}
         <g transform="translate(226 118)">
           <g className="sc-par-b"><g className="sc-qr">
             <g transform="rotate(5 58 58)">

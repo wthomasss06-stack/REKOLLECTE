@@ -4,7 +4,7 @@ import SignatureCanvas from "react-signature-canvas";
 import { ArrowCounterClockwise } from "@phosphor-icons/react";
 
 /**
- * Le canvas doit avoir EXACTEMENT la taille à laquelle il est affiché (× densité de pixels de l'écran). Sans cela il garde
+ * Le canvas doit avoir EXACTEMENT la taille à laquelle il est affiché (× densité de pixels de l’écran). Sans cela il garde
  * sa taille HTML par défaut (300×150) étirée en CSS, et signature_pad, qui lit la position du doigt en pixels CSS, trace le
  * trait décalé par rapport au doigt — très visible sur tablette. On redimensionne donc au montage et à chaque changement
  * de largeur, en conservant le tracé déjà dessiné.

@@ -7,15 +7,15 @@ import { cloudImage, cloudinaryLoader } from "@/lib/cloudinary";
 
 /**
  * next/image servi par Cloudinary (loader), avec repli automatique sur le fichier local de
- * /public si Cloudinary ne répond pas (image pas encore uploadée, panne…) : la landing n'a
- * jamais d'image cassée, même juste après un déploiement.
+ * /public si Cloudinary ne répond pas (image pas encore uploadée, panne…) : la landing n’a
+ * jamais d’image cassée, même juste après un déploiement.
  */
 export function CloudImage(props: Omit<ImageProps, "loader">) {
   const { onError, unoptimized, ...rest } = props;
   const [failed, setFailed] = useState(false);
   const ref = useRef<HTMLImageElement>(null);
 
-  // Une erreur survenue avant l'hydratation n'émet plus d'événement : on la détecte au montage.
+  // Une erreur survenue avant l’hydratation n’émet plus d’événement : on la détecte au montage.
   useEffect(() => {
     const img = ref.current;
     if (img && img.complete && img.naturalWidth === 0) setFailed(true);

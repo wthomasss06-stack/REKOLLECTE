@@ -15,7 +15,7 @@ export interface SeoLink {
   text: string;
 }
 
-/** Tableau comparatif : la première colonne sert d'intitulé de ligne. Défilement horizontal sur mobile. */
+/** Tableau comparatif : la première colonne sert d’intitulé de ligne. Défilement horizontal sur mobile. */
 export function SeoTable({ caption, head, rows }: { caption: string; head: string[]; rows: string[][] }) {
   return (
     <div className="table-wrap">
@@ -58,12 +58,12 @@ function SeoRelated({ links }: { links: SeoLink[] }) {
 interface SeoPageProps {
   /** Chemin canonique de la page (ex. « /gestion-visiteurs-qr-code »). */
   path: string;
-  /** Titre H1 : un seul par page, il porte l'intention de recherche principale. */
+  /** Titre H1 : un seul par page, il porte l’intention de recherche principale. */
   h1: string;
   description: string;
-  /** Libellé du dernier élément fil d'Ariane (nom court de la page). */
+  /** Libellé du dernier élément fil d’Ariane (nom court de la page). */
   crumb: string;
-  /** Réponse directe, affichée en premier : c'est l'extrait que reprennent Google et les moteurs de réponse. */
+  /** Réponse directe, affichée en premier : c’est l’extrait que reprennent Google et les moteurs de réponse. */
   answer: React.ReactNode;
   faqs: SeoFaq[];
   /** Pages voisines à relier (maillage interne), affichées sous la FAQ. */
@@ -74,7 +74,7 @@ interface SeoPageProps {
   children: React.ReactNode;
 }
 
-/** Gabarit des pages de référencement : fil d'Ariane, H1, réponse directe, contenu, FAQ, appel à l'action et JSON-LD
+/** Gabarit des pages de référencement : fil d’Ariane, H1, réponse directe, contenu, FAQ, appel à l’action et JSON-LD
  * (WebPage ou Article, BreadcrumbList, FAQPage) reliés par @id au reste du site. Composant serveur : tout part dans le HTML initial. */
 export default function SeoPage({ path, h1, description, crumb, answer, faqs, related, kind = "WebPage", publishedIso = SEO_UPDATED_ISO, children }: SeoPageProps) {
   const url = `${SITE_URL}${path}`;

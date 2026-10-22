@@ -115,7 +115,8 @@ def sanitize_responses(organization: Organization, fields, responses: dict) -> d
 
 def public_schema(template, organization: Organization) -> list:
     """Schéma réellement servi (et exigé) pour un visiteur : liste « Qui venez-vous voir ? », champs inclus dans le plan, motifs prédéfinis."""
-    fields = public_fields_schema(template, organization)
+    # La lecture de pièce d'identité est retirée du produit : un champ « document_scan » resté dans un ancien formulaire n'est plus servi.
+    fields = [field for field in public_fields_schema(template, organization) if not (isinstance(field, dict) and field.get("type") == "document_scan")]
     return apply_privacy_options(apply_entitlements_to_schema(fields, organization), organization)
 
 

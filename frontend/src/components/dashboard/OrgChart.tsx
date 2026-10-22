@@ -4,7 +4,7 @@ import type { UserProfile } from "@/types";
 import styles from "./OrgChart.module.css";
 
 function roleLabel(role: UserProfile["role"]) {
-  return role === "BOSS" ? "Patron" : role === "GERANT" ? "Gérant" : "Staff";
+  return role === "BOSS" ? "Patron" : role === "GERANT" ? "Gérant" : "Agent";
 }
 
 function MemberCard({ member, accent }: { member: UserProfile; accent: "boss" | "manager" | "staff" }) {
@@ -48,7 +48,7 @@ export default function OrgChart({ members }: { members: UserProfile[] }) {
                   <div className={styles.managerConnector} />
                   <MemberCard member={manager} accent="manager" />
                   {managerStaff.length > 0 && <div className={styles.staffRow}>{managerStaff.map((member) => <div key={member.id} className={styles.staffBranch}><div className={styles.staffConnector} /><MemberCard member={member} accent="staff" /></div>)}</div>}
-                  {managerStaff.length === 0 && <p className={styles.empty}>Aucun staff rattaché</p>}
+                  {managerStaff.length === 0 && <p className={styles.empty}>Aucun Agent rattaché</p>}
                 </section>
               );
             })}
@@ -56,7 +56,7 @@ export default function OrgChart({ members }: { members: UserProfile[] }) {
         ) : (
           <p className={styles.empty}>Aucun gérant nommé pour le moment.</p>
         )}
-        {unassigned.length > 0 && <section className={styles.unassigned}><p className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-soft">Staff à affecter</p><div className={styles.unassignedRow}>{unassigned.map((member) => <MemberCard key={member.id} member={member} accent="staff" />)}</div></section>}
+        {unassigned.length > 0 && <section className={styles.unassigned}><p className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-soft">Agent à affecter</p><div className={styles.unassignedRow}>{unassigned.map((member) => <MemberCard key={member.id} member={member} accent="staff" />)}</div></section>}
       </div>
     </div>
   );

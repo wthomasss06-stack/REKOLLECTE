@@ -16,8 +16,8 @@ export const TONE_MOOD: Record<FlashTone, MoodName> = {
 };
 
 /**
- * Carte de message façon “flash message” : teinte douce qui s'estompe vers la surface,
- * humeur posée sur une ligne d'horizon dessinée à la main, gros titre coloré, actions en pilule.
+ * Carte de message façon “flash message” : teinte douce qui s’estompe vers la surface,
+ * humeur posée sur une ligne d’horizon dessinée à la main, gros titre coloré, actions en pilule.
  * Purement visuelle : la logique (promesses, focus, clavier) vit dans DialogProvider.
  */
 export default function FlashCard({

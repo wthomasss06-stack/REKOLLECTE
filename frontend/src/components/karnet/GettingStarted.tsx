@@ -11,8 +11,8 @@ import { buildGuideSteps, type GuideStep } from "@/lib/karnetGuide";
 
 /**
  * Guide « Premiers pas » de REKOLLECTE+ : ressource -> client -> première réservation -> encaissement.
- * L'ordre est celui des dépendances réelles : sans ressource on ne peut pas réserver, sans client non plus.
- * Les étapes se cochent TOUTES SEULES d'après les données (GET /karnet/summary/), pas d'un clic « fait ».
+ * L’ordre est celui des dépendances réelles : sans ressource on ne peut pas réserver, sans client non plus.
+ * Les étapes se cochent TOUTES SEULES d’après les données (GET /karnet/summary/), pas d’un clic « fait ».
  */
 
 interface GuideApi {
@@ -23,13 +23,13 @@ interface GuideApi {
   visible: boolean;
   dismiss: () => void;
   refresh: () => Promise<void>;
-  /** Ouvrir la fenêtre Paiements = avoir « contrôlé » l'encaissement (dernière étape du guide). */
+  /** Ouvrir la fenêtre Paiements = avoir « contrôlé » l’encaissement (dernière étape du guide). */
   markPaymentsSeen: () => void;
 }
 
 const GuideContext = createContext<GuideApi | null>(null);
 
-/** Même chose que useGuide, mais renvoie null hors du fournisseur (page REKOLLECTE au Niveau 1, où le guide n'existe pas). */
+/** Même chose que useGuide, mais renvoie null hors du fournisseur (page REKOLLECTE au Niveau 1, où le guide n’existe pas). */
 export function useGuideOptional(): GuideApi | null {
   return useContext(GuideContext);
 }
@@ -58,7 +58,7 @@ export function GuideProvider({ children }: { children: ReactNode }) {
       const res = await apiClient.get<KarnetSummary>("/karnet/summary/");
       setSummary(res.data);
     } catch {
-      /* le guide est un confort : en cas d'échec il reste simplement caché */
+      /* le guide est un confort : en cas d’échec il reste simplement caché */
     }
   }, []);
 
@@ -104,7 +104,7 @@ export function GuideProvider({ children }: { children: ReactNode }) {
 
 const ctaClass = "inline-flex min-h-[44px] shrink-0 items-center justify-center gap-2 rounded-full bg-cta px-5 text-sm font-semibold text-cta-ink transition hover:bg-cta-hover";
 
-/** Carte complète (page d'accueil REKOLLECTE+) ou bandeau compact (autres onglets). */
+/** Carte complète (page d’accueil REKOLLECTE+) ou bandeau compact (autres onglets). */
 export default function GettingStarted({ variant }: { variant: "full" | "compact" }) {
   const { steps, current, doneCount, visible, dismiss } = useGuide();
   if (!visible || !current) return null;
@@ -136,7 +136,7 @@ export default function GettingStarted({ variant }: { variant: "full" | "compact
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-lg font-bold text-ink">Premiers pas avec REKOLLECTE+</h2>
-          <p className="mt-1 text-sm text-ink-soft">{doneCount} étape{doneCount > 1 ? "s" : ""} sur {steps.length} — dans cet ordre, c’est le plus court chemin jusqu’à ton premier encaissement.</p>
+          <p className="mt-1 text-sm text-ink-soft">{doneCount} étape{doneCount > 1 ? "s" : ""} sur {steps.length} — dans cet ordre, c’est le plus court chemin jusqu’à votre premier encaissement.</p>
         </div>
         {progress}
       </div>

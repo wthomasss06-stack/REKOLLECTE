@@ -23,7 +23,7 @@ export default function Modal({
   return <ModalCard title={title} description={description} onClose={onClose} wide={wide}>{children}</ModalCard>;
 }
 
-/** Carte montée seulement à l'ouverture : c'est elle qui porte l'effet gooey (sortie du bouton cliqué, retour dans ce bouton à la fermeture). */
+/** Carte montée seulement à l’ouverture : c’est elle qui porte l’effet gooey (sortie du bouton cliqué, retour dans ce bouton à la fermeture). */
 function ModalCard({ title, description, onClose, children, wide }: { title: string; description?: string; onClose: () => void; children: React.ReactNode; wide: boolean }) {
   const cardRef = useRef<HTMLDivElement>(null);
   useGooey(cardRef);

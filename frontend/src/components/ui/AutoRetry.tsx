@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 import Loader from "@/components/Loader";
 
-// Délai croissant entre deux relances automatiques d'une même page (3 s, 5 s, 8 s… plafonné à 20 s).
+// Délai croissant entre deux relances automatiques d’une même page (3 s, 5 s, 8 s… plafonné à 20 s).
 // La mémoire survit au démontage : la page repasse par son chargement entre deux essais.
 const history = new Map<string, { attempt: number; at: number }>();
 
@@ -17,8 +17,8 @@ function nextDelay(key: string): number {
   return Math.min(Math.round(3_000 * 1.6 ** attempt), 20_000);
 }
 
-/** Remplace l'écran d'erreur « Impossible de charger… [Réessayer] » : la page reste sur le chargement de marque et se relance
- * toute seule (délai croissant, et tout de suite au retour du réseau ou de l'onglet). Aucun bouton à taper, aucun message technique
+/** Remplace l’écran d’erreur « Impossible de charger… [Réessayer] » : la page reste sur le chargement de marque et se relance
+ * toute seule (délai croissant, et tout de suite au retour du réseau ou de l’onglet). Aucun bouton à taper, aucun message technique
  * (« le serveur se réveille… ») : seul le chargement REKOLLECTE reste affiché. */
 export default function AutoRetry({ onRetry, label = "Chargement…" }: { onRetry: () => void; label?: string }) {
   const pathname = usePathname();

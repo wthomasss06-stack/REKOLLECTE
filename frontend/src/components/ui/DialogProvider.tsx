@@ -17,15 +17,15 @@ import { lockScroll } from "@/lib/scrollLock";
  *   const ok = await confirm({ tone: "danger", title: "Supprimer ?", run: () => apiClient.delete(url) });
  *
  * Avec `run`, la requête part DANS la boîte (mode “ajax”) : bouton en chargement, puis
- * carte de réussite (si successTitle) ou carte d'erreur avec « Réessayer ». Le résultat vaut
- * true seulement si l'action a réellement abouti.
+ * carte de réussite (si successTitle) ou carte d’erreur avec « Réessayer ». Le résultat vaut
+ * true seulement si l’action a réellement abouti.
  */
 interface BaseOptions { title: string; message?: ReactNode; tone?: FlashTone; mood?: MoodName }
 interface RunOptions<Args extends unknown[]> {
-  /** Requête exécutée dans la boîte ; une exception affiche la carte d'erreur. */
+  /** Requête exécutée dans la boîte ; une exception affiche la carte d’erreur. */
   run?: (...args: Args) => Promise<unknown>;
   runningLabel?: string;
-  /** Si fourni, une carte de réussite s'affiche ~2 s après la requête. */
+  /** Si fourni, une carte de réussite s’affiche ~2 s après la requête. */
   successTitle?: string;
   successMessage?: ReactNode;
   errorTitle?: string;
@@ -61,7 +61,7 @@ export function DialogProvider({ children }: { children: ReactNode }) {
   const queueRef = useRef<Request[]>([]);
   const idRef = useRef(0);
 
-  // Une seule boîte à l'écran : les demandes simultanées attendent leur tour.
+  // Une seule boîte à l’écran : les demandes simultanées attendent leur tour.
   const enqueue = useCallback((request: Request) => {
     if (activeRef.current) { queueRef.current.push(request); return; }
     activeRef.current = request;
@@ -97,7 +97,7 @@ function DialogView({ request, onDone }: { request: Request; onDone: () => void 
   const titleId = `${uid}-title`;
   const messageId = `${uid}-message`;
 
-  useGooey(cardRef, { selector: ".qr-flash" }); // la carte sort du bouton qui a demandé la confirmation et s'y résorbe
+  useGooey(cardRef, { selector: ".qr-flash" }); // la carte sort du bouton qui a demandé la confirmation et s’y résorbe
 
   const options = request.options;
   const runOptions = request.kind === "alert" ? undefined : request.options;
@@ -123,7 +123,7 @@ function DialogView({ request, onDone }: { request: Request; onDone: () => void 
     } catch (error) {
       if (!mounted.current) return;
       const info = normalizeApiError(error);
-      setFailure(info.code === "http_network" ? "Impossible de joindre le serveur. Vérifie ta connexion puis réessaie." : info.message);
+      setFailure(info.code === "http_network" ? "Impossible de joindre le serveur. Vérifiez votre connexion puis réessayez." : info.message);
       setPhase("error");
       return;
     }
@@ -143,14 +143,14 @@ function DialogView({ request, onDone }: { request: Request; onDone: () => void 
 
   useEffect(() => { cancelHandlerRef.current = cancel; });
 
-  // Réussite : la carte se referme seule ; « Continuer » permet d'aller plus vite.
+  // Réussite : la carte se referme seule ; « Continuer » permet d’aller plus vite.
   useEffect(() => {
     if (phase !== "success") return;
     const timer = window.setTimeout(() => settle(true), 1900);
     return () => window.clearTimeout(timer);
   }, [phase, settle]);
 
-  // Fond figé, focus rendu à l'élément d'origine, Échap = annuler, Tab reste dans la carte.
+  // Fond figé, focus rendu à l’élément d’origine, Échap = annuler, Tab reste dans la carte.
   useEffect(() => {
     const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const unlockScroll = lockScroll();

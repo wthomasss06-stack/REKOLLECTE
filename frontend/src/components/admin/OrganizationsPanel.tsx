@@ -22,7 +22,7 @@ export default function OrganizationsPanel({ data, onCreate, onEdit, onDelete }:
     event.preventDefault();
     if (!name.trim() || busy) return;
     setBusy(true);
-    try { await onCreate(name.trim()); setName(""); } catch { /* l'erreur est déjà annoncée par la page : on garde la saisie */ } finally { setBusy(false); }
+    try { await onCreate(name.trim()); setName(""); } catch { /* l’erreur est déjà annoncée par la page : on garde la saisie */ } finally { setBusy(false); }
   };
 
   return (
@@ -34,7 +34,7 @@ export default function OrganizationsPanel({ data, onCreate, onEdit, onDelete }:
       <SearchField value={query} onChange={setQuery} placeholder={`Rechercher parmi ${data.length} entreprise${data.length > 1 ? "s" : ""}`} label="Rechercher une entreprise" />
 
       {rows.length === 0 ? (
-        <EmptyState icon={Buildings} title={data.length ? "Aucune entreprise ne correspond" : "Aucune entreprise pour l’instant"}>{data.length ? "Essaie un autre nom." : "Crée la première avec le champ ci-dessus."}</EmptyState>
+        <EmptyState icon={Buildings} title={data.length ? "Aucune entreprise ne correspond" : "Aucune entreprise pour l’instant"}>{data.length ? "Essayez un autre nom." : "Créez la première avec le champ ci-dessus."}</EmptyState>
       ) : (
         <>
           <div className="hidden overflow-x-auto rounded-2xl border border-border bg-surface md:block">

@@ -9,7 +9,7 @@ export interface SettingsRow {
   title: string;
   description: string;
   icon: Icon;
-  /** Si renseigné, la ligne est un lien (ex. Audit → Paramètres) au lieu d'ouvrir une fenêtre. */
+  /** Si renseigné, la ligne est un lien (ex. Audit → Paramètres) au lieu d’ouvrir une fenêtre. */
   href?: string;
 }
 

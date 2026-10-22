@@ -1,12 +1,12 @@
 import { API_BASE } from "@/lib/apiBase";
 
 /**
- * Mesure d'audience de la vitrine publique, liée au consentement.
+ * Mesure d’audience de la vitrine publique, liée au consentement.
  *
- *  - Rien n'est envoyé, et aucun cookie n'est posé, tant que la personne n'a pas accepté dans le bandeau.
- *  - Le choix est mémorisé dans le navigateur (6 mois, puis le bandeau revient) et le refus n'envoie qu'un compteur anonyme.
- *  - Les cookies `rk_vid` (visiteur, 13 mois) et `rk_sid` (visite, 30 min) sont posés par l'API (httpOnly, même domaine) à la première mesure.
- *  - Jamais de suivi dans l'application connectée, l'administration, ni les formulaires remplis par les visiteurs des établissements.
+ *  - Rien n’est envoyé, et aucun cookie n’est posé, tant que la personne n’a pas accepté dans le bandeau.
+ *  - Le choix est mémorisé dans le navigateur (6 mois, puis le bandeau revient) et le refus n’envoie qu’un compteur anonyme.
+ *  - Les cookies `rk_vid` (visiteur, 13 mois) et `rk_sid` (visite, 30 min) sont posés par l’API (httpOnly, même domaine) à la première mesure.
+ *  - Jamais de suivi dans l’application connectée, l’administration, ni les formulaires remplis par les visiteurs des établissements.
  */
 export const CONSENT_KEY = "rk_cookie_consent";
 export const CONSENT_EVENT = "rk:consent";
@@ -54,7 +54,7 @@ function post(path: string, body?: unknown) {
 export function saveConsent(analytics: boolean): ConsentChoice {
   const choice: ConsentChoice = { v: CONSENT_VERSION, analytics, at: new Date().toISOString() };
   try { window.localStorage.setItem(CONSENT_KEY, JSON.stringify(choice)); } catch { /* navigation privée : le choix vaut pour cette page seulement */ }
-  void post("/analytics/consent/", { accepted: analytics }); // d'abord la décision, ensuite la première page vue qui en découle
+  void post("/analytics/consent/", { accepted: analytics }); // d’abord la décision, ensuite la première page vue qui en découle
   window.dispatchEvent(new CustomEvent<ConsentChoice>(CONSENT_EVENT, { detail: choice }));
   return choice;
 }

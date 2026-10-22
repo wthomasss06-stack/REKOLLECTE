@@ -15,8 +15,8 @@ import { apiClient } from "@/lib/api";
 import type { KarnetClientDetail } from "@/types";
 
 /**
- * REKOLLECTE+ (ex "Vue d'ensemble") : les visiteurs de l'accueil devenus clients,
- * avec ce qu'ils ont fait chez toi. Un clic ouvre l'historique complet dans un
+ * REKOLLECTE+ (ex "Vue d’ensemble") : les visiteurs de l’accueil devenus clients,
+ * avec ce qu’ils ont fait chez toi. Un clic ouvre l’historique complet dans un
  * modal, sans quitter la liste (voir ClientHistoryModal).
  */
 export default function ClientsPanel() {
@@ -33,7 +33,7 @@ export default function ClientsPanel() {
   const canManage = user?.role === "BOSS" || user?.role === "GERANT";
 
   // Le guide « Premiers pas » renvoie ici avec ?new=1 : on ouvre directement le formulaire.
-  // (lecture directe de l'URL : useSearchParams imposerait une frontière Suspense à toute la page)
+  // (lecture directe de l’URL : useSearchParams imposerait une frontière Suspense à toute la page)
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get("new") === "1") {
       setFormOpen(true);
@@ -62,7 +62,7 @@ export default function ClientsPanel() {
         .then((res) => !cancelled && setClients(res.data))
         .catch(() => !cancelled && setError("Impossible de charger les clients."))
         .finally(() => !cancelled && setLoading(false));
-    }, search ? 300 : 0); // pas d'attente au premier chargement, un court debounce pendant la frappe
+    }, search ? 300 : 0); // pas d’attente au premier chargement, un court debounce pendant la frappe
     return () => {
       cancelled = true;
       window.clearTimeout(timer);
@@ -127,10 +127,10 @@ export default function ClientsPanel() {
                 {search ? (
                   <p className="text-sm text-ink-soft">Aucun client ne correspond à cette recherche.</p>
                 ) : summary && summary.resources === 0 ? (
-                  // L'étape qui bloque vraiment est la ressource, pas le client : on le dit et on y emmène.
+                  // L’étape qui bloque vraiment est la ressource, pas le client : on le dit et on y emmène.
                   <>
-                    <p className="font-semibold text-ink">Commence par créer ta première ressource</p>
-                    <p className="mx-auto mt-1 max-w-md text-sm text-ink-soft">Une chambre, une table, une salle… C’est ce que tes clients réservent. Une fois qu’elle existe, tu pourras ajouter un client puis faire ta première réservation.</p>
+                    <p className="font-semibold text-ink">Commencez par créer votre première ressource</p>
+                    <p className="mx-auto mt-1 max-w-md text-sm text-ink-soft">Une chambre, une table, une salle… C’est ce que vos clients réservent. Une fois qu’elle existe, vous pourrez ajouter un client puis faire votre première réservation.</p>
                     {canManage ? (
                       <Link href="/dashboard/rekollecte?open=ressources&onboarding=1" className="mt-4 inline-flex min-h-[44px] items-center rounded-full bg-cta px-6 text-sm font-semibold text-cta-ink transition hover:bg-cta-hover">Créer une ressource</Link>
                     ) : (
@@ -139,7 +139,7 @@ export default function ClientsPanel() {
                   </>
                 ) : (
                   <>
-                    <p className="text-sm text-ink-soft">Aucun client pour le moment : les passages à l’accueil alimentent cette liste, ou ajoute-en un à la main.</p>
+                    <p className="text-sm text-ink-soft">Aucun client pour le moment : les passages à l’accueil alimentent cette liste, ou ajoutez-en un à la main.</p>
                     <button type="button" onClick={() => setFormOpen(true)} className="mt-4 inline-flex min-h-[44px] items-center gap-2 rounded-full bg-cta px-6 text-sm font-semibold text-cta-ink transition hover:bg-cta-hover"><Plus size={16} weight="bold" /> Ajouter un client</button>
                   </>
                 )}

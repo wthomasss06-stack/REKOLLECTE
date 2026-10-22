@@ -20,7 +20,6 @@ export default function DonneesPanel() {
   const [policy, setPolicy] = useState<Policy | null>(null);
   const [retention, setRetention] = useState("");
   const [restrict, setRestrict] = useState(false);
-  const [storeNumber, setStoreNumber] = useState(false);
   const [contact, setContact] = useState("");
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
@@ -33,7 +32,6 @@ export default function DonneesPanel() {
     if (!organization) return;
     setRetention(organization.retention_visits_days ? String(organization.retention_visits_days) : "");
     setRestrict(Boolean(organization.restrict_visit_reasons));
-    setStoreNumber(Boolean(organization.store_document_number));
     setContact(organization.privacy_contact || "");
   }, [organization]);
 
@@ -41,7 +39,7 @@ export default function DonneesPanel() {
     event.preventDefault();
     setError(""); setSaved(false);
     try {
-      await apiClient.patch("/org/me/", { retention_visits_days: retention ? Number(retention) : null, restrict_visit_reasons: restrict, store_document_number: storeNumber, privacy_contact: contact });
+      await apiClient.patch("/org/me/", { retention_visits_days: retention ? Number(retention) : null, restrict_visit_reasons: restrict, privacy_contact: contact });
       await refreshUser();
       apiClient.get<Policy>("/privacy/retention/").then(({ data }) => setPolicy(data)).catch(() => undefined);
       setSaved(true);
@@ -83,7 +81,6 @@ export default function DonneesPanel() {
       <section className="space-y-3">
         <h3 className="text-sm font-semibold text-ink">Minimiser les données collectées</h3>
         <label className="flex min-h-[44px] items-start gap-3 text-sm text-ink"><input type="checkbox" checked={restrict} onChange={(event) => setRestrict(event.target.checked)} className="mt-0.5 h-5 w-5 accent-cta" /><span>Motifs de visite prédéfinis uniquement <span className="block text-xs text-ink-soft">Retire « Autre » (texte libre) : un visiteur pourrait y écrire une information sensible, par exemple de santé.</span></span></label>
-        <label className="flex min-h-[44px] items-start gap-3 text-sm text-ink"><input type="checkbox" checked={storeNumber} onChange={(event) => setStoreNumber(event.target.checked)} className="mt-0.5 h-5 w-5 accent-cta" /><span>Conserver le numéro complet de la pièce d’identité <span className="block text-xs text-ink-soft">Déconseillé : par défaut, seuls les 3 derniers caractères sont gardés. À activer seulement sur besoin démontré.</span></span></label>
       </section>
       <section className="space-y-2">
         <h3 className="text-sm font-semibold text-ink">Contact pour les droits des personnes</h3>

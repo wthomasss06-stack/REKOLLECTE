@@ -27,12 +27,12 @@ const MANAGERS: AccountRole[] = ["BOSS", "GERANT"];
 interface Section extends SettingsRow { roles: AccountRole[]; level2?: boolean; panel?: () => ReactNode }
 
 // Niveau 1 : Formulaire et QR codes. Niveau 2 (REKOLLECTE+) : les mêmes lignes, dans le même ordre, puis les outils en plus —
-// la page ne change pas de place ni de forme quand l'établissement passe au Niveau 2.
+// la page ne change pas de place ni de forme quand l’établissement passe au Niveau 2.
 const SECTIONS: Section[] = [
   { id: "formulaire", title: "Formulaire", description: "Les champs que le visiteur remplit en arrivant", icon: ListChecks, roles: MANAGERS, panel: () => <FormulairePanel /> },
   { id: "qr", title: "QR codes", description: "Points d’accueil, QR à afficher et à imprimer", icon: QrCode, roles: ALL_ROLES, panel: () => <QrCodePanel /> },
   { id: "clients", title: "Clients", description: "Les visiteurs devenus clients, avec leur historique", icon: UsersThree, roles: ALL_ROLES, level2: true, panel: () => <ClientsPanel /> },
-  { id: "ressources", title: "Ressources", description: "Chambres, tables, salles… ce que tes clients réservent", icon: Cube, roles: ALL_ROLES, level2: true, panel: () => <ResourcesPanel /> },
+  { id: "ressources", title: "Ressources", description: "Chambres, tables, salles… ce que vos clients réservent", icon: Cube, roles: ALL_ROLES, level2: true, panel: () => <ResourcesPanel /> },
   { id: "reservations", title: "Réservations", description: "Le planning, les créneaux et leur statut", icon: CalendarCheck, roles: ALL_ROLES, level2: true, panel: () => <ReservationsPanel /> },
   { id: "paiements", title: "Paiements", description: "Ce qui est à encaisser et l’historique des encaissements", icon: Money, roles: ALL_ROLES, level2: true, panel: () => <PaiementsPanel /> },
   { id: "rappels", title: "Rappels", description: "Les créneaux terminés à traiter, avec alarme", icon: BellRinging, roles: ALL_ROLES, level2: true, panel: () => <RappelsPanel /> },
@@ -47,7 +47,7 @@ function RekollecteContent() {
   const karnet = Boolean(organization?.capabilities?.karnet);
   const markPaymentsSeen = guide?.markPaymentsSeen;
 
-  // Ouvrir Paiements = avoir « contrôlé » l'encaissement : c'est la dernière étape du guide « Premiers pas ».
+  // Ouvrir Paiements = avoir « contrôlé » l’encaissement : c’est la dernière étape du guide « Premiers pas ».
   useEffect(() => { if (openId === "paiements") markPaymentsSeen?.(); }, [openId, markPaymentsSeen]);
 
   if (!user || !organization) return <Loader fullScreen={false} label="Chargement…" />;
@@ -61,7 +61,7 @@ function RekollecteContent() {
     <div className={`mx-auto max-w-2xl space-y-6 ${karnet ? "touch-comfort" : ""}`}>
       <div>
         <h1 className="text-2xl font-bold text-ink">{product}</h1>
-        <p className="mt-1 text-sm text-ink-soft">{karnet ? "Le formulaire, les QR codes, les clients, les ressources, les réservations, les paiements et les rappels de ton établissement." : "Le formulaire que remplissent tes visiteurs et les QR codes pour y accéder."}</p>
+        <p className="mt-1 text-sm text-ink-soft">{karnet ? "Le formulaire, les QR codes, les clients, les ressources, les réservations, les paiements et les rappels de votre établissement." : "Le formulaire que remplissent vos visiteurs et les QR codes pour y accéder."}</p>
       </div>
       {karnet && guide && <GettingStarted variant="compact" />}
       <SettingsRows rows={sections} activeId={openId} onSelect={(id) => open(id as PanelId)} label={`Rubriques de ${product}`} />

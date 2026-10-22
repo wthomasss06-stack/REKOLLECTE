@@ -7,11 +7,11 @@ import { X } from "@phosphor-icons/react";
 import { useGooey } from "@/lib/gooey";
 import { lockScroll } from "@/lib/scrollLock";
 
-/** Fenêtre d'une rubrique (réglages, REKOLLECTE) : bloque le défilement de la page, piège le focus, se ferme avec Échap
- * ou un clic dans le fond, et rend le focus à la ligne qui l'a ouverte. Sur téléphone : feuille qui monte du bas (voir globals.css).
- * Une autre fenêtre ouverte PAR-DESSUS (confirmation, formulaire d'une rubrique) garde la main : Échap et Tab ne la concernent pas. */
+/** Fenêtre d’une rubrique (réglages, REKOLLECTE) : bloque le défilement de la page, piège le focus, se ferme avec Échap
+ * ou un clic dans le fond, et rend le focus à la ligne qui l’a ouverte. Sur téléphone : feuille qui monte du bas (voir globals.css).
+ * Une autre fenêtre ouverte PAR-DESSUS (confirmation, formulaire d’une rubrique) garde la main : Échap et Tab ne la concernent pas. */
 /** `comfort` : champs et boutons >= 44 px sur tablette/téléphone (classe .touch-comfort de globals.css), à reporter ici car la fenêtre
- * est rendue à la racine du document (portail) et sort donc de la page qui l'a ouverte. */
+ * est rendue à la racine du document (portail) et sort donc de la page qui l’a ouverte. */
 export default function SettingsModal({ title, onClose, wide = false, comfort = false, children }: { title: string; onClose: () => void; wide?: boolean; comfort?: boolean; children: ReactNode }) {
   const dialogRef = useRef<HTMLElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -55,10 +55,10 @@ export default function SettingsModal({ title, onClose, wide = false, comfort = 
     };
   }, []);
 
-  useGooey(dialogRef); // la fenêtre sort du bouton cliqué (rangée de réglage, carte REKOLLECTE…) et s'y résorbe à la fermeture
+  useGooey(dialogRef); // la fenêtre sort du bouton cliqué (rangée de réglage, carte REKOLLECTE…) et s’y résorbe à la fermeture
 
   if (typeof document === "undefined") return null;
-  // Portail : la fenêtre ne dépend ni des marges (space-y), ni des transformations, ni du défilement de la page qui l'ouvre.
+  // Portail : la fenêtre ne dépend ni des marges (space-y), ni des transformations, ni du défilement de la page qui l’ouvre.
   return createPortal(
     <div className={`rk-modal-backdrop${comfort ? " touch-comfort" : ""}`} onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
       <section ref={dialogRef} className={`rk-modal${wide ? " rk-modal--wide" : ""}`} role="dialog" aria-modal="true" aria-labelledby="rk-modal-title">

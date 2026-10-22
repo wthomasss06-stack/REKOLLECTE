@@ -9,9 +9,8 @@ import { FORM_PRESETS } from "@/lib/formPresets";
 import type { FieldType, FormField } from "@/types";
 
 const FIELD_TYPE_LABELS: Record<FieldType, string> = {
-  host: "Qui venez-vous voir ?", text: "Texte court", phone: "Téléphone", email: "Email", number: "Nombre", date: "Date", select: "Liste déroulante", checkbox: "Case à cocher", signature: "Signature", photo: "Photo visiteur", document_scan: "Scanner une pièce d’identité",
+  host: "Qui venez-vous voir ?", text: "Texte court", phone: "Téléphone", email: "Email", number: "Nombre", date: "Date", select: "Liste déroulante", checkbox: "Case à cocher", signature: "Signature", photo: "Photo visiteur",
 };
-const DOCUMENT_FIELD_OPTIONS = [["last_name", "Nom"], ["first_names", "Prénoms"], ["document_number", "Numéro du document"], ["birth_date", "Date de naissance"], ["nationality", "Nationalité"], ["expiry_date", "Date d’expiration"]] as const;
 const IDENTITY_ROLE_LABELS = { full_name: "Nom du client", phone: "Téléphone du client", email: "Email du client" } as const;
 
 let idCounter = 0;
@@ -21,9 +20,9 @@ function keepSignaturesLast(fields: FormField[]): FormField[] {
   return [...fields.filter((field) => field.type !== "signature"), ...fields.filter((field) => field.type === "signature")];
 }
 
-export default function FormBuilder({ initialSchema, formId, initialTitle = "Registre d'accès", onSaved }: { initialSchema: FormField[]; formId?: string; initialTitle?: string; onSaved?: () => void }) {
+export default function FormBuilder({ initialSchema, formId, initialTitle = "Registre d’accès", onSaved }: { initialSchema: FormField[]; formId?: string; initialTitle?: string; onSaved?: () => void }) {
   const { confirm } = useDialog();
-  const [fields, setFields] = useState<FormField[]>(() => keepSignaturesLast(initialSchema));
+  const [fields, setFields] = useState<FormField[]>(() => keepSignaturesLast(initialSchema.filter((field) => (field.type as string) !== "document_scan")));
   const [title, setTitle] = useState(initialTitle);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -34,13 +33,13 @@ export default function FormBuilder({ initialSchema, formId, initialTitle = "Reg
   // Modèles : repliés quand le formulaire a déjà des champs (on le modifie), ouverts quand il est vide (on le crée).
   const uid = useId();
   const [presetsOpen, setPresetsOpen] = useState(() => initialSchema.length === 0);
-  // Champs ajoutés depuis la dernière sauvegarde : mis en évidence pour qu'on voie qu'ils existent bien.
+  // Champs ajoutés depuis la dernière sauvegarde : mis en évidence pour qu’on voie qu’ils existent bien.
   const [freshIds, setFreshIds] = useState<Set<string>>(() => new Set());
   const rowRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const fieldsSectionRef = useRef<HTMLElement>(null);
   const revealRef = useRef<string | null>(null);
 
-  // Après un ajout (ou un modèle appliqué), amène le nouveau champ à l'écran : sur téléphone, il est sinon hors de vue.
+  // Après un ajout (ou un modèle appliqué), amène le nouveau champ à l’écran : sur téléphone, il est sinon hors de vue.
   useEffect(() => {
     const target = revealRef.current;
     if (!target) return;
@@ -61,7 +60,7 @@ export default function FormBuilder({ initialSchema, formId, initialTitle = "Reg
       tone: "info",
       mood: "smug",
       title: "Remplacer les champs ?",
-      message: "Les champs actuels seront remplacés par ce modèle. Rien n’est publié tant que tu n’enregistres pas.",
+      message: "Les champs actuels seront remplacés par ce modèle. Rien n’est publié tant que vous n’enregistrez pas.",
       confirmLabel: "Remplacer",
       cancelLabel: "Garder mes champs",
     }))) return;
@@ -151,7 +150,7 @@ export default function FormBuilder({ initialSchema, formId, initialTitle = "Reg
       if (formId) await apiClient.patch(`/form-templates/${formId}/`, payload);
       else await apiClient.put("/form-template/", payload);
       setSaved(true); setFreshIds(new Set()); onSaved?.();
-    } catch { setSaveError("Impossible d'enregistrer. Vérifie ta connexion et réessaie."); }
+    } catch { setSaveError("Impossible d’enregistrer. Vérifiez votre connexion et réessayez."); }
     finally { setSaving(false); }
   };
 
@@ -163,7 +162,7 @@ export default function FormBuilder({ initialSchema, formId, initialTitle = "Reg
       <input value={title} onChange={(e) => { setTitle(e.target.value); setSaved(false); }} className="mb-5 w-full rounded-md border border-border bg-surface p-2.5 text-sm text-ink outline-none focus:border-ink" />
       <h2 className="mb-3 text-sm font-medium text-ink-soft">
         <button type="button" id={`${uid}-presets-toggle`} aria-expanded={presetsOpen} aria-controls={`${uid}-presets-panel`} onClick={() => setPresetsOpen((open) => !open)} className="flex min-h-[44px] w-full items-center justify-between gap-3 rounded-lg border border-border bg-surface px-3 text-left transition hover:border-ink">
-          <span>Repartir d&apos;un modèle <span className="ml-1 text-xs font-normal">({FORM_PRESETS.length} modèles)</span></span>
+          <span>Repartir d’un modèle <span className="ml-1 text-xs font-normal">({FORM_PRESETS.length} modèles)</span></span>
           <CaretDown size={16} weight="bold" aria-hidden="true" className={`shrink-0 transition-transform duration-200 ${presetsOpen ? "rotate-180" : ""}`} />
         </button>
       </h2>
@@ -172,9 +171,9 @@ export default function FormBuilder({ initialSchema, formId, initialTitle = "Reg
 
     <section ref={fieldsSectionRef} className="scroll-mt-4">
       <div className="mb-3 flex items-center justify-between"><h2 className="font-heading font-semibold text-ink">Champs du formulaire</h2><button type="button" onClick={addField} className="flex items-center gap-1 text-sm font-medium text-ink transition hover:text-cta-hover"><Plus size={16} weight="bold" /> Ajouter</button></div>
-      {freshCount > 0 && <p role="status" aria-live="polite" className="mb-3 rounded-lg bg-success-bg px-3 py-2 text-xs font-medium text-success-text">{freshCount === 1 ? "1 champ ajouté, en vert : il n’est pas encore enregistré." : `${freshCount} champs ajoutés, en vert : ils ne sont pas encore enregistrés.`} Appuie sur « Enregistrer » pour les publier.</p>}
+      {freshCount > 0 && <p role="status" aria-live="polite" className="mb-3 rounded-lg bg-success-bg px-3 py-2 text-xs font-medium text-success-text">{freshCount === 1 ? "1 champ ajouté, en vert : il n’est pas encore enregistré." : `${freshCount} champs ajoutés, en vert : ils ne sont pas encore enregistrés.`} Appuyez sur « Enregistrer » pour les publier.</p>}
       <p className="mb-3 text-xs text-ink-soft">Sur ordinateur, fais glisser les champs par leur poignée pour changer leur ordre. La signature reste automatiquement en dernière position.</p>
-      {fields.length === 0 ? <p className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-ink-soft">Aucun champ pour l&apos;instant — choisis un modèle ci-dessus ou ajoute tes propres champs.</p> : <div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
+      {fields.length === 0 ? <p className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-ink-soft">Aucun champ pour l’instant — choisis un modèle ci-dessus ou ajoutez vos propres champs.</p> : <div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
         {fields.map((field) => {
           const isSignature = field.type === "signature";
           const isDropTarget = dropTargetId === field.id && !isSignature;
@@ -194,7 +193,6 @@ export default function FormBuilder({ initialSchema, formId, initialTitle = "Reg
             </div>
             {field.type === "select" && <input value={field.options?.join(", ") ?? ""} onChange={(e) => updateField(field.id, "options", e.target.value.split(",").map((s) => s.trim()).filter(Boolean))} placeholder="Options séparées par une virgule (ex : Rendez-vous, Livraison)" className="mt-2.5 w-full rounded-md border border-border bg-canvas p-2.5 text-sm text-ink outline-none focus:border-ink" />}
             {field.type === "host" && <p className="mt-2.5 rounded-lg border border-border bg-canvas p-3 text-xs leading-relaxed text-ink-soft">Facultatif pour le visiteur : il choisit la personne qu’il vient voir dans une liste. Cette personne reçoit une alerte sur son tableau de bord ; sans choix, le patron et les gérants sont prévenus. La liste vient de l’équipe (Paramètres › Équipe › Personnes à prévenir) ; tant que personne n’est cochée, ce champ reste caché au visiteur.</p>}
-            {field.type === "document_scan" && <div className="mt-3 space-y-3 rounded-lg border border-border bg-canvas p-3"><label className="block text-xs font-medium text-ink-soft">Type de document<select value={field.document_type || "free"} onChange={(e) => updateField(field.id, "document_type", e.target.value as FormField["document_type"])} className="mt-1 w-full rounded-md border border-border bg-surface p-2 text-sm text-ink"><option value="cni">CNI</option><option value="passport">Passeport</option><option value="free">Document libre</option></select></label><div><p className="mb-2 text-xs font-medium text-ink-soft">Données à extraire</p><div className="grid grid-cols-2 gap-2">{DOCUMENT_FIELD_OPTIONS.map(([value, label]) => <label key={value} className="flex items-center gap-2 text-xs text-ink"><input type="checkbox" checked={(field.extract_fields || ["last_name", "first_names", "document_number", "birth_date"]).includes(value)} onChange={(e) => { const current = field.extract_fields || ["last_name", "first_names", "document_number", "birth_date"]; updateField(field.id, "extract_fields", e.target.checked ? [...current, value] : current.filter((item) => item !== value)); }} className="h-4 w-4 accent-cta" />{label}</label>)}</div></div><label className="flex items-center gap-2 text-xs text-ink"><input type="checkbox" checked={field.requires_agent_validation !== false} onChange={(e) => updateField(field.id, "requires_agent_validation", e.target.checked)} className="h-4 w-4 accent-cta" />Vérification par un agent obligatoire</label><label className="flex items-center gap-2 text-xs text-ink"><input type="checkbox" checked={field.retain_document_image === true} onChange={(e) => updateField(field.id, "retain_document_image", e.target.checked)} className="h-4 w-4 accent-cta" />Conserver l’image du document</label><p className="text-[11px] text-ink-soft">L’image n’est pas conservée par défaut. Les données OCR restent modifiables avant validation.</p></div>}
           </div>;
         })}
       </div>}

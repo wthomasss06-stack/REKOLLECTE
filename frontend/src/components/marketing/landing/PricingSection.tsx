@@ -6,31 +6,21 @@ import { FREE_PERIOD_ACTIVE, FREE_UNTIL_LABEL, PLANS, PRICING_FOOTNOTES } from "
 const secondaryBtn =
   "mt-6 inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full border border-border px-5 text-sm font-semibold text-ink transition-colors hover:border-ink";
 
-/** Grille tarifaire de la landing. Pas d'état, pas d'effet : rendu identique côté serveur et côté client.
- *  Pendant la période de lancement (FREE_PERIOD_ACTIVE), les prix payants sont barrés : tout est libre jusqu'à la date annoncée. */
+/** Grille tarifaire de la landing. Pas d’état, pas d’effet : rendu identique côté serveur et côté client.
+ *  Pendant la période de lancement (FREE_PERIOD_ACTIVE), les prix payants sont barrés : tout est libre jusqu’à la date annoncée. */
 export default function PricingSection() {
   return (
     <section id="tarifs" aria-labelledby="tarifs-titre" className="mx-auto w-full max-w-[1180px] px-4 py-14 sm:px-6 sm:py-20">
       <div className="mx-auto max-w-2xl text-center" data-reveal>
         <span className="lp-label">Tarifs</span>
         <h2 id="tarifs-titre" className="mt-5 text-[clamp(2rem,4.6vw,3.3rem)] font-bold leading-[1.06] tracking-[-0.03em] text-ink">
-          {FREE_PERIOD_ACTIVE ? <>Tout est gratuit jusqu&apos;au {FREE_UNTIL_LABEL}.</> : <>Des offres simples, en FCFA.</>}
+          {FREE_PERIOD_ACTIVE ? <>Tout est gratuit jusqu’au {FREE_UNTIL_LABEL}.</> : <>Des offres simples, en FCFA.</>}
         </h2>
         <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-ink-soft">
           {FREE_PERIOD_ACTIVE
-            ? "Usage libre : toutes les fonctions sont ouvertes et il n'y a rien à acheter. À partir de cette date, les offres ci-dessous s'appliquent."
+            ? "Toutes les fonctions sont ouvertes. Les prix barrés s’appliquent ensuite."
             : "Pensées pour remplacer le cahier et Excel : claires, en FCFA, sans mauvaise surprise."}
         </p>
-        {FREE_PERIOD_ACTIVE && (
-          <>
-            <p className="mt-5 inline-flex items-center gap-2 rounded-full bg-success-bg px-4 py-2 text-xs font-bold text-success-text">
-              <CheckMark size={12} /> Usage libre jusqu&apos;au {FREE_UNTIL_LABEL}
-            </p>
-            <p className="mx-auto mt-4 max-w-md text-xs leading-relaxed text-ink-soft">
-              Vous faites partie de nos premiers utilisateurs : vos retours nous aident à corriger et à améliorer REKOLLECTE. Un souci, une idée ? Utilisez le bouton Feedback.
-            </p>
-          </>
-        )}
       </div>
 
       <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-reveal>
@@ -62,9 +52,6 @@ export default function PricingSection() {
                     </>
                   )}
                 </p>
-                {FREE_PERIOD_ACTIVE && plan.id !== "free" && (
-                  <p className="mt-2 inline-flex rounded-full bg-success-bg px-3 py-1 text-[11px] font-bold text-success-text">Usage libre jusqu&apos;au {FREE_UNTIL_LABEL}</p>
-                )}
                 {plan.id === "free" && <p className="mt-2 text-[11px] font-medium text-ink-soft">Gratuit, sans limite de durée</p>}
               </div>
 
@@ -96,6 +83,7 @@ export default function PricingSection() {
 
       <ul className="mx-auto mt-8 max-w-3xl space-y-1.5 text-center text-xs leading-relaxed text-ink-soft" data-reveal>
         {PRICING_FOOTNOTES.map((note) => <li key={note}>{note}</li>)}
+        <li>Détails de facturation : <Link href="/cgu" className="underline underline-offset-4 hover:text-ink">conditions d’utilisation, article 6</Link>.</li>
       </ul>
     </section>
   );

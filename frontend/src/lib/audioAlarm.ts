@@ -1,11 +1,11 @@
 /**
  * Sonnerie des rappels de fin de créneau (Web Audio, aucun fichier son).
  *
- * Les navigateurs interdisent de produire du son sans geste de l'utilisateur, et les tablettes
- * suspendent le son quand l'onglet passe en arrière-plan ou que l'écran se verrouille. Ce module
+ * Les navigateurs interdisent de produire du son sans geste de l’utilisateur, et les tablettes
+ * suspendent le son quand l’onglet passe en arrière-plan ou que l’écran se verrouille. Ce module
  * ne tente donc jamais de « forcer » : il (1) débloque le son sur un geste, (2) vérifie à chaque
  * sonnerie que le contexte audio tourne vraiment, (3) dit honnêtement quand il est bloqué, pour que
- * l'interface affiche un bouton de réactivation et une alerte visuelle à la place.
+ * l’interface affiche un bouton de réactivation et une alerte visuelle à la place.
  */
 
 export type SoundState = "unsupported" | "off" | "ready" | "blocked";
@@ -41,7 +41,7 @@ export function writeSoundPreference(enabled: boolean): void {
   }
 }
 
-/** « ready » seulement si l'utilisateur a activé le son ET que le contexte audio tourne réellement. */
+/** « ready » seulement si l’utilisateur a activé le son ET que le contexte audio tourne réellement. */
 export function currentSoundState(): SoundState {
   if (!audioSupported()) return "unsupported";
   if (!readSoundPreference()) return "off";
@@ -100,7 +100,7 @@ export async function playAlarm(): Promise<boolean> {
   return true;
 }
 
-// --- Alertes d'arrivée de visiteurs ------------------------------------------------------------------------------------
+// --- Alertes d’arrivée de visiteurs ------------------------------------------------------------------------------------
 // Même contexte audio (donc même déblocage par geste) que la sonnerie des rappels, mais une préférence à part : un
 // patron peut vouloir le carillon des visiteurs sans la sonnerie des rappels, et inversement.
 
@@ -129,7 +129,7 @@ export function currentVisitSoundState(): SoundState {
   return context && context.state === "running" ? "ready" : "blocked";
 }
 
-/** Carillon doux à deux notes (do-sol aigus), distinct des trois bips d'alarme. Renvoie false si le son est bloqué. */
+/** Carillon doux à deux notes (do-sol aigus), distinct des trois bips d’alarme. Renvoie false si le son est bloqué. */
 export async function playChime(): Promise<boolean> {
   if (!context || context.state === "closed") return false;
   try {

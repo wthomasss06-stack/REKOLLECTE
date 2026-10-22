@@ -25,12 +25,12 @@ export const PERMISSION_MATRIX: PermissionRow[] = [
   { label: "Régénérer le QR principal historique", boss: true, gerant: false, staff: false },
   { label: "Modifier le nom/logo de l’établissement", boss: true, gerant: false, staff: false },
   { label: "Modifier les motifs de visite", boss: true, gerant: true, staff: false },
-  { label: "Activer/désactiver le Niveau 2 REKOLLECTE+", boss: true, gerant: false, staff: false },
+  { label: "Activer ou désactiver REKOLLECTE+", boss: true, gerant: false, staff: false },
   { label: "Créer une réservation / encaisser (REKOLLECTE+)", boss: true, gerant: true, staff: true },
   { label: "Ajouter ou tarifer une ressource (REKOLLECTE+)", boss: true, gerant: true, staff: false },
   { label: "Inviter un Gérant", boss: true, gerant: false, staff: false },
-  { label: "Inviter un Staff", boss: true, gerant: true, staff: false },
-  { label: "Utiliser le mode Accueil / Staff", boss: true, gerant: true, staff: true },
+  { label: "Inviter un Agent", boss: true, gerant: true, staff: false },
+  { label: "Utiliser le mode Accueil", boss: true, gerant: true, staff: true },
   { label: "Remplir une fiche visiteur sur tablette", boss: true, gerant: true, staff: true },
 ];
 
@@ -40,5 +40,5 @@ export function permissionsForRole(role: AccountRole): string[] {
 }
 
 export function roleLabel(role: AccountRole): string {
-  return role === "BOSS" ? "Patron" : role === "GERANT" ? "Gérant" : "Staff";
+  return role === "BOSS" ? "Patron" : role === "GERANT" ? "Gérant" : "Agent";
 }

@@ -1,9 +1,9 @@
-// Réveil du serveur (Render free : l'instance s'endort après ~15 min sans trafic et met 30 à 60 s à repartir).
+// Réveil du serveur (Render free : l’instance s’endort après ~15 min sans trafic et met 30 à 60 s à repartir).
 //
-// Principe : un serveur endormi n'est PAS une session expirée. On le détecte avec une sonde légère
+// Principe : un serveur endormi n’est PAS une session expirée. On le détecte avec une sonde légère
 // (GET /api/v1/health/, sans effet de bord, donc interrompable et rejouable à volonté), on attend
-// qu'il réponde, et seulement ensuite on envoie les vraies requêtes. Tout le monde (client API,
-// refresh JWT, connexion Google, bandeau d'état) partage UNE seule boucle de sonde.
+// qu’il réponde, et seulement ensuite on envoie les vraies requêtes. Tout le monde (client API,
+// refresh JWT, connexion Google, bandeau d’état) partage UNE seule boucle de sonde.
 
 import { isApiJsonResponse } from "@/lib/apiBase";
 
@@ -12,10 +12,10 @@ const HEALTH_URL = "/api/v1/health/";
 const PROBE_TIMEOUT_MS = 10_000;
 // Au-delà, on considère le serveur réellement indisponible (et plus seulement en train de se réveiller).
 const DEFAULT_MAX_WAIT_MS = 180_000;
-// Render coupe l'instance après 15 min d'inactivité : on revérifie avant d'envoyer une requête si le
+// Render coupe l’instance après 15 min d’inactivité : on revérifie avant d’envoyer une requête si le
 // dernier signe de vie date de plus de 8 min.
 const FRESH_MS = 8 * 60_000;
-// Le bandeau « le serveur se réveille » n'apparaît que si la sonde traîne : pas de clignotement
+// Le bandeau « le serveur se réveille » n’apparaît que si la sonde traîne : pas de clignotement
 // quand le serveur répond vite.
 const SLOW_PROBE_MS = 1_500;
 const BACKOFF_MS = [1_000, 2_000, 3_000, 4_000, 5_000];
@@ -48,7 +48,7 @@ export function subscribeWake(listener: () => void): () => void {
   return () => listeners.delete(listener);
 }
 
-/** À appeler dès qu'une réponse du serveur arrive : le serveur est réveillé. */
+/** À appeler dès qu’une réponse du serveur arrive : le serveur est réveillé. */
 export function markServerOk(): void {
   lastOkAt = Date.now();
   if (snapshot.status !== "ok") {
@@ -66,14 +66,14 @@ export function markServerDown(): void {
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-/** Une réponse n'est celle de l'API que si elle est du JSON : la page d'attente d'Render est du HTML. */
+/** Une réponse n’est celle de l’API que si elle est du JSON : la page d’attente d’Render est du HTML. */
 async function probeOnce(): Promise<boolean> {
   if (typeof window === "undefined") return true;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), PROBE_TIMEOUT_MS);
   try {
     const response = await fetch(HEALTH_URL, { method: "GET", cache: "no-store", credentials: "omit", signal: controller.signal });
-    // 429 : l'API a répondu (limiteur de débit) — elle est donc bien réveillée.
+    // 429 : l’API a répondu (limiteur de débit) — elle est donc bien réveillée.
     return (response.ok || response.status === 429) && isApiJsonResponse(response);
   } catch {
     return false;
@@ -102,7 +102,7 @@ async function runLoop(maxWaitMs: number): Promise<boolean> {
 }
 
 /**
- * Résout `true` dès que le serveur répond, `false` s'il reste muet après `maxMs`.
+ * Résout `true` dès que le serveur répond, `false` s’il reste muet après `maxMs`.
  * Immédiat (sans réseau) quand le serveur a répondu récemment. Les appels simultanés partagent la même boucle.
  */
 export function waitForServer(options: { maxMs?: number } = {}): Promise<boolean> {
@@ -122,9 +122,9 @@ export function warmServer(): void {
 }
 
 /**
- * Garde le serveur éveillé tant que l'espace connecté est ouvert (un ping toutes les 9 min, onglet visible),
- * et le réveille à l'avance quand on revient sur un onglet resté longtemps en arrière-plan.
- * Retourne la fonction d'arrêt.
+ * Garde le serveur éveillé tant que l’espace connecté est ouvert (un ping toutes les 9 min, onglet visible),
+ * et le réveille à l’avance quand on revient sur un onglet resté longtemps en arrière-plan.
+ * Retourne la fonction d’arrêt.
  */
 export function startKeepAlive(): () => void {
   if (typeof window === "undefined") return () => undefined;

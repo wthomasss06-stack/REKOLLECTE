@@ -19,7 +19,7 @@ export const ADMIN_TABS: { key: AdminTab; label: string; short: string; title: s
 
 const ICONS = { overview: SquaresFour, traffic: ChartLineUp, organizations: Buildings, members: UsersThree, feedback: ChatCircleDots, audit: ShieldCheck } as const;
 
-/** Cadre de l'administration : en-tête, navigation (la même que l'espace connecté : AppNav) et zone de contenu. */
+/** Cadre de l’administration : en-tête, navigation (la même que l’espace connecté : AppNav) et zone de contenu. */
 export default function AdminShell({ tab, onTab, newFeedback, liveNow, loading, onRefresh, onLogout, children }: {
   tab: AdminTab;
   onTab: (tab: AdminTab) => void;

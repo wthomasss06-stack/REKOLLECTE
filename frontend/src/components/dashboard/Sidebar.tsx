@@ -4,12 +4,12 @@ import type { AccountRole, OrganizationCapabilities } from "@/types";
 import AppNav, { type NavItem } from "./AppNav";
 import { useLogout } from "./useLogout";
 
-/** Navigation de l'espace d'un établissement. La mécanique (repli, états actifs, barre du bas) vit dans AppNav, partagée avec l'administration. */
+/** Navigation de l’espace d’un établissement. La mécanique (repli, états actifs, barre du bas) vit dans AppNav, partagée avec l’administration. */
 export default function Sidebar({ orgName, orgLogo = "", userName = "", capabilities }: { orgName: string; orgLogo?: string; userName?: string; role: AccountRole; capabilities?: OrganizationCapabilities }) {
   const askLogout = useLogout(userName);
   const showKarnet = Boolean(capabilities?.karnet);
   // Quatre entrées, dans cet ordre, pour tous les rôles. La quatrième est REKOLLECTE au Niveau 1 ; au Niveau 2, REKOLLECTE+ prend
-  // exactement sa place (même route, mêmes premières lignes, plus les outils) : rien ne bouge pour la personne qui l'utilise.
+  // exactement sa place (même route, mêmes premières lignes, plus les outils) : rien ne bouge pour la personne qui l’utilise.
   // Ce que chaque rôle voit DANS Paramètres et REKOLLECTE est filtré dans ces pages, pas ici.
   const items: NavItem[] = [
     { key: "visiteurs", href: "/dashboard", label: "Visiteurs", icon: UsersThree, exact: true },

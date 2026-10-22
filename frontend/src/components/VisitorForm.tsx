@@ -10,9 +10,8 @@ import { isKioskLikeDevice } from "@/lib/device";
 import { compressImageFile } from "@/lib/imageCompress";
 import type { FormField, PrivacyNotice } from "@/types";
 import SignaturePad from "./SignaturePad";
-import DocumentScanner, { type DocumentScanResult } from "./DocumentScanner";
 
-type ResponseValue = string | boolean | DocumentScanResult;
+type ResponseValue = string | boolean;
 
 const FIELD_CLASS = "min-h-[44px] rounded-lg border border-border bg-surface p-3 text-ink outline-none focus:border-ink";
 const CONFIRMATION_DELAY_MS = 4500;
@@ -20,7 +19,7 @@ const NO_REASONS: string[] = [];
 
 /**
  * Jeton `autocomplete` du champ. Sur une tablette partagée : « off », sinon le navigateur proposerait au visiteur suivant
- * les coordonnées du précédent. Sur le téléphone du visiteur, au contraire, l'autocomplétion lui fait gagner du temps.
+ * les coordonnées du précédent. Sur le téléphone du visiteur, au contraire, l’autocomplétion lui fait gagner du temps.
  */
 function autoCompleteFor(field: FormField, kiosk: boolean): string | undefined {
   if (kiosk) return "off";
@@ -43,10 +42,10 @@ export default function VisitorForm({
   orgName: string;
   logoUrl?: string;
   visitReasons?: string[];
-  /** Mention d'information construite par le serveur (responsable, finalité, durée, droits…). */
+  /** Mention d’information construite par le serveur (responsable, finalité, durée, droits…). */
   privacyNotice?: PrivacyNotice;
   syncState: SyncController;
-  /** Recharge le formulaire et les motifs depuis le serveur. Absent : le bouton « Actualiser les motifs » n'est pas proposé. */
+  /** Recharge le formulaire et les motifs depuis le serveur. Absent : le bouton « Actualiser les motifs » n’est pas proposé. */
   onRefreshReasons?: () => Promise<RefreshResult>;
 }) {
   const uid = useId();
@@ -77,8 +76,8 @@ export default function VisitorForm({
     window.scrollTo?.({ top: 0 });
   }, [reset]);
 
-  // Après la confirmation : la tablette d'accueil se remet à zéro toute seule. Sur un téléphone, on tente de fermer la page ;
-  // le navigateur ne l'autorise que si la page a été ouverte par un script, sinon l'écran de remerciement reste affiché.
+  // Après la confirmation : la tablette d’accueil se remet à zéro toute seule. Sur un téléphone, on tente de fermer la page ;
+  // le navigateur ne l’autorise que si la page a été ouverte par un script, sinon l’écran de remerciement reste affiché.
   useEffect(() => {
     if (status !== "synced" && status !== "saved_offline") return;
     const timer = window.setTimeout(() => {
@@ -110,7 +109,7 @@ export default function VisitorForm({
     if (field.type === "signature") return !signature;
     const value = formData[field.id];
     if (field.type === "checkbox") return value !== true;
-    if (field.type === "document_scan" || field.type === "photo") return !value;
+    if (field.type === "photo") return !value;
     return typeof value !== "string" || value.trim() === "";
   });
 
@@ -161,7 +160,7 @@ export default function VisitorForm({
             const value = event.target.value;
             setFormData((prev) => {
               const next = { ...prev, [field.id]: value };
-              // La précision n'a de sens que pour « Autre » : on n'envoie pas un ancien texte resté en mémoire.
+              // La précision n’a de sens que pour « Autre » : on n’envoie pas un ancien texte resté en mémoire.
               if (value !== "Autre") delete next[`${field.id}_autre`];
               return next;
             });
@@ -186,21 +185,6 @@ export default function VisitorForm({
 
     if (field.type === "signature") return <SignaturePad onSave={setSignature} />;
 
-    if (field.type === "document_scan") {
-      return <DocumentScanner
-        qrToken={qrToken}
-        documentType={field.document_type}
-        extractFields={field.extract_fields}
-        required={field.required}
-        requiresAgentValidation={field.requires_agent_validation !== false}
-        retainDocumentImage={field.retain_document_image === true}
-        onChange={(value) => {
-          if (value) setValue(field.id, value);
-          else setFormData((prev) => { const next = { ...prev }; delete next[field.id]; return next; });
-        }}
-      />;
-    }
-
     if (field.type === "photo") return <PhotoCapture id={id} required={field.required} onChange={(value) => setValue(field.id, value)} />;
 
     return <input
@@ -223,7 +207,7 @@ export default function VisitorForm({
           : null}
       <div>
         <h1 className="text-2xl font-bold text-ink">{orgName}</h1>
-        <p className="text-sm text-ink-soft">Merci de remplir ce registre d&apos;accès</p>
+        <p className="text-sm text-ink-soft">Merci de remplir ce registre d’accès</p>
       </div>
     </header>
 
@@ -244,7 +228,7 @@ export default function VisitorForm({
           </label>
         </div>;
       }
-      const labelFor = field.type === "signature" || field.type === "document_scan" ? undefined : domId(field.id);
+      const labelFor = field.type === "signature" ? undefined : domId(field.id);
       return <div key={field.id} data-field-id={field.id} className="flex flex-col gap-1.5">
         <label htmlFor={labelFor} className="text-sm font-medium text-ink">{field.label} {requiredMark}</label>
         {renderControl(field)}
@@ -274,8 +258,8 @@ export default function VisitorForm({
 }
 
 /**
- * Bandeau de synchronisation vu par les visiteurs. Il rassure (hors ligne, envoi en cours) sans exposer d'information interne :
- * ni nombre de fiches des visiteurs précédents, ni heure de dernière synchronisation, ni message d'erreur technique.
+ * Bandeau de synchronisation vu par les visiteurs. Il rassure (hors ligne, envoi en cours) sans exposer d’information interne :
+ * ni nombre de fiches des visiteurs précédents, ni heure de dernière synchronisation, ni message d’erreur technique.
  */
 function SyncBanner({ hasNetwork, pending, failed, syncing, retryNow }: { hasNetwork: boolean; pending: boolean; failed: boolean; syncing: boolean; retryNow: () => void }) {
   if (!hasNetwork) {
@@ -302,7 +286,7 @@ function SyncBanner({ hasNetwork, pending, failed, syncing, retryNow }: { hasNet
   return null;
 }
 
-/** Mention d'information sous le formulaire : une phrase visible, le détail (responsable, finalité, catégories, destinataires, durée, droits, transfert) en un toucher. */
+/** Mention d’information sous le formulaire : une phrase visible, le détail (responsable, finalité, catégories, destinataires, durée, droits, transfert) en un toucher. */
 function PrivacyInfo({ notice, orgName }: { notice?: PrivacyNotice; orgName: string }) {
   if (!notice) {
     return <p className="text-xs leading-relaxed text-ink-soft">
@@ -353,7 +337,7 @@ function PhotoCapture({ id, required, onChange }: { id: string; required: boolea
     setBusy(true);
     setError("");
     try {
-      // Photo réduite avant d'être rangée dans la file hors-ligne (voir lib/imageCompress.ts).
+      // Photo réduite avant d’être rangée dans la file hors ligne (voir lib/imageCompress.ts).
       const value = await compressImageFile(file);
       setPreview(value);
       onChange(value);

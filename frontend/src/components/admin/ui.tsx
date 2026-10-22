@@ -2,7 +2,7 @@
 import type { ElementType, ReactNode } from "react";
 import { MagnifyingGlass } from "@phosphor-icons/react";
 
-/** Briques communes des panneaux d'administration (mêmes cartes, mêmes états vides, mêmes champs de recherche). */
+/** Briques communes des panneaux d’administration (mêmes cartes, mêmes états vides, mêmes champs de recherche). */
 
 export function Panel({ title, subtitle, action, children, className = "" }: { title?: string; subtitle?: string; action?: ReactNode; children: ReactNode; className?: string }) {
   return (

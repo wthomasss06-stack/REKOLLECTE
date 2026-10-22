@@ -45,23 +45,23 @@ export default function AdministrationPanel() {
       tone: "brand",
       title: enabling ? "Activer REKOLLECTE+ ?" : "Désactiver REKOLLECTE+ ?",
       message: enabling
-        ? "Ton établissement passe au Niveau 2 : le registre devient l’espace Clients et REKOLLECTE+ ajoute les ressources, réservations, paiements et rappels."
-        : "Les sections REKOLLECTE+ disparaissent de la barre latérale. Rien n’est supprimé, tu pourras réactiver plus tard.",
+        ? "Le registre devient l’espace Clients et REKOLLECTE+ ajoute ressources, réservations, paiements et rappels."
+        : "Les sections REKOLLECTE+ disparaissent de la barre latérale. Rien n’est supprimé : vous pourrez réactiver plus tard.",
       confirmLabel: enabling ? "Activer" : "Désactiver",
       cancelLabel: "Annuler",
       runningLabel: enabling ? "Activation…" : "Désactivation…",
       successTitle: enabling ? "REKOLLECTE+ est activé !" : "REKOLLECTE+ est désactivé.",
       successMessage: enabling
-        ? "La barre latérale, le titre d’onglet et le favicon reflètent déjà le Niveau 2 — rien d’autre à faire."
-        : "L’établissement repasse à l’identité Renseignement seule.",
+        ? "La barre latérale, le titre d’onglet et le favicon sont déjà à jour. Rien d’autre à faire."
+        : "L’établissement repasse à REKOLLECTE seul.",
       run: async () => {
         await apiClient.patch("/org/me/karnet/", { karnet_enabled: enabling });
         await refreshUser();
       },
     });
-    // Onboarding : juste après l'activation, on propose de configurer les
+    // Onboarding : juste après l’activation, on propose de configurer les
     // ressources tout de suite (chambres, fauteuils, bureaux…) — le builder
-    // laisse "Plus tard" pour qui préfère le faire ensuite depuis l'onglet Ressources.
+    // laisse "Plus tard" pour qui préfère le faire ensuite depuis l’onglet Ressources.
     if (activated && enabling) router.push("/dashboard/rekollecte?open=ressources&onboarding=1");
   };
 
@@ -85,7 +85,7 @@ export default function AdministrationPanel() {
     try {
       const nextPage = auditPage + 1;
       // On redemande par numéro de page (comme le registre) plutôt que de
-      // suivre l'URL absolue `next` renvoyée par l'API : celle-ci pointe vers
+      // suivre l’URL absolue `next` renvoyée par l’API : celle-ci pointe vers
       // le domaine Render lui-même, hors du proxy Next.js same-origin.
       const response = await apiClient.get<PaginatedResponse<AuditEvent>>("/auth/audit/", { params: { page: nextPage } });
       setEvents((current) => [...current, ...response.data.results]);
@@ -104,16 +104,16 @@ export default function AdministrationPanel() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-sm text-ink-soft">Historique des connexions et des actions sensibles de ton établissement.</p>
+        <p className="text-sm text-ink-soft">Historique des connexions et des actions sensibles de votre établissement.</p>
       </div>
       <section className="rounded-xl border border-border bg-surface p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="font-semibold text-ink">Niveau 2 — REKOLLECTE+</h2>
+            <h2 className="font-semibold text-ink">REKOLLECTE+</h2>
             <p className="mt-1 max-w-md text-sm text-ink-soft">
               {organization?.karnet_enabled
-                ? "REKOLLECTE+ est actif : les visiteurs enregistrés alimentent l’espace Clients, tandis que les opérations restent regroupées dans REKOLLECTE+."
-                : "Ajoute les fonctions de gestion hôtelière autour de ton registre : clients, ressources, réservations, paiements et rappels."}
+                ? "REKOLLECTE+ est actif : les visiteurs alimentent l’espace Clients."
+                : "Ajoutez clients, ressources, réservations, paiements et rappels autour de votre registre."}
             </p>
           </div>
           <button

@@ -20,7 +20,7 @@ export interface ResourceCategoryMeta {
 // Un point de départ par métier, comme les modèles de formulaire : le Patron
 // ou le Gérant peut tout modifier ensuite (nom, prix, capacité...). "Autre"
 // couvre le cas où rien ne correspond — la ressource reste personnalisable à
-// 100% dans les deux cas, ceci n'est qu'un point de départ.
+// 100% dans les deux cas, ceci n’est qu’un point de départ.
 export const RESOURCE_CATEGORIES: ResourceCategoryMeta[] = [
   { id: "accommodation", label: "Hébergement", description: "Hôtels, auberges, résidences et locations" },
   { id: "beauty", label: "Beauté et soins", description: "Salons, instituts et spas" },

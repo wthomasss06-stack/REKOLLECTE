@@ -29,7 +29,6 @@ from .models import AccessPoint, CheckIn, FormTemplate
 from .privacy import (
     build_privacy_notice, delete_subject_data, export_subject_data, public_schema, public_visit_reasons, retention_policy,
 )
-from .ocr_utils import OCR_FIELDS, run_document_ocr
 from .serializers import AccessPointSerializer, AccessPointWriteSerializer, CheckInSerializer, CheckInSyncItemSerializer, FormTemplateCreateSerializer, FormTemplateSerializer, PublicFormSerializer
 from .services import default_template, resolve_target, sync_single_checkin
 
@@ -233,45 +232,6 @@ class CheckInAlertsView(APIView):
             if timezone.is_naive(since):
                 since = since.replace(tzinfo=UTC)
         return Response(build_alert_payload(request.user, since))
-
-
-class DocumentOcrView(APIView):
-    """Lecture OCR côté serveur d'une pièce d'identité (CNI, passeport) envoyée
-    par un visiteur au formulaire QR. Remplace tesseract.js côté navigateur
-    (trop lent sur les téléphones d'entrée de gamme, voir DocumentScanner.tsx)
-    — Tesseract tourne ici sur le serveur, avec un throttle dédié plus strict
-    que les autres endpoints publics car chaque appel coûte du CPU."""
-
-    permission_classes = [AllowAny]
-    throttle_classes = [throttling.ScopedRateThrottle]
-    throttle_scope = "ocr"
-    MAX_IMAGE_B64_CHARS = 8_000_000  # ~6 Mo décodés, large marge sur une photo compressée en jpeg
-
-    def post(self, request, qr_token):
-        organization, template, _ = resolve_public_target(qr_token)
-        if not organization:
-            return error_response("QR Code invalide ou désactivé.", status.HTTP_404_NOT_FOUND)
-
-        enforce_feature(organization, "ocr")  # 403 plan_required si le plan n'inclut pas la lecture des pièces (quand les plans s'appliquent)
-
-        image = request.data.get("image")
-        if not isinstance(image, str) or not image:
-            return error_response("Image manquante.", status.HTTP_400_BAD_REQUEST)
-        if len(image) > self.MAX_IMAGE_B64_CHARS:
-            return error_response("Image trop volumineuse.", status.HTTP_400_BAD_REQUEST)
-
-        fields = request.data.get("fields", [])
-        if not isinstance(fields, list):
-            fields = []
-        fields = [f for f in fields if f in OCR_FIELDS] or list(OCR_FIELDS)
-
-        result = run_document_ocr(image, fields)
-        # L'image n'est jamais écrite sur disque ni en base ici : elle n'existe
-        # que le temps de cette requête, décodée en mémoire puis jetée avec la
-        # réponse HTTP (durée de conservation des documents encore à trancher
-        # côté produit — voir le rapport de fusion — donc on ne conserve rien
-        # par défaut).
-        return Response(result)
 
 
 class CheckInPagination(PageNumberPagination):

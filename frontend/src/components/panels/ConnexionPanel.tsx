@@ -25,7 +25,7 @@ export default function ConnexionPanel() {
     apiClient
       .get<{ identities: Identity[] }>("/auth/identities/")
       .then((res) => setIdentities(res.data.identities))
-      .catch(() => setError("Impossible de charger tes méthodes de connexion."));
+      .catch(() => setError("Impossible de charger vos méthodes de connexion."));
   }, []);
   useEffect(load, [load]);
 
@@ -35,7 +35,7 @@ export default function ConnexionPanel() {
       const { data } = await apiClient.post<{ url: string }>(`/auth/${provider}/link/`);
       window.location.assign(data.url); // le cookie « nonce » est posé par cette réponse
     } catch {
-      setError("Impossible de démarrer la liaison. Réessaie.");
+      setError("Impossible de démarrer la liaison. Réessayez.");
     }
   };
 
@@ -74,13 +74,13 @@ export default function ConnexionPanel() {
               disabled={(identities || []).length <= 1}
               onClick={() => unlink(identity.provider)}
               className="rounded-full border border-border px-3 py-1.5 text-xs font-medium text-ink-soft transition hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
-              title={(identities || []).length <= 1 ? "C’est ta seule méthode de connexion" : undefined}
+              title={(identities || []).length <= 1 ? "C’est votre seule méthode de connexion" : undefined}
             >
               Retirer
             </button>
           </li>
         ))}
-        {identities && identities.length === 0 && <li className="p-4 text-sm text-ink-soft">Ton compte sera relié à ta prochaine connexion.</li>}
+        {identities && identities.length === 0 && <li className="p-4 text-sm text-ink-soft">Votre compte sera relié à votre prochaine connexion.</li>}
       </ul>
 
       {linkable.length > 0 && (

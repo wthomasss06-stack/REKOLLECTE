@@ -5,8 +5,8 @@
 export const FREE_UNTIL_ISO = "2026-12-01";
 export const FREE_UNTIL_LABEL = "1er décembre 2026";
 // Période de lancement : TOUT est gratuit et libre (aucune limite de plan). La landing affiche alors les prix barrés.
-// Le 1er décembre, passer à `false` et republier : les prix s'affichent normalement. Ce n'est volontairement pas calculé
-// d'après la date du jour : la page est générée au déploiement, et les plans ne doivent « entrer en vigueur » qu'une fois
+// Le 1er décembre, passer à `false` et republier : les prix s’affichent normalement. Ce n’est volontairement pas calculé
+// d’après la date du jour : la page est générée au déploiement, et les plans ne doivent « entrer en vigueur » qu’une fois
 // les Gates franchies et PLAN_ENFORCEMENT_STARTS_AT renseigné côté serveur (voir docs/PLANS_ET_ABONNEMENTS.md).
 export const FREE_PERIOD_ACTIVE = true;
 // Même adresse que la page « Mentions légales » : à remplacer par une adresse professionnelle dédiée.
@@ -39,7 +39,7 @@ export const PLANS: PricePlan[] = [
       "Historique des 30 derniers jours",
       "Export de sortie toujours disponible",
     ],
-    missing: ["Numéro de téléphone et lecture de pièce d’identité : à partir d’Essentiel"],
+    missing: ["Numéro de téléphone : à partir d’Essentiel"],
     cta: { label: "Créer mon espace", href: "/connexion" },
   },
   {
@@ -54,7 +54,6 @@ export const PLANS: PricePlan[] = [
       "5 membres dans l’équipe",
       "Historique de 12 mois et export CSV",
       "Champ téléphone",
-      "Lecture de pièce d’identité (à activer)",
     ],
     cta: { label: "Créer mon espace", href: "/connexion" },
   },
@@ -95,12 +94,7 @@ export const PLANS: PricePlan[] = [
 ];
 
 export const PRICING_FOOTNOTES: string[] = [
-  ...(FREE_PERIOD_ACTIVE
-    ? [`Jusqu’au ${FREE_UNTIL_LABEL}, tout est gratuit et libre : aucun paiement, aucune limite de plan. À partir de cette date, les prix barrés ci-dessus s’appliquent.`]
-    : []),
-  "Prix en FCFA, par établissement et par mois. Les précisions sur les taxes seront communiquées avant la première facturation.",
-  "Paiement annuel : 10 mois payés pour 12 (Essentiel 30\u00a0000 FCFA par an, REKOLLECTE+ 70\u00a0000 FCFA par an).",
-  "Nouveaux comptes, après la période de lancement : 14 jours d’essai de REKOLLECTE+.",
-  "L’enregistrement des visiteurs n’est jamais bloqué par un plan. À la fin d’un essai ou en cas d’impayé, l’espace repasse au plan Gratuit : vos données restent intactes et l’export de sortie reste disponible.",
-  `Ces offres sont annoncées à l’avance. Les prix et les limites peuvent être ajustés avant le ${FREE_UNTIL_LABEL} ; chaque établissement est prévenu par écrit avant toute limitation de son accès.`,
+  "Prix en FCFA, par établissement et par mois. Paiement annuel : 10 mois payés pour 12 (Essentiel 30\u00a0000 FCFA/an, REKOLLECTE+ 70\u00a0000 FCFA/an).",
+  FREE_PERIOD_ACTIVE ? "Nouveaux comptes : 14 jours d’essai de REKOLLECTE+ après le lancement." : "Nouveaux comptes : 14 jours d’essai de REKOLLECTE+.",
+  "L’enregistrement des visiteurs n’est jamais bloqué. En cas d’impayé, vous repassez au plan Gratuit : données intactes, export toujours disponible.",
 ];

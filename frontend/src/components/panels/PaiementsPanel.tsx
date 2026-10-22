@@ -13,10 +13,10 @@ import type { KarnetReservation } from "@/types";
 export default function PaiementsPanel() {
   const { user } = useAuthContext();
   const { confirm } = useDialog();
-  // Phase 9 — règle métier : encaisser reste ouvert à toute l'équipe, mais
+  // Phase 9 — règle métier : encaisser reste ouvert à toute l’équipe, mais
   // annuler un encaissement déjà enregistré est réservé à Patron/Gérant
-  // (l'API renvoie 403 sinon ; ce contrôle d'affichage évite juste de proposer
-  // une action qui échouerait pour un Staff).
+  // (l’API renvoie 403 sinon ; ce contrôle d’affichage évite juste de proposer
+  // une action qui échouerait pour un Agent).
   const canUnmark = user?.role === "BOSS" || user?.role === "GERANT";
   const [reservations, setReservations] = useState<KarnetReservation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,7 +42,7 @@ export default function PaiementsPanel() {
       notifyKarnetChanged();
       load();
     } catch {
-      setError("Impossible d’enregistrer cet encaissement. Réessaie.");
+      setError("Impossible d’enregistrer cet encaissement. Réessayez.");
     } finally {
       setMarkingId(null);
     }

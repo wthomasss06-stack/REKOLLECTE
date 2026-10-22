@@ -13,7 +13,7 @@ import StaggeredMenu, { StaggeredMenuTrigger } from "@/components/marketing/Stag
 gsap.registerPlugin(useGSAP);
 
 // `id` = section de la landing surveillée pour surligner le lien actif (pilule blanche
-// façon Flowa) ; les liens sans id sont actifs selon l'URL (ex. /aide).
+// façon Flowa) ; les liens sans id sont actifs selon l’URL (ex. /aide).
 const NAV_LINKS = [
   { href: "/#accueil", label: "Accueil", id: "accueil" },
   { href: "/#fonctionnalites", label: "Fonctionnalités", id: "fonctionnalites" },
@@ -42,7 +42,7 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [menuOpen]);
 
-  // Lien actif sur la landing : la section qui croise le milieu de l'écran.
+  // Lien actif sur la landing : la section qui croise le milieu de l’écran.
   useEffect(() => {
     if (pathname !== "/") return undefined;
     const observer = new IntersectionObserver(

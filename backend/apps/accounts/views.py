@@ -48,7 +48,7 @@ class GoogleAuthView(APIView):
         try:
             google_profile = verify_google_credential(serializer.validated_data["credential"])
         except InvalidGoogleTokenError:
-            return error_response("Jeton Google invalide ou expiré. Reconnecte-toi.", status.HTTP_401_UNAUTHORIZED)
+            return error_response("Jeton Google invalide ou expiré. Reconnectez-vous.", status.HTTP_401_UNAUTHORIZED)
 
         profile = ProviderProfile(
             provider="google",
@@ -61,7 +61,7 @@ class GoogleAuthView(APIView):
         try:
             user, created = resolve_login(profile)
         except EmailRequiredError:
-            return error_response("Ton compte Google n’a pas d’e-mail vérifié. Utilise un autre compte.", status.HTTP_400_BAD_REQUEST)
+            return error_response("Votre compte Google n’a pas d’e-mail vérifié. Utilisez un autre compte.", status.HTTP_400_BAD_REQUEST)
         except IdentityConflictError:
             return error_response("Ce compte Google est déjà lié à un autre espace.", status.HTTP_409_CONFLICT)
         except RevokedAccessError as exc:
@@ -99,14 +99,14 @@ class CookieTokenRefreshView(APIView):
 
     @staticmethod
     def _reject():
-        response = error_response("Session invalide, reconnecte-toi.", status.HTTP_401_UNAUTHORIZED)
+        response = error_response("Session invalide, reconnectez-vous.", status.HTTP_401_UNAUTHORIZED)
         clear_refresh_cookie(response)
         return response
 
     def post(self, request):
         raw_token = request.COOKIES.get("qr_refresh_token")
         if not raw_token:
-            return error_response("Session expirée, reconnecte-toi.", status.HTTP_401_UNAUTHORIZED)
+            return error_response("Session expirée, reconnectez-vous.", status.HTTP_401_UNAUTHORIZED)
         try:
             with transaction.atomic():
                 refresh = RefreshToken(raw_token)

@@ -1,6 +1,6 @@
 # REKOLLECTE — documentation complète pour assistants IA
 
-Dernière révision : 11 octobre 2026. Site officiel : https://rekollecte-ci.vercel.app/ — Éditeur : AKATech Studio, Abidjan (Côte d'Ivoire).
+Dernière révision : 21 octobre 2026. Site officiel : https://rekollecte-ci.vercel.app/ — Éditeur : AKATech Studio, Abidjan (Côte d'Ivoire).
 
 ## Définition
 
@@ -20,7 +20,7 @@ REKOLLECTE (avec un K) n'a aucun lien avec l'application reCollect de suivi de m
 
 ## Comment ça marche
 
-1. Le Patron se connecte avec Google et crée l'espace de son établissement (nom, logo).
+1. Le Patron se connecte avec Google ou Facebook et crée l'espace de son établissement (nom, logo).
 2. Il choisit un modèle de formulaire (bureau, restaurant, hôtel, chantier), ajuste les champs et génère un ou plusieurs QR Codes / points d'accueil.
 3. Le visiteur scanne le QR Code (ou utilise la tablette d'accueil), remplit le formulaire et signe. Sans réseau, la fiche est gardée sur l'appareil puis synchronisée automatiquement.
 4. Le Patron, le Gérant et le Staff consultent le registre ; le Patron et le Gérant exportent en CSV et pilotent l'équipe.

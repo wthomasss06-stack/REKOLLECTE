@@ -1,5 +1,48 @@
 # REKOLLECTE – notes de patch
 
+## Patch v9 — réécriture du writing et élagage SEO (22/10/2026), cumulatif avec le v8
+
+Ce zip **contient aussi le v8** : le décompresser seul, à la racine. Supprimer toujours `frontend/src/components/DocumentScanner.tsx`, `backend/apps/checkins/ocr_utils.py`, `backend/apps/checkins/tests/test_document_ocr.py`. **Vérifié** : `pytest` 287 verts, `tsc --noEmit` propre. **Non testé** : `next build`, rendu réel.
+
+### Charte appliquée
+- **Vouvoiement partout** : espace connecté, onboarding, connexion, erreurs, panneaux, aide, cookies, landing, messages backend (`feedback`, `accounts`).
+- **Vocabulaire unique** : « établissement » (plus « entreprise » pour le client), « tableau de bord » (plus « dashboard »), « hors ligne », « Agent » (plus « Staff » dans les libellés ; les valeurs techniques `STAFF` restent), « avis » (plus « feedback »), REKOLLECTE / REKOLLECTE+ (plus « Niveau 1/2 » ; l'identité « Renseignement » n'apparaît plus dans l'administration).
+- **Apostrophes** : ’ partout dans le texte visible.
+- **Un message = un emplacement** : la date de gratuité n'est plus écrite que dans le titre de Tarifs et dans les CGU §6 ; ailleurs « gratuit pendant le lancement ».
+
+### Réécritures
+- **Tarifs** : en-tête 83 → 17 mots, notes ≈ 140 → ≈ 60 mots, pastilles supprimées, lien vers CGU article 6.
+- **Landing** : accroche courte, FAQ (10 questions), « pourquoi », étapes, promesses et lignes de fonctionnalités réécrites ; promesses non vérifiées retirées (« pendant plusieurs jours », « rien ne se perd », « déjà réglées d'avance »).
+- **CGU** : §3, §4 et §8 ramenés à des règles (plus de description d'écrans), note interne retirée du §6 ; avertissement juridique raccourci (CGU et confidentialité).
+- **Extrait Google** : description du site sans date ; méta-descriptions « à propos » et « REKOLLECTE+ » ≤ 160 caractères.
+- **Connexion** : « Première visite ? Votre espace est créé à la première connexion. »
+
+### Pages de contenu SEO (logiciel, QR code, guide, à propos)
+- Redites supprimées (liste « sans réseau » et « plusieurs QR » déjà dans la FAQ, double paragraphe « formulaire », rappel juridique répété, 5 étapes dupliquées entre logiciel et guide, liste « limites du papier » qui doublait le tableau, paragraphe de renvoi final) : ≈ 9 % de texte en moins, titres H1/H2, tableaux, FAQ et liens internes conservés.
+- « AKATech Studio » retiré du texte visible de ces pages ; « À propos » renvoie vers Crédits et mentions légales. Il reste dans les données structurées (éditeur), `llms*.txt` et la mention d'information sous le formulaire visiteur (backend).
+
+### Pas traité (à décider)
+- Console d'administration plateforme (« Feedbacks ») et aide § « rôle STAFF » : inchangées.
+- Élagage plus poussé des pages SEO : possible, au prix d'une perte de couverture de mots-clés.
+
+## Patch v8 — pages légales alignées sur le produit, OCR retiré, « En savoir plus » (21/10/2026), par-dessus le v7
+
+Décompresser à la racine, puis **supprimer** : `frontend/src/components/DocumentScanner.tsx`, `backend/apps/checkins/ocr_utils.py`, `backend/apps/checkins/tests/test_document_ocr.py`. Aucune migration. **Vérifié** : `pytest` 287 verts, `tsc --noEmit` propre. **Non testé** : `next build` (polices Google indisponibles dans le bac à sable), affichage réel de la section « En savoir plus ».
+
+### Pages légales (CGU, confidentialité, mentions légales)
+- Connexion : **Google et Facebook** uniquement (Apple ne fonctionne pas). CGU §2, confidentialité, aide, onboarding, landing, pages de contenu, `llms*.txt` et description de la rubrique Connexion suivent.
+- Confidentialité : sessions de connexion (appareil, adresse IP, 14 jours), journal d'audit, REKOLLECTE+ (clients, réservations), abonnement et paiements, avis, Cloudinary et Facebook comme services tiers, transfert possible hors Côte d'Ivoire, tableau des durées de conservation réelles, cookie `qr_refresh_token` (14 jours), rôle de prestataire technique de l'éditeur.
+- CGU §6 : la date de gratuité vient de `FREE_UNTIL_LABEL` (plus de date écrite en dur). CGU §9 renvoie à la confidentialité. Date des pages légales : 21 octobre 2026.
+- « AKATech Studio » n'apparaît plus dans les textes légaux (« l'éditeur ») ni avec un point parasite. Il reste dans Crédits et le footer (au survol du logo).
+
+### Lecture de pièce d'identité (OCR) retirée
+- Frontend : composant, bloc du FormBuilder, ligne Abonnement, case « numéro complet » de Données, lignes de la grille tarifaire.
+- Backend : route `public/forms/<qr>/ocr/`, `ocr_utils.py`, throttle `ocr`, droit `ocr` des plans, `pytesseract` et `Pillow` (requirements), paquets Tesseract du Dockerfile (Docker n'est plus obligatoire sur Render).
+- Un champ `document_scan` resté dans un ancien formulaire n'est plus servi aux visiteurs ; le constructeur l'écarte à l'enregistrement. Les anciennes réponses restent lisibles et exportables.
+
+### Paramètres › En savoir plus
+- Nouvelle rubrique (`EnSavoirPlusPanel.tsx`) : À propos, Aide, Crédits, Conditions d'utilisation, Politique de confidentialité, Mentions légales.
+
 ## Patch v7 — grille tarifaire publique et corrections mobile (21/10/2026), par-dessus le v6
 
 Décompresser à la racine. Aucune migration. **Vérifié** : syntaxe TypeScript des fichiers modifiés (aucune erreur de syntaxe), contrôle exécutable du verrou de défilement (`node --experimental-strip-types frontend/scripts/scrollLock.check.mjs`). **Non testé** : `next build`, tests e2e (`frontend/e2e/tarifs.spec.ts`) et rendu sur appareil réel (dépendances absentes de l'archive) : lancer `npm ci && npm run build && npm run test:e2e` avant de déployer.

@@ -11,8 +11,8 @@ import type { KarnetClientDetail } from "@/types";
 const field = "min-h-[44px] w-full rounded-lg border border-border bg-canvas px-3 text-sm text-ink outline-none focus:border-cta";
 
 /**
- * Ajout manuel d'un client. Le serveur retrouve une fiche existante par e-mail ou par téléphone
- * (0701020304 = +225 07 01 02 03 04) : dans ce cas on ouvre la fiche existante au lieu d'en créer une 2e.
+ * Ajout manuel d’un client. Le serveur retrouve une fiche existante par e-mail ou par téléphone
+ * (0701020304 = +225 07 01 02 03 04) : dans ce cas on ouvre la fiche existante au lieu d’en créer une 2e.
  */
 export default function ClientFormModal({ open, onClose, onSaved }: {
   open: boolean;

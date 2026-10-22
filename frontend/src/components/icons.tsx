@@ -1,5 +1,5 @@
 // Flèches et icônes en SVG minimal (ligne + polyline), reproduisant exactement le
-// style du fichier de référence fourni — pas de librairie d'icônes ici.
+// style du fichier de référence fourni — pas de librairie d’icônes ici.
 export function ArrowUpRight({ size = 16 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
