@@ -1,5 +1,41 @@
 # REKOLLECTE – notes de patch
 
+## Patch v11 — effet gooey fiable sur toutes les fenêtres et tous les boutons qui les ouvrent (23/10/2026), cumulatif avec v8 à v10
+
+Ce zip **contient aussi v8, v9 et v10** : le décompresser seul, à la racine. Supprimer toujours `frontend/src/components/DocumentScanner.tsx`, `backend/apps/checkins/ocr_utils.py`, `backend/apps/checkins/tests/test_document_ocr.py`. **Vérifié** : `tsc --noEmit` propre, `pytest` 287 verts. **Non testé** : le rendu réel (animations WAAPI et filtre SVG dans un navigateur).
+
+### Constat
+- Toutes les fenêtres de l'application passent déjà par le moteur partagé `lib/gooey.tsx` : `Modal` (formulaire client, historique client, ressources, formulaire, QR, matrice des droits), `SettingsModal` (paramètres, facturation admin), `DialogProvider` (confirmations, messages flash), cookies, cloche, menu du profil, widget d'avis, point info Tarifs.
+- Les cas où l'effet manquait venaient du moteur, pas des fenêtres : clic sur une carte qui n'est pas un bouton, ouverture après un appel réseau lent, ouverture sans clic (lien profond).
+
+### Moteur (`lib/gooey.tsx`)
+- **Bouton d'origine élargi** : en plus des boutons et liens, labels, onglets, cases, interrupteurs, options et **cartes cliquables** (détectées par le curseur « pointer », la carte entière et non son texte).
+- **Fenêtre de fraîcheur** portée de 1,6 s à 3 s, pour les ouvertures qui suivent un appel réseau lent ; si le bouton a disparu entre-temps, retour à 1,6 s.
+- **Repli** : une fenêtre ouverte sans clic récent (lien profond, ouverture automatique) sort désormais du bas de l'écran au lieu d'apparaître sans effet. Les menus volants (cloche, profil, bulle d'aide) n'ont pas de repli : ils ne s'ouvrent que par un clic.
+- Inchangé : aucun effet avec « réduire les animations », ni sur un navigateur sans WAAPI.
+
+### Pas traité
+- Menu mobile du site (`StaggeredMenu`) : il garde sa transition plein écran ; un flou gooey plein écran serait coûteux sur les téléphones modestes.
+- Console d'administration plateforme.
+
+## Patch v10 — schémas animés des pages d'information et point info Tarifs (22/10/2026), cumulatif avec v8 et v9
+
+Ce zip **contient aussi v8 et v9** : le décompresser seul, à la racine. Supprimer toujours `frontend/src/components/DocumentScanner.tsx`, `backend/apps/checkins/ocr_utils.py`, `backend/apps/checkins/tests/test_document_ocr.py`. **Vérifié** : `tsc --noEmit` propre, `pytest` 287 verts, rendu image de chaque schéma en thème clair et sombre. **Non testé** : l'animation GSAP dans un navigateur, `next build`.
+
+### Schémas animés (dossier `frontend/src/components/marketing/figures/`)
+- Inspirés d'E-Carnet (briques `parts.tsx`, moteur `FigureMotion.tsx`), adaptés à REKOLLECTE : thème clair et sombre via les variables `--c-*`, pictogrammes Phosphor, GSAP et ScrollTrigger déjà présents dans le projet.
+- 12 schémas, tous construits à partir du texte réel de la page :
+  - CGU : rôles emboîtés, tarification (retour au plan Gratuit), responsabilités ;
+  - Confidentialité : parcours d'une donnée visiteur, cookies avec interrupteur de consentement, exercice des droits ;
+  - Mentions légales : hébergement ; Crédits : une même équipe ; À propos : du scan au registre, REKOLLECTE+ ; Aide : rôles, parcours visiteur, hors ligne.
+- Illustration d'en-tête (feuille et badge) sur CGU, confidentialité, mentions légales, à propos et aide, via la nouvelle propriété `art` de `LegalLayout`.
+- Mouvement : apparition à l'écran, traits qui se dessinent, points qui parcourent les flux, interrupteur. Réservé à `prefers-reduced-motion: no-preference` ; sans JavaScript ou avec mouvement réduit, l'état final est affiché. Le marketing layout charge `figures.css` et enveloppe le contenu dans `FigureMotion`.
+- Accessibilité : chaque schéma a un résumé lu par les lecteurs d'écran et une légende visible.
+
+### Section Tarifs
+- La note « Prix en FCFA, par établissement et par mois… paiement annuel » est retirée.
+- Les autres notes (14 jours d'essai, enregistrement jamais bloqué, lien vers l'article 6) sont dans un point info « À savoir » (`PricingInfo.tsx`) : panneau flottant qui sort du bouton avec l'effet gooey de la cloche de notifications (moteur partagé `lib/gooey.tsx`), fermé par Échap, un clic à côté ou la croix.
+
 ## Patch v9 — réécriture du writing et élagage SEO (22/10/2026), cumulatif avec le v8
 
 Ce zip **contient aussi le v8** : le décompresser seul, à la racine. Supprimer toujours `frontend/src/components/DocumentScanner.tsx`, `backend/apps/checkins/ocr_utils.py`, `backend/apps/checkins/tests/test_document_ocr.py`. **Vérifié** : `pytest` 287 verts, `tsc --noEmit` propre. **Non testé** : `next build`, rendu réel.

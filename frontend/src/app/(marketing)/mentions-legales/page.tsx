@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import LegalLayout from "@/components/marketing/LegalLayout";
+import { DocHero } from "@/components/marketing/figures/DocHero";
+import { HostingFigure } from "@/components/marketing/figures/HostingFigure";
+import { Buildings } from "@phosphor-icons/react/dist/ssr";
 
 export const metadata: Metadata = { title: "Mentions légales", robots: { index: false } };
 
 export default function MentionsLegalesPage() {
-  return <LegalLayout title="Mentions légales">
+  return <LegalLayout title="Mentions légales" art={<DocHero icon={Buildings} />}>
     <h2>Éditeur du site</h2>
     <p>REKOLLECTE est édité à Abidjan, Côte d’Ivoire.</p>
     <p>Conception et développement : voir la page <Link href="/credits">Crédits</Link>.</p>
@@ -20,6 +23,7 @@ export default function MentionsLegalesPage() {
     <ul><li><strong>Frontend :</strong> Vercel.</li><li><strong>Backend applicatif :</strong> Render.</li><li><strong>Base de données :</strong> Neon, PostgreSQL.</li><li><strong>Images (logos, photos de profil) :</strong> Cloudinary.</li></ul>
     <p>Les conditions contractuelles des fournisseurs d’infrastructure sont distinctes des présentes mentions légales.</p>
 
+        <HostingFigure />
     <h2>Propriété intellectuelle</h2>
     <p>La structure, les textes, le logo, les interfaces et le code de REKOLLECTE sont protégés par les règles applicables de propriété intellectuelle, sauf éléments appartenant à des tiers. Toute reproduction ou réutilisation non autorisée est interdite.</p>
 

@@ -2,6 +2,10 @@ import Link from "next/link";
 
 import JsonLd from "@/components/marketing/JsonLd";
 import LegalLayout from "@/components/marketing/LegalLayout";
+import { DocHero } from "@/components/marketing/figures/DocHero";
+import { FlowFigure } from "@/components/marketing/figures/FlowFigure";
+import { PlusFigure } from "@/components/marketing/figures/PlusFigure";
+import { Info } from "@phosphor-icons/react/dist/ssr";
 import { breadcrumb, faqPage } from "@/lib/jsonld";
 import { pageMeta } from "@/lib/seo";
 import { CONTENT_UPDATED_ISO, CONTENT_UPDATED_LABEL, IDS, SITE_URL } from "@/lib/site";
@@ -40,7 +44,7 @@ export default function AboutPage() {
   };
 
   return (
-    <LegalLayout title="Qu’est-ce que REKOLLECTE ?" lastUpdated={CONTENT_UPDATED_LABEL}>
+    <LegalLayout title="Qu’est-ce que REKOLLECTE ?" lastUpdated={CONTENT_UPDATED_LABEL} art={<DocHero icon={Info} />}>
       <JsonLd data={jsonLd} />
 
       <p>
@@ -69,11 +73,13 @@ export default function AboutPage() {
       </ul>
       <p>Le détail pas à pas est dans l’<Link href="/aide">aide</Link> et dans le <Link href="/guide/registre-visiteurs-numerique">guide du registre visiteurs numérique</Link>.</p>
 
+      <FlowFigure />
       <h2>REKOLLECTE et REKOLLECTE+</h2>
       <p>
         <strong>REKOLLECTE</strong> est le registre visiteurs. <strong>REKOLLECTE+</strong> y ajoute les fiches clients, les ressources, les réservations, les encaissements et les rappels de fin de créneau ; il s’active depuis les paramètres. Voir la page <Link href="/rekollecte-plus">REKOLLECTE+</Link>.
       </p>
 
+      <PlusFigure />
       <h2>Pour qui</h2>
       <ul>
         <li>Bureaux et espaces professionnels : suivre qui est venu, pour qui et pourquoi.</li>

@@ -1,0 +1,76 @@
+/* Schémas animés des pages d'information (légales, à propos, aide, crédits).
+   Les couleurs viennent des variables du thème (--c-*), donc clair et sombre sont gérés. Aucune valeur de départ d'animation ici :
+   elles sont posées par FigureMotion.tsx, si le script ne se charge pas ou si le mouvement est réduit, tout reste affiché. */
+
+.fig { margin: 2.25rem auto; max-width: 30rem; }
+.fig--wide { max-width: 36rem; }
+.fig__art {
+  border: 1px solid rgb(var(--c-border));
+  border-radius: 1.25rem;
+  background: rgb(var(--c-surface));
+  padding: 1.5rem 1.25rem;
+}
+.fig__svg { display: block; width: 100%; height: auto; overflow: visible; }
+.fig figcaption {
+  margin: 0.75rem auto 0;
+  max-width: 26rem;
+  text-align: center;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: rgb(var(--c-ink-soft));
+}
+
+/* ---------- Cartes, pastilles, textes ---------- */
+.fig .fg-node { fill: rgb(var(--c-canvas)); stroke: rgb(var(--c-border)); stroke-width: 1.5; }
+.fig .fg-tone--soft .fg-node { fill: rgb(var(--c-sage) / 0.3); }
+.fig .fg-tone--accent .fg-node { fill: rgb(var(--c-lime) / 0.55); stroke: rgb(var(--c-cta) / 0.5); }
+.dark .fig .fg-tone--accent .fg-node { fill: rgb(var(--c-cta) / 0.16); stroke: rgb(var(--c-cta) / 0.55); }
+.fig .fg-tone--ghost .fg-node { fill: transparent; stroke-dasharray: 5 5; }
+.fig .fg-chip .fg-node { fill: rgb(var(--c-surface)); }
+.fig .fg-chip.fg-tone--accent .fg-node { fill: rgb(var(--c-lime) / 0.55); }
+.dark .fig .fg-chip.fg-tone--accent .fg-node { fill: rgb(var(--c-cta) / 0.16); }
+
+.fig text { font-family: var(--font-sans), -apple-system, ui-sans-serif, system-ui, sans-serif; }
+.fig .fg-title { font-size: 13px; font-weight: 700; fill: rgb(var(--c-ink)); }
+.fig .fg-title--lg { font-size: 15px; }
+.fig .fg-sub { font-size: 11px; font-weight: 400; fill: rgb(var(--c-ink-soft)); }
+.fig .fg-sub--ink { fill: rgb(var(--c-ink)); font-weight: 500; }
+.fig .fg-label { font-size: 10.5px; font-weight: 500; fill: rgb(var(--c-ink-soft)); }
+.fig .fg-icon { color: rgb(var(--c-cta)); }
+.fig .fg-check { fill: none; stroke: rgb(var(--c-cta)); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---------- Traits, flèches, paquets ---------- */
+.fig .fg-line, .fig .fg-arrow { fill: none; stroke: rgb(var(--c-ink-soft)); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.fig .fg-line--dash { stroke-dasharray: 3 7; }
+.fig .fg-track { fill: none; stroke: none; }
+.fig .fg-dot { fill: rgb(var(--c-cta)); opacity: 0; }
+
+/* ---------- Interrupteur (consentement) ---------- */
+.fig .fg-toggle__track { fill: rgb(var(--c-border)); transition: fill 0.25s; }
+.fig .fg-toggle__track.is-on { fill: rgb(var(--c-cta)); }
+.fig .fg-toggle__knob { fill: rgb(var(--c-surface)); stroke: rgb(var(--c-ink-soft) / 0.45); stroke-width: 1; }
+
+/* ---------- Couches emboîtées (rôles) ---------- */
+.fig .fg-layer { stroke: rgb(var(--c-border)); stroke-width: 1.5; }
+.fig .fg-layer--1 { fill: rgb(var(--c-canvas)); }
+.fig .fg-layer--2 { fill: rgb(var(--c-sage) / 0.3); }
+.fig .fg-layer--3 { fill: rgb(var(--c-lime) / 0.55); stroke: rgb(var(--c-cta) / 0.4); }
+.dark .fig .fg-layer--3 { fill: rgb(var(--c-cta) / 0.16); }
+.dark .fig .fg-layer--2 { fill: rgb(var(--c-sage) / 0.12); }
+.dark .fig .fg-tone--soft .fg-node { fill: rgb(var(--c-sage) / 0.14); }
+
+/* ---------- Feuille d'en-tête des pages légales ---------- */
+.legal-art { width: 6.25rem; flex: none; }
+@media (min-width: 640px) { .legal-art { width: 8.5rem; } }
+.legal-art .fg-sheet { fill: rgb(var(--c-surface)); stroke: rgb(var(--c-border)); stroke-width: 2; }
+.legal-art .fg-sheet--back { fill: rgb(var(--c-sage) / 0.35); }
+.legal-art .fg-doc-line, .legal-art .fg-doc-title { fill: none; stroke-linecap: round; }
+.legal-art .fg-doc-line { stroke: rgb(var(--c-ink-soft) / 0.45); stroke-width: 4; }
+.legal-art .fg-doc-title { stroke: rgb(var(--c-ink)); stroke-width: 5; }
+.legal-art .fg-badge { fill: rgb(var(--c-lime)); stroke: rgb(var(--c-cta) / 0.5); stroke-width: 2; }
+.dark .legal-art .fg-badge { fill: rgb(var(--c-cta) / 0.2); }
+
+/* ---------- Mouvement continu (seulement si FigureMotion l'a activé) ---------- */
+@keyframes fg-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+.pm-ready .fg-float { animation: fg-float 4.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .fg-float { animation: none; } }

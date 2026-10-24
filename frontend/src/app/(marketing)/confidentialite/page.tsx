@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import LegalLayout from "@/components/marketing/LegalLayout";
+import { DocHero } from "@/components/marketing/figures/DocHero";
+import { DataFlowFigure } from "@/components/marketing/figures/DataFlowFigure";
+import { CookiesFigure } from "@/components/marketing/figures/CookiesFigure";
+import { RightsFigure } from "@/components/marketing/figures/RightsFigure";
+import { LockKey } from "@phosphor-icons/react/dist/ssr";
 import CookiePreferencesButton from "@/components/privacy/CookiePreferencesButton";
 
 export const metadata: Metadata = { title: "Politique de confidentialité", robots: { index: false } };
 
 export default function ConfidentialitePage() {
-  return <LegalLayout title="Politique de confidentialité">
+  return <LegalLayout title="Politique de confidentialité" art={<DocHero icon={LockKey} />}>
     <h2>Responsable du service</h2>
     <p>REKOLLECTE est édité à Abidjan, Côte d’Ivoire. Contact : <a href="mailto:wthomasss06@gmail.com">wthomasss06@gmail.com</a> — <a href="tel:+2250142507750">+225 01 42 50 77 50</a>. L’éditeur est responsable du traitement des comptes des membres, de la mesure d’audience de la vitrine, de la facturation et des avis reçus.</p>
     <p>Pour les données collectées auprès de ses propres visiteurs, chaque établissement utilisateur détermine les finalités, les champs et la durée de conservation et assume les responsabilités qui lui incombent ; l’éditeur agit alors comme prestataire technique : il héberge et traite ces données pour le compte de l’établissement. Son identité et son contact peuvent être affichés dans son propre parcours d’information.</p>
@@ -25,7 +30,9 @@ export default function ConfidentialitePage() {
 
     <h2>Destinataires et infrastructure</h2><p>Les données sont accessibles aux membres autorisés de l’établissement selon leur rôle. Le projet est versionné depuis GitHub et déployé avec une infrastructure composée de <strong>Vercel</strong> pour le frontend, <strong>Render</strong> pour le backend applicatif et <strong>Neon</strong> pour la base PostgreSQL. <strong>Cloudinary</strong> héberge les images (logos, photos de profil, visuels du site). <strong>Google</strong> et <strong>Facebook</strong> interviennent pour la connexion. Ces prestataires peuvent être situés hors de Côte d’Ivoire : les données peuvent donc y être transférées. Aucun service publicitaire ni outil de mesure d’audience tiers n’est intégré : la mesure d’audience de la vitrine est réalisée par REKOLLECTE elle-même, sur l’infrastructure décrite ci-dessus, sans transmission à un tiers.</p>
 
+        <DataFlowFigure />
     <h2>Cookies et stockage local</h2><p>Un cookie httpOnly de renouvellement, strictement nécessaire, peut être utilisé pour maintenir la connexion des membres après actualisation. L’interface visiteur utilise le stockage local du navigateur pour le mode offline et la file de synchronisation. Aucun cookie publicitaire n’est nécessaire au fonctionnement du service. Des informations de courte durée en session peuvent servir à afficher un accueil de connexion ou de déconnexion adapté. Votre choix dans le bandeau cookies est mémorisé dans le stockage local de votre navigateur (<code>rk_cookie_consent</code>) pendant 6 mois, puis le bandeau vous le redemande.</p>
+    <CookiesFigure />
     <div className="table-wrap"><table>
       <thead><tr><th>Nom</th><th>Rôle</th><th>Durée</th><th>Consentement</th></tr></thead>
       <tbody>
@@ -53,6 +60,7 @@ export default function ConfidentialitePage() {
     <p>Le service applique notamment une isolation par organisation, une validation serveur, un contrôle de rôle, une limitation des requêtes publiques et la possibilité de régénérer le QR.</p>
 
     <h2>Droits des personnes</h2><p>Selon la réglementation applicable, les personnes peuvent demander l’accès, la rectification ou la suppression de leurs données. La demande doit être adressée en priorité à l’établissement qui a collecté les informations : le Patron peut, depuis Paramètres › Données, exporter ou supprimer toutes les données d’une personne retrouvée par son téléphone ou son e-mail. Les membres peuvent également demander la désactivation de leur compte ; le Patron peut suspendre ou supprimer l’espace de l’établissement selon les droits prévus. Pour contacter l’éditeur : <a href="mailto:wthomasss06@gmail.com">wthomasss06@gmail.com</a> ou <a href="tel:+2250142507750">+225 01 42 50 77 50</a>.</p>
+        <RightsFigure />
     <div className="legal-warning">Cette politique sera relue juridiquement avant toute commercialisation payante. Identité de l’éditeur : voir les <Link href="/mentions-legales">mentions légales</Link>.</div>
   </LegalLayout>;
 }

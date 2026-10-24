@@ -94,7 +94,6 @@ export const PLANS: PricePlan[] = [
 ];
 
 export const PRICING_FOOTNOTES: string[] = [
-  "Prix en FCFA, par établissement et par mois. Paiement annuel : 10 mois payés pour 12 (Essentiel 30\u00a0000 FCFA/an, REKOLLECTE+ 70\u00a0000 FCFA/an).",
   FREE_PERIOD_ACTIVE ? "Nouveaux comptes : 14 jours d’essai de REKOLLECTE+ après le lancement." : "Nouveaux comptes : 14 jours d’essai de REKOLLECTE+.",
   "L’enregistrement des visiteurs n’est jamais bloqué. En cas d’impayé, vous repassez au plan Gratuit : données intactes, export toujours disponible.",
 ];

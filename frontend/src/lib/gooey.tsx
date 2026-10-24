@@ -10,11 +10,16 @@ import { useEffect, useLayoutEffect, useRef, type RefObject } from "react";
  *  - `useGooey(ref)` s’appelle dans le composant de la fenêtre : au montage, une goutte part du bouton vers la carte ; au démontage,
  *    un « fantôme » de la carte se résorbe dans le bouton. Rien à ajouter sur les boutons eux-mêmes.
  *
- * Mouvement réduit, navigateur sans WAAPI, ou fenêtre ouverte sans clic récent : aucune animation, la fenêtre apparaît comme avant.
+ * Ce qui compte comme « bouton d’origine » : tout élément interactif (bouton, lien, onglet, case…) et, à défaut, la carte cliquable la plus proche
+ * (curseur « pointer »). Une fenêtre qui s’ouvre après un appel réseau lent garde son bouton d’origine (3 s) ; une fenêtre ouverte sans clic récent
+ * (lien profond, ouverture automatique) sort du bas de l’écran. Les menus volants (`kind: "popover"`) n’ont pas de repli : ils ne s’ouvrent que par un clic.
+ *
+ * Mouvement réduit ou navigateur sans WAAPI : aucune animation, la fenêtre apparaît comme avant.
  */
 export const GOO_FILTER_ID = "rk-goo-shared";
-const FRESH_MS = 1600;
-const INTERACTIVE = 'button, a[href], [role="button"], [role="menuitem"], summary, [data-goo-origin]';
+const FRESH_MS = 3000; // une fenêtre ouverte après un appel réseau lent (Abidjan, 3G) garde son bouton d’origine
+const DISCONNECTED_MS = 1600; // bouton disparu entre-temps (navigation, liste rafraîchie) : on ne s’y fie que très peu de temps
+const INTERACTIVE = 'button, a[href], label, summary, input[type="checkbox"], input[type="radio"], input[type="submit"], input[type="button"], [role="button"], [role="menuitem"], [role="tab"], [role="switch"], [role="option"], [role="link"], [data-goo-origin]';
 const HOST_SELECTOR = "[data-goo-host], .rk-modal-backdrop, .qr-flash-overlay";
 
 interface Rect { left: number; top: number; width: number; height: number }
@@ -29,10 +34,30 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 /** Pseudo-aléatoire déterministe : les gouttes tombent toujours au même endroit (pas de scintillement d’une ouverture à l’autre). */
 const noise = (i: number) => { const x = Math.sin(i * 12.9898 + 4.1414) * 43758.5453; return x - Math.floor(x); };
 
+/** Élément cliqué qui servira d’origine : d’abord un contrôle interactif ; à défaut, la carte cliquable (curseur « pointer »). Le curseur étant hérité,
+ *  on remonte jusqu’au plus haut ancêtre qui l’a encore (6 niveaux au plus, jamais plus de la moitié de l’écran) : c’est la carte entière, pas son texte. */
+function findOrigin(start: Element): Element | null {
+  const semantic = start.closest(INTERACTIVE);
+  if (semantic) return semantic;
+  const isPointer = (el: Element) => getComputedStyle(el).cursor === "pointer";
+  let el: Element | null = start;
+  for (let depth = 0; el && el !== document.body && depth < 6 && !isPointer(el); depth += 1) el = el.parentElement;
+  if (!el || el === document.body || !isPointer(el)) return null;
+  const screenArea = window.innerWidth * window.innerHeight;
+  for (let depth = 0; depth < 6; depth += 1) {
+    const parent: Element | null = el.parentElement;
+    if (!parent || parent === document.body || !isPointer(parent)) break;
+    const r = parent.getBoundingClientRect();
+    if (r.width * r.height > screenArea * 0.5) break;
+    el = parent;
+  }
+  return el;
+}
+
 export function GooeyProvider() {
   useEffect(() => {
     const onClick = (event: MouseEvent) => {
-      const target = event.target instanceof Element ? event.target.closest(INTERACTIVE) : null;
+      const target = event.target instanceof Element ? findOrigin(event.target) : null;
       if (!target || target.closest("[data-no-goo]")) return;
       const rect = toRect(target.getBoundingClientRect());
       if (rect.width < 2 || rect.height < 2) return;
@@ -56,7 +81,9 @@ export function GooeyProvider() {
 }
 
 function freshOrigin(): Origin | null {
-  if (!lastOrigin || performance.now() - lastOrigin.at > FRESH_MS) return null;
+  if (!lastOrigin) return null;
+  const age = performance.now() - lastOrigin.at;
+  if (age > FRESH_MS || (!lastOrigin.el.isConnected && age > DISCONNECTED_MS)) return null;
   return lastOrigin;
 }
 
@@ -136,7 +163,8 @@ export interface GooeyOptions {
   selector?: string;
   /** `dialog` : le calque se glisse derrière la carte, dans son fond. `popover` : calque au-dessus de la page, carte révélée à la fin. */
   kind?: Kind;
-  /** Si la fenêtre s’ouvre sans clic récent : `bottom` la fait sortir du bas de l’écran, `none` garde l’apparition d’origine. */
+  /** Si la fenêtre s’ouvre sans clic récent : `bottom` la fait sortir du bas de l’écran, `none` garde l’apparition d’origine.
+   *  Par défaut : `bottom` pour une fenêtre (`dialog`), `none` pour un menu volant (`popover`). */
   fallback?: "bottom" | "none";
   /** Ignore le dernier clic (fenêtre qui s’ouvre seule). */
   ignoreClick?: boolean;
@@ -154,7 +182,8 @@ export function useGooey(ref: RefObject<HTMLElement | null>, options: GooeyOptio
     const host = ref.current;
     if (!host || typeof window === "undefined") return undefined;
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches || typeof host.animate !== "function") return undefined;
-    const { selector, kind = "dialog", fallback = "none", ignoreClick = false } = options;
+    const { selector, kind = "dialog", ignoreClick = false } = options;
+    const fallback = options.fallback ?? (kind === "popover" ? "none" : "bottom");
     const card = (selector ? host.querySelector<HTMLElement>(selector) : host) ?? host;
 
     const origin = ignoreClick ? null : freshOrigin();

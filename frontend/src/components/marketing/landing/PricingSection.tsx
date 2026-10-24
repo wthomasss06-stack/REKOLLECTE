@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { ArrowUpRight, CheckMark } from "@/components/icons";
 import { FREE_PERIOD_ACTIVE, FREE_UNTIL_LABEL, PLANS, PRICING_FOOTNOTES } from "@/lib/pricing";
+import PricingInfo from "./PricingInfo";
 
 const secondaryBtn =
   "mt-6 inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full border border-border px-5 text-sm font-semibold text-ink transition-colors hover:border-ink";
@@ -81,10 +82,7 @@ export default function PricingSection() {
         })}
       </ul>
 
-      <ul className="mx-auto mt-8 max-w-3xl space-y-1.5 text-center text-xs leading-relaxed text-ink-soft" data-reveal>
-        {PRICING_FOOTNOTES.map((note) => <li key={note}>{note}</li>)}
-        <li>Détails de facturation : <Link href="/cgu" className="underline underline-offset-4 hover:text-ink">conditions d’utilisation, article 6</Link>.</li>
-      </ul>
+      <PricingInfo notes={PRICING_FOOTNOTES} />
     </section>
   );
 }
