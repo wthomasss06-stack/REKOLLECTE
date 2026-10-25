@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import AppHeader from "@/components/dashboard/AppHeader";
 import ProductIdentity from "@/components/dashboard/ProductIdentity";
 import Sidebar from "@/components/dashboard/Sidebar";
+import { useSidebarCollapsed } from "@/components/shell/useSidebarCollapsed";
 import PlanBanner from "@/components/billing/PlanBanner";
 import { ReminderProvider } from "@/components/karnet/ReminderAlarm";
 import { useDialog } from "@/components/ui/DialogProvider";
@@ -19,6 +20,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const { loading, user, organization, isAuthenticated } = useAuthContext();
   const { alert } = useDialog();
+  const [navCollapsed, toggleNav] = useSidebarCollapsed();
 
   // Filet de sécurité : si une fenêtre s’est mal refermée, le défilement ne reste jamais figé après un changement de page.
   useEffect(() => { releaseStaleScrollLock(); }, [pathname]);
@@ -56,14 +58,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   // avant, ils n’existaient que sur la page REKOLLECTE+, donc un agent resté sur « Accueil » n’entendait jamais l’alarme.
   const reminders = Boolean(organization?.capabilities?.karnet);
   return (
-    <div className="min-h-screen bg-canvas">
+    <div className={`space bg-canvas${navCollapsed ? " space--nav-collapsed" : ""}`}>
       <ProductIdentity capabilities={organization?.capabilities} />
-      <AppHeader />
-      <Sidebar orgName={organization?.name || user.organization_name} orgLogo={organization?.logo_url} userName={user.full_name || user.email} role={user.role} capabilities={organization?.capabilities} />
-      <main className="px-4 pb-28 pt-20 sm:px-6 md:ml-[72px] md:p-10 md:pb-10 md:pt-24">
-        <PlanBanner />
-        {reminders ? <ReminderProvider>{children}</ReminderProvider> : children}
-      </main>
+      <Sidebar orgName={organization?.name || user.organization_name} orgLogo={organization?.logo_url} userName={user.full_name || user.email} role={user.role} capabilities={organization?.capabilities} collapsed={navCollapsed} onToggle={toggleNav} />
+      <div className="space-col">
+        <AppHeader />
+        <main className="px-4 pb-28 pt-4 sm:px-6 md:p-10 md:pb-10 md:pt-4">
+          <PlanBanner />
+          {reminders ? <ReminderProvider>{children}</ReminderProvider> : children}
+        </main>
+      </div>
     </div>
   );
 }

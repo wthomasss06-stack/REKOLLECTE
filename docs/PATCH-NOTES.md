@@ -1,5 +1,19 @@
 # REKOLLECTE – notes de patch
 
+## Patch v12 — barre latérale d'E-Carnet adaptée à REKOLLECTE, un seul logo (23/10/2026), cumulatif avec v8 à v11
+
+Ce zip **contient aussi v8 à v11** : le décompresser seul, à la racine. **Supprimer à la main** : `frontend/src/components/DocumentScanner.tsx`, `backend/apps/checkins/ocr_utils.py`, `backend/apps/checkins/tests/test_document_ocr.py`, et les icônes propres au niveau 2, devenues inutiles : `frontend/public/manifest-karnet.json`, `frontend/public/brand/karnet-favicon.png`, `frontend/public/brand/karnet-logo-mark.webp`, `frontend/public/brand/karnet-logo-source.webp`, `frontend/public/icons/karnet-apple-touch-icon.png`, `frontend/public/icons/karnet-icon-192.png`, `frontend/public/icons/karnet-icon-192.webp`, `frontend/public/icons/karnet-icon-512.png`, `frontend/public/icons/karnet-icon-512.webp`, `frontend/public/icons/karnet-icon-maskable-512.png`. **Vérifié** : `tsc --noEmit` propre, rendu de contrôle de la barre (ordinateur déplié et replié, téléphone, clair et sombre). **Non testé** : le comportement réel dans un navigateur (goutte qui glisse, repli, menu du compte), `next build`.
+
+### Barre latérale (`components/shell/`)
+- Même structure que celle d'E-Carnet : en-tête (logo + bouton de repli), navigation en lignes arrondies, compte en bas avec menu. Sur ordinateur : pleine hauteur, repliable en rail d'icônes avec bulles, le contenu s'ajuste à sa largeur. Sur téléphone : barre basse flottante à icônes, la pastille active est une goutte gooey qui glisse d'un onglet à l'autre.
+- Couleurs = variables du thème (`--c-*`) : clair et sombre sans règle dédiée. Le menu du compte (profil, apparence, déconnexion) utilise l'effet gooey partagé. Le repli mémorisé garde la même clé qu'avant.
+- `AppHeader` devient une barre d'outils (synchronisation et notifications, en haut à droite du contenu). Sur téléphone elle porte aussi le R et le menu du profil.
+- `Sidebar.tsx` n'est plus qu'un fournisseur de données ; `AppNav` reste utilisé par la console d'administration.
+
+### Un seul logo : le R
+- Le R est le seul logo de REKOLLECTE, quel que soit le niveau : en-tête de la barre latérale et de l'en-tête mobile, favicon, icône d'écran d'accueil et manifest identiques pour REKOLLECTE et REKOLLECTE+. Seul le titre de l'onglet et le nom écrit à côté portent le niveau.
+- Le logo et le nom de l'établissement apparaissent dans le menu du compte.
+
 ## Patch v11 — effet gooey fiable sur toutes les fenêtres et tous les boutons qui les ouvrent (23/10/2026), cumulatif avec v8 à v10
 
 Ce zip **contient aussi v8, v9 et v10** : le décompresser seul, à la racine. Supprimer toujours `frontend/src/components/DocumentScanner.tsx`, `backend/apps/checkins/ocr_utils.py`, `backend/apps/checkins/tests/test_document_ocr.py`. **Vérifié** : `tsc --noEmit` propre, `pytest` 287 verts. **Non testé** : le rendu réel (animations WAAPI et filtre SVG dans un navigateur).

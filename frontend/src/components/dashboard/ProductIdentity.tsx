@@ -4,10 +4,12 @@ import { useEffect } from "react";
 
 import type { OrganizationCapabilities } from "@/types";
 
-const IDENTITIES = {
-  base: { title: "REKOLLECTE", icon: "/favicon.png", apple: "/icons/icon-192.png", manifest: "/manifest.json" },
-  karnet: { title: "REKOLLECTE+", icon: "/brand/karnet-favicon.png", apple: "/icons/karnet-apple-touch-icon.png", manifest: "/manifest-karnet.json" },
-};
+// Un seul logo, le R, quel que soit le niveau : icône, icône d’écran d’accueil et manifest sont les mêmes pour REKOLLECTE et REKOLLECTE+.
+// Seul le titre de l’onglet porte le nom du niveau.
+const ICON = "/favicon.png";
+const APPLE = "/icons/icon-192.png";
+const MANIFEST = "/manifest.json";
+const TITLES = { base: "REKOLLECTE", karnet: "REKOLLECTE+" };
 
 function setLinkIcon(rel: string, href: string) {
   let link = document.querySelector<HTMLLinkElement>(`link[rel="${rel}"]`);
@@ -20,29 +22,19 @@ function setLinkIcon(rel: string, href: string) {
 }
 
 /**
- * Bascule l’identité du navigateur ET du manifest PWA (titre d’onglet, favicon,
- * manifest installable) entre Renseignement et REKOLLECTE+ selon
- * `organization.capabilities.karnet` — un état décidé côté serveur uniquement (cf. plan
- * de bascule Niveau 1 → Niveau 2), jamais calculé ici.
- *
- * Le nom et le logo de CHAQUE établissement (orgName/orgLogo affichés dans la Sidebar)
- * restent inchangés : c’est l’identité de l’entreprise du client, pas celle du produit.
- * Seule l’identité produit (ce composant) reflète le palier actif.
- *
- * Deux manifests statiques (public/manifest.json et public/manifest-karnet.json) plutôt
- * qu’un manifest généré côté serveur par établissement : le lien <link rel="manifest">
- * est réécrit ici avant que l’utilisateur ne déclenche "Ajouter à l’écran d’accueil",
- * ce qui suffit en pratique et évite un aller-retour serveur à chaque chargement.
+ * Titre de l’onglet selon le niveau actif (`organization.capabilities.karnet`, décidé côté serveur uniquement, jamais calculé ici).
+ * Le logo ne change pas : c’est toujours le R de REKOLLECTE (favicon, icône d’écran d’accueil et manifest identiques aux deux niveaux).
+ * Le nom et le logo de CHAQUE établissement restent propres à l’établissement : ils ne sont pas l’identité du produit.
  */
 export default function ProductIdentity({ capabilities }: { capabilities?: OrganizationCapabilities }) {
   const isKarnet = Boolean(capabilities?.karnet);
 
   useEffect(() => {
-    const identity = isKarnet ? IDENTITIES.karnet : IDENTITIES.base;
-    document.title = identity.title;
-    setLinkIcon("icon", identity.icon);
-    setLinkIcon("apple-touch-icon", identity.apple);
-    setLinkIcon("manifest", identity.manifest);
+    document.title = isKarnet ? TITLES.karnet : TITLES.base;
+    // Remet le R partout (une ancienne session a pu laisser l’icône du niveau 2 dans l’onglet ou le manifest).
+    setLinkIcon("icon", ICON);
+    setLinkIcon("apple-touch-icon", APPLE);
+    setLinkIcon("manifest", MANIFEST);
   }, [isKarnet]);
 
   return null;

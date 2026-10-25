@@ -52,7 +52,7 @@ export default function AdministrationPanel() {
       runningLabel: enabling ? "Activation…" : "Désactivation…",
       successTitle: enabling ? "REKOLLECTE+ est activé !" : "REKOLLECTE+ est désactivé.",
       successMessage: enabling
-        ? "La barre latérale, le titre d’onglet et le favicon sont déjà à jour. Rien d’autre à faire."
+        ? "La barre latérale et le titre d’onglet sont déjà à jour. Rien d’autre à faire."
         : "L’établissement repasse à REKOLLECTE seul.",
       run: async () => {
         await apiClient.patch("/org/me/karnet/", { karnet_enabled: enabling });

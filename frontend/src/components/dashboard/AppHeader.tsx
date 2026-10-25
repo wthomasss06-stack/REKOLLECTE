@@ -27,8 +27,9 @@ function Avatar({ name, url, size }: { name: string; url?: string; size: number 
   );
 }
 
-/** En-tête de l’espace connecté : la marque du palier actif à gauche (REKOLLECTE, ou REKOLLECTE+ au Niveau 2), le profil à droite.
- * Sur téléphone seulement, le menu du profil porte aussi le mode clair/sombre et la déconnexion (sur ordinateur, ils restent dans la barre latérale). */
+/** Barre d’outils de l’espace connecté : synchronisation et notifications, en haut à droite du contenu.
+ *  Sur ordinateur, la marque et le compte sont dans la barre latérale ; sur téléphone, cette barre porte aussi le R de REKOLLECTE
+ *  (le seul logo, quel que soit le niveau) et le menu du profil (apparence et déconnexion comprises). */
 export default function AppHeader() {
   const { user, organization } = useAuthContext();
   const [open, setOpen] = useState(false);
@@ -39,7 +40,7 @@ export default function AppHeader() {
   const product = organization?.capabilities?.karnet ? "REKOLLECTE+" : "REKOLLECTE";
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) return undefined;
     const onPointer = (event: PointerEvent) => { if (!menuRef.current?.contains(event.target as Node)) setOpen(false); };
     const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") { setOpen(false); buttonRef.current?.focus(); } };
     document.addEventListener("pointerdown", onPointer);
@@ -51,16 +52,16 @@ export default function AppHeader() {
   const itemClass = "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-ink hover:bg-canvas";
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between gap-3 border-b border-border bg-surface px-4 md:px-5">
-      <Link href="/dashboard" className="flex min-w-0 items-center gap-2.5" aria-label={`${product} — accueil`}>
+    <header className="sticky top-0 z-50 flex h-14 items-center gap-3 border-b border-border bg-surface px-4 md:border-0 md:bg-transparent md:px-10">
+      <Link href="/dashboard" className="flex min-w-0 items-center gap-2.5 md:hidden" aria-label={`${product} — accueil`}>
         <Logo size={30} className="shrink-0" />
         <span className="truncate font-heading text-[15px] font-bold tracking-tight text-ink">{product}</span>
       </Link>
 
-      <div className="flex shrink-0 items-center gap-2">
+      <div className="ml-auto flex shrink-0 items-center gap-2">
         <SyncStatusBadge />
         <VisitAlerts />
-        <div ref={menuRef} className="relative">
+        <div ref={menuRef} className="relative md:hidden">
           <button
             ref={buttonRef}
             type="button"
@@ -68,10 +69,9 @@ export default function AppHeader() {
             aria-haspopup="menu"
             aria-expanded={open}
             aria-label="Menu du profil"
-            className="flex items-center gap-2 rounded-full border border-border bg-canvas py-1 pl-1 pr-2.5 hover:border-cta md:pr-3"
+            className="flex items-center gap-2 rounded-full border border-border bg-canvas py-1 pl-1 pr-2.5 hover:border-cta"
           >
             <Avatar name={name} url={user.avatar_url} size={30} />
-            <span className="hidden min-w-0 text-left md:block"><span className="block max-w-[150px] truncate text-xs font-semibold leading-tight text-ink">{name}</span><span className="block text-[11px] leading-tight text-ink-soft">{roleLabel(user.role)}</span></span>
             <CaretDown size={13} weight="bold" className={`text-ink-soft transition-transform ${open ? "rotate-180" : ""}`} aria-hidden="true" />
           </button>
 
@@ -87,11 +87,8 @@ export default function AppHeader() {
               </div>
               <div className="pt-1">
                 <Link role="menuitem" href="/dashboard/parametres?open=moi" onClick={() => setOpen(false)} className={itemClass}><GearSix size={18} weight="bold" className="text-ink-soft" /> Mon profil</Link>
-                {/* Téléphone seulement : sur ordinateur, ces deux commandes restent en bas de la barre latérale. */}
-                <div className="md:hidden">
-                  <div className="flex items-center justify-between gap-3 px-3 py-2 text-sm font-medium text-ink"><span>Apparence</span><ThemeToggle /></div>
-                  <button type="button" role="menuitem" onClick={() => { setOpen(false); void askLogout(); }} className={`${itemClass} text-error-text`}><SignOut size={18} weight="bold" /> Se déconnecter</button>
-                </div>
+                <div className="flex items-center justify-between gap-3 px-3 py-2 text-sm font-medium text-ink"><span>Apparence</span><ThemeToggle /></div>
+                <button type="button" role="menuitem" onClick={() => { setOpen(false); void askLogout(); }} className={`${itemClass} text-error-text`}><SignOut size={18} weight="bold" /> Se déconnecter</button>
               </div>
             </GooeyPanel>
           )}
