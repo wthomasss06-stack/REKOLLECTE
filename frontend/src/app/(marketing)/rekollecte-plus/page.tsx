@@ -8,7 +8,7 @@ import { CONTENT_UPDATED_ISO, CONTENT_UPDATED_LABEL, IDS, SITE_URL } from "@/lib
 
 const FAQ = [
   { question: "Qu’est-ce que REKOLLECTE+ ?", answer: "REKOLLECTE+ complète REKOLLECTE. Il transforme les visiteurs enregistrés à l’accueil en fiches clients et ajoute la gestion des ressources (chambre, table, salle…), des réservations, des encaissements et des rappels de fin de créneau." },
-  { question: "Comment activer REKOLLECTE+ ?", answer: "Le Patron l’active depuis Paramètres > Administration. Le registre devient alors l’espace « Clients » et les sections Ressources, Réservations, Paiements et Rappels apparaissent." },
+  { question: "Comment activer REKOLLECTE+ ?", answer: "Le Patron l’active depuis la page REKOLLECTE. Le registre devient alors l’espace « Clients » et les sections Ressources, Réservations, Paiements et Rappels apparaissent." },
   { question: "Peut-on désactiver REKOLLECTE+ ?", answer: "Oui. Les sections disparaissent de la navigation mais rien n’est supprimé : l’établissement peut le réactiver plus tard." },
   { question: "REKOLLECTE+ propose-t-il un paiement en ligne ?", answer: "Non. Aucun agrégateur de paiement en ligne n’est activé à ce stade : REKOLLECTE+ enregistre les encaissements de l’établissement." },
   { question: "Qui peut annuler un encaissement ?", answer: "Toute l’équipe peut encaisser, mais annuler un encaissement déjà enregistré est réservé au Patron et au Gérant." },
@@ -66,7 +66,7 @@ export default function RekollectePlusPage() {
 
       <h2>Comment l’activer</h2>
       <ul>
-        <li><strong>1.</strong> Le Patron ouvre Paramètres, puis Administration.</li>
+        <li><strong>1.</strong> Le Patron ouvre la page REKOLLECTE, puis la rubrique REKOLLECTE+.</li>
         <li><strong>2.</strong> Il active REKOLLECTE+ : le registre devient l’espace Clients.</li>
         <li><strong>3.</strong> Il crée ses premières ressources (proposé juste après l’activation, avec une option « Plus tard »).</li>
         <li><strong>4.</strong> L’équipe crée les réservations ; Patron, Gérant et Agent peuvent encaisser.</li>

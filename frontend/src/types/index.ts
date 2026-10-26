@@ -98,7 +98,12 @@ export interface VisitAlertsPayload { now: string; cursor: string; total: number
 
 export interface StaffInvitation { id: string; email: string; role: AccountRole; accepted_at: string | null; revoked_at: string | null; revoked_reason: string; created_at: string; }
 export interface TeamAccess { members: UserProfile[]; invitations: StaffInvitation[]; }
-export interface AuditEvent { id: string; action: string; actor_name: string | null; actor_email: string | null; target_name: string | null; target_email: string | null; metadata: Record<string, unknown>; created_at: string; }
+export type AuditCategory = "connexions" | "equipe" | "donnees" | "offre";
+/** `category`, `label` et `sensitive` sont décidés côté serveur (apps/accounts/audit.py) : une seule table de libellés, partagée avec l’export CSV. */
+export interface AuditEvent { id: string; action: string; category: AuditCategory | "autres"; label: string; sensitive: boolean; actor_name: string | null; actor_email: string | null; target_name: string | null; target_email: string | null; metadata: Record<string, unknown>; created_at: string; }
+export interface AuditSummary { days: 7 | 30 | 90; counts: Record<AuditCategory, number>; sensitive: number; last_sensitive_at: string | null; active_sessions: number; connected_members: number; members: number; }
+/** Appareil actuellement connecté d’un membre (GET /auth/sessions/, réservé au Patron). */
+export interface OrgSession { id: string; user_id: string; user_name: string; user_email: string; user_role: "BOSS" | "GERANT" | "STAFF"; device: string; device_kind: "mobile" | "ordinateur"; ip_address: string | null; created_at: string; last_used_at: string | null; expires_at: string; current: boolean; }
 
 /** Calculee cote serveur uniquement (Organization.capabilities) — le frontend ne fait
  * jamais ce calcul lui-meme, il ne fait que refleter ce que l’API renvoie. */

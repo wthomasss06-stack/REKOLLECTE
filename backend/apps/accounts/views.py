@@ -14,6 +14,7 @@ from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 from apps.common.permissions import IsBoss, IsBossOrGerant
 from apps.common.responses import error_response
 
+from .audit import filter_events
 from .cookies import clear_refresh_cookie, set_refresh_cookie
 from .models import AuditEvent, RefreshSession, StaffInvitation, User
 from .serializers import AuditEventSerializer, GoogleAuthSerializer, InviteStaffSerializer, StaffInvitationSerializer, UserProfileUpdateSerializer, UserSerializer
@@ -306,7 +307,9 @@ class AuditEventListView(generics.ListAPIView):
     pagination_class = AuditEventPagination
 
     def get_queryset(self):
-        return AuditEvent.objects.filter(organization=self.request.user.organization).select_related("actor", "target_user")
+        # Filtres facultatifs : category, sensitive=1, actor, since, until, q (voir audit.filter_events).
+        queryset = AuditEvent.objects.filter(organization=self.request.user.organization).select_related("actor", "target_user")
+        return filter_events(queryset, self.request.query_params)
 
 
 class AcceptTermsView(APIView):

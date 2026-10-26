@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .oauth_views import IdentityListView, IdentityUnlinkView, OAuthCallbackView, OAuthLinkStartView, OAuthStartView
+from .audit_views import AuditEventExportView, AuditSummaryView, MemberSessionsRevokeView, OrgSessionListView, OrgSessionRevokeView
 from .views import AcceptTermsView, AuditEventListView, CookieTokenRefreshView, DeactivateMeView, GoogleAuthView, InviteStaffView, LogoutView, MemberVisitHostView, MeView, RevokeInvitationView, RevokeMemberView, TeamAccessView
 
 urlpatterns = [
@@ -21,4 +22,9 @@ urlpatterns = [
     path("team/members/<uuid:user_id>/revoke/", RevokeMemberView.as_view(), name="auth-revoke-member"),
     path("team/members/<uuid:user_id>/visit-host/", MemberVisitHostView.as_view(), name="auth-member-visit-host"),
     path("audit/", AuditEventListView.as_view(), name="auth-audit"),
+    path("audit/export/", AuditEventExportView.as_view(), name="auth-audit-export"),
+    path("audit/summary/", AuditSummaryView.as_view(), name="auth-audit-summary"),
+    path("sessions/", OrgSessionListView.as_view(), name="auth-sessions"),
+    path("sessions/<uuid:session_id>/revoke/", OrgSessionRevokeView.as_view(), name="auth-session-revoke"),
+    path("team/members/<uuid:user_id>/sessions/revoke/", MemberSessionsRevokeView.as_view(), name="auth-member-sessions-revoke"),
 ]

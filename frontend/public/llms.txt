@@ -27,7 +27,7 @@
 
 ## REKOLLECTE+ (niveau 2)
 
-- Activé par le Patron depuis Paramètres > Administration ; réversible, aucune donnée supprimée à la désactivation.
+- Activé par le Patron depuis la page REKOLLECTE ; réversible, aucune donnée supprimée à la désactivation.
 - Fiches clients avec historique complet des passages et des réservations.
 - Ressources par catégorie (hébergement, beauté et soins, espaces professionnels, événementiel et restauration, stationnement, sport et loisirs, autre), tarif par heure ou séance, par jour ou nuit, ou au forfait mensuel.
 - Réservations numérotées avec détection de conflit ; encaissements enregistrés ; rappel sonore à la fin de chaque créneau.

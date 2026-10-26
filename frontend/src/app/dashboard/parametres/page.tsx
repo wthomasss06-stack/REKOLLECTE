@@ -34,7 +34,7 @@ const SECTIONS: Section[] = [
   { id: "abonnement", title: "Abonnement", description: "Votre plan, ses limites, vos reçus et l’export de vos données", icon: CreditCard, roles: MANAGERS, wide: true, panel: () => <AbonnementPanel /> },
   { id: "donnees", title: "Données et confidentialité", description: "Durée de conservation, données minimisées, droits des personnes", icon: LockKey, roles: ["BOSS"], wide: true, panel: () => <DonneesPanel /> },
   { id: "connexion", title: "Connexion", description: "Google et Facebook : les façons de vous connecter", icon: KeyIcon, roles: ALL_ROLES, panel: () => <ConnexionPanel /> },
-  { id: "administration", title: "Administration", description: "REKOLLECTE+, historique des connexions et actions sensibles", icon: ShieldCheck, roles: ["BOSS"], wide: true, panel: () => <AdministrationPanel /> },
+  { id: "administration", title: "Administration", description: "Vue d’ensemble, journal d’activité et appareils connectés", icon: ShieldCheck, roles: ["BOSS"], wide: true, panel: () => <AdministrationPanel /> },
   { id: "avis", title: "Votre avis", description: "Une idée, une erreur ? Dites-le-nous", icon: ChatCircleDots, roles: ALL_ROLES, panel: () => <FeedbackPanel /> },
   { id: "en-savoir-plus", title: "En savoir plus", description: "À propos, aide, crédits, conditions et confidentialité", icon: Info, roles: ALL_ROLES, panel: () => <EnSavoirPlusPanel /> },
 ];

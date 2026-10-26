@@ -1,13 +1,14 @@
 "use client";
 
 import { Suspense, useEffect, type ReactNode } from "react";
-import { BellRinging, CalendarCheck, Cube, ListChecks, Money, QrCode, ShieldCheck, UsersThree } from "@phosphor-icons/react";
+import { BellRinging, CalendarCheck, Cube, ListChecks, Money, QrCode, ShieldCheck, Sparkle, UsersThree } from "@phosphor-icons/react";
 
 import GettingStarted, { useGuideOptional } from "@/components/karnet/GettingStarted";
 import Loader from "@/components/Loader";
 import ClientsPanel from "@/components/panels/ClientsPanel";
 import FormulairePanel from "@/components/panels/FormulairePanel";
 import PaiementsPanel from "@/components/panels/PaiementsPanel";
+import PlusActivationPanel from "@/components/panels/PlusActivationPanel";
 import QrCodePanel from "@/components/panels/QrCodePanel";
 import RappelsPanel from "@/components/panels/RappelsPanel";
 import ReservationsPanel from "@/components/panels/ReservationsPanel";
@@ -18,16 +19,16 @@ import { useAuthContext } from "@/context/AuthContext";
 import { useModalParam } from "@/hooks/useModalParam";
 import type { AccountRole } from "@/types";
 
-const IDS = ["formulaire", "qr", "clients", "ressources", "reservations", "paiements", "rappels"] as const;
+const IDS = ["formulaire", "qr", "clients", "ressources", "reservations", "paiements", "rappels", "plus"] as const;
 type PanelId = (typeof IDS)[number];
 
 const ALL_ROLES: AccountRole[] = ["BOSS", "GERANT", "STAFF"];
 const MANAGERS: AccountRole[] = ["BOSS", "GERANT"];
 
-interface Section extends SettingsRow { roles: AccountRole[]; level2?: boolean; panel?: () => ReactNode }
+interface Section extends SettingsRow { roles: AccountRole[]; level2?: boolean; panel?: (context: { close: () => void }) => ReactNode }
 
-// Niveau 1 : Formulaire et QR codes. Niveau 2 (REKOLLECTE+) : les mêmes lignes, dans le même ordre, puis les outils en plus —
-// la page ne change pas de place ni de forme quand l’établissement passe au Niveau 2.
+// REKOLLECTE : Formulaire et QR codes. REKOLLECTE+ : les mêmes lignes, dans le même ordre, puis les outils en plus —
+// la page ne change pas de place ni de forme quand l’établissement passe à REKOLLECTE+.
 const SECTIONS: Section[] = [
   { id: "formulaire", title: "Formulaire", description: "Les champs que le visiteur remplit en arrivant", icon: ListChecks, roles: MANAGERS, panel: () => <FormulairePanel /> },
   { id: "qr", title: "QR codes", description: "Points d’accueil, QR à afficher et à imprimer", icon: QrCode, roles: ALL_ROLES, panel: () => <QrCodePanel /> },
@@ -38,6 +39,8 @@ const SECTIONS: Section[] = [
   { id: "rappels", title: "Rappels", description: "Les créneaux terminés à traiter, avec alarme", icon: BellRinging, roles: ALL_ROLES, level2: true, panel: () => <RappelsPanel /> },
   // Le journal reste unique : il vit dans Paramètres > Administration (réservé au Patron), on y renvoie.
   { id: "audit", title: "Audit", description: "Le journal des actions sensibles de l’établissement", icon: ShieldCheck, roles: ["BOSS"], level2: true, href: "/dashboard/parametres?open=administration" },
+  // Activation de REKOLLECTE+ : réservée au Patron, à tous les niveaux (c’est ici qu’on l’active, ici qu’on la désactive).
+  { id: "plus", title: "REKOLLECTE+", description: "Clients, ressources, réservations, paiements et rappels", icon: Sparkle, roles: ["BOSS"], panel: ({ close }) => <PlusActivationPanel onDone={close} /> },
 ];
 
 function RekollecteContent() {
@@ -52,7 +55,8 @@ function RekollecteContent() {
 
   if (!user || !organization) return <Loader fullScreen={false} label="Chargement…" />;
 
-  const sections = SECTIONS.filter((section) => section.roles.includes(user.role) && (karnet || !section.level2));
+  const sections = SECTIONS.filter((section) => section.roles.includes(user.role) && (karnet || !section.level2))
+    .map((section) => (section.id === "plus" && karnet ? { ...section, description: "Actif : voir les capacités ou désactiver" } : section));
   const current = sections.find((section) => section.id === openId && section.panel) ?? null;
   const product = karnet ? "REKOLLECTE+" : "REKOLLECTE";
 
@@ -65,7 +69,7 @@ function RekollecteContent() {
       </div>
       {karnet && guide && <GettingStarted variant="compact" />}
       <SettingsRows rows={sections} activeId={openId} onSelect={(id) => open(id as PanelId)} label={`Rubriques de ${product}`} />
-      {current && <SettingsModal title={current.title} wide comfort={karnet} onClose={close}>{current.panel?.()}</SettingsModal>}
+      {current && <SettingsModal title={current.title} wide comfort={karnet} onClose={close}>{current.panel?.({ close })}</SettingsModal>}
     </div>
   );
 }

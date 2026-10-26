@@ -1,5 +1,24 @@
 # REKOLLECTE – notes de patch
 
+## Patch v13 — Administration pour les établissements, activation de REKOLLECTE+ dans la page REKOLLECTE (24/10/2026), cumulatif avec v8 à v12
+
+Ce zip **contient aussi v8 à v12** : le décompresser seul, à la racine. Supprimer toujours les fichiers listés dans les notes v9 et v12. Aucune migration. **Vérifié** : `pytest` (nouveaux tests du journal, de l'export et des appareils), `tsc --noEmit` propre. **Non testé** : le rendu et les interactions dans un navigateur.
+
+### Administration (Paramètres › Administration, Patron)
+Trois onglets :
+- **Vue d'ensemble** : activité sur 7, 30 ou 90 jours (connexions, actions sensibles, appareils connectés, changements d'équipe), dernières actions sensibles, raccourcis vers Équipe et Données.
+- **Activité** : journal filtrable (catégorie Connexions / Équipe / Données / Offre, actions sensibles seulement, période, recherche par nom ou e-mail), lu par jour, avec libellés lisibles pour tous les événements (avant, plusieurs s'affichaient avec leur code), **export CSV** du journal filtré (compatible Excel, protégé contre l'injection de formules, 10 000 lignes au plus).
+- **Appareils** : tous les appareils connectés de l'établissement, par membre (navigateur et système, IP, dernière activité). Le Patron déconnecte un appareil ou tous ceux d'un membre ; l'appareil en cours d'utilisation est protégé. Le renouvellement est refusé aussitôt, l'accès déjà ouvert expire en 10 minutes au plus.
+- Journalisation : chaque déconnexion décidée par le Patron et chaque export du journal sont eux-mêmes inscrits au journal (`auth.session_revoked` avec la raison « boss », `auth.member_sessions_revoked`, `audit.exported`).
+
+### API (apps/accounts)
+- `GET /auth/audit/` accepte `category`, `sensitive=1`, `actor`, `since`, `until`, `q` et renvoie `category`, `label`, `sensitive` ; les libellés et catégories vivent dans `audit.py` (une seule table, partagée avec l'export).
+- Nouveaux : `GET /auth/audit/summary/`, `GET /auth/audit/export/`, `GET /auth/sessions/`, `POST /auth/sessions/<id>/revoke/`, `POST /auth/team/members/<id>/sessions/revoke/` (Patron uniquement).
+
+### REKOLLECTE+
+- L'activation et la désactivation quittent l'Administration : elles sont dans la page REKOLLECTE, rubrique « REKOLLECTE+ », **visible uniquement par le Patron**, à tous les niveaux. Même confirmation qu'avant, puis proposition de créer les premières ressources.
+- Les textes publics qui indiquaient « Paramètres > Administration » ou « depuis les paramètres » renvoient maintenant à la page REKOLLECTE (page REKOLLECTE+, FAQ, à propos, schéma, `llms*.txt`).
+
 ## Patch v12 — barre latérale d'E-Carnet adaptée à REKOLLECTE, un seul logo (23/10/2026), cumulatif avec v8 à v11
 
 Ce zip **contient aussi v8 à v11** : le décompresser seul, à la racine. **Supprimer à la main** : `frontend/src/components/DocumentScanner.tsx`, `backend/apps/checkins/ocr_utils.py`, `backend/apps/checkins/tests/test_document_ocr.py`, et les icônes propres au niveau 2, devenues inutiles : `frontend/public/manifest-karnet.json`, `frontend/public/brand/karnet-favicon.png`, `frontend/public/brand/karnet-logo-mark.webp`, `frontend/public/brand/karnet-logo-source.webp`, `frontend/public/icons/karnet-apple-touch-icon.png`, `frontend/public/icons/karnet-icon-192.png`, `frontend/public/icons/karnet-icon-192.webp`, `frontend/public/icons/karnet-icon-512.png`, `frontend/public/icons/karnet-icon-512.webp`, `frontend/public/icons/karnet-icon-maskable-512.png`. **Vérifié** : `tsc --noEmit` propre, rendu de contrôle de la barre (ordinateur déplié et replié, téléphone, clair et sombre). **Non testé** : le comportement réel dans un navigateur (goutte qui glisse, repli, menu du compte), `next build`.

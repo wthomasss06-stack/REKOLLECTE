@@ -76,7 +76,7 @@ export default function AboutPage() {
       <FlowFigure />
       <h2>REKOLLECTE et REKOLLECTE+</h2>
       <p>
-        <strong>REKOLLECTE</strong> est le registre visiteurs. <strong>REKOLLECTE+</strong> y ajoute les fiches clients, les ressources, les réservations, les encaissements et les rappels de fin de créneau ; il s’active depuis les paramètres. Voir la page <Link href="/rekollecte-plus">REKOLLECTE+</Link>.
+        <strong>REKOLLECTE</strong> est le registre visiteurs. <strong>REKOLLECTE+</strong> y ajoute les fiches clients, les ressources, les réservations, les encaissements et les rappels de fin de créneau ; il s’active depuis la page REKOLLECTE. Voir la page <Link href="/rekollecte-plus">REKOLLECTE+</Link>.
       </p>
 
       <PlusFigure />

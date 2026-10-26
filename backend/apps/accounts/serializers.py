@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from .audit import describe
 from .models import AuditEvent, StaffInvitation, User
 
 
@@ -29,6 +30,9 @@ class StaffInvitationSerializer(serializers.ModelSerializer):
 
 
 class AuditEventSerializer(serializers.ModelSerializer):
+    category = serializers.SerializerMethodField()
+    label = serializers.SerializerMethodField()
+    sensitive = serializers.SerializerMethodField()
     actor_email = serializers.EmailField(source="actor.email", read_only=True)
     actor_name = serializers.CharField(source="actor.full_name", read_only=True, allow_null=True)
     target_email = serializers.EmailField(source="target_user.email", read_only=True, allow_null=True)
@@ -36,8 +40,17 @@ class AuditEventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AuditEvent
-        fields = ["id", "action", "actor_name", "actor_email", "target_name", "target_email", "metadata", "created_at"]
+        fields = ["id", "action", "category", "label", "sensitive", "actor_name", "actor_email", "target_name", "target_email", "metadata", "created_at"]
         read_only_fields = fields
+
+    def get_category(self, obj) -> str:
+        return describe(obj.action, obj.metadata)[0]
+
+    def get_label(self, obj) -> str:
+        return describe(obj.action, obj.metadata)[1]
+
+    def get_sensitive(self, obj) -> bool:
+        return describe(obj.action, obj.metadata)[2]
 
 
 class UserProfileUpdateSerializer(serializers.Serializer):

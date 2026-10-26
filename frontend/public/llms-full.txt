@@ -42,7 +42,7 @@ Bureaux et espaces professionnels ; restaurants et hôtels ; chantiers et sites 
 
 ## Fonctionnalités de REKOLLECTE+ (niveau 2)
 
-- Activation par le Patron depuis Paramètres > Administration ; désactivation possible sans suppression de données.
+- Activation par le Patron depuis la page REKOLLECTE ; désactivation possible sans suppression de données.
 - Le registre devient l'espace « Clients » : fiche client avec coordonnées, historique des passages et des réservations, solde dû.
 - Ressources créées à partir de types prêts à l'emploi, par catégorie : hébergement, beauté et soins, espaces professionnels, événementiel et restauration, stationnement, sport et loisirs, autre. Champs : capacité, code, emplacement, équipements, description, mode de tarification (par heure ou séance, par jour ou nuit, forfait mensuel).
 - Réservations numérotées, durée et montant calculés, détection de conflit si la ressource est déjà occupée.

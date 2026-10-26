@@ -8,7 +8,7 @@ export const FAQS = [
   { question: "Qu’est-ce que REKOLLECTE ?", answer: "REKOLLECTE est un registre visiteurs numérique par QR Code, conçu à Abidjan. Il remplace le cahier de visites des bureaux, restaurants, hôtels et accès chantier : le visiteur scanne, remplit le formulaire et signe à l’écran, sans compte, même sans connexion internet." },
   { question: "REKOLLECTE est-il un logiciel de gestion des visiteurs ?", answer: "Oui. C’est un logiciel de gestion des visiteurs par QR Code : formulaire adapté à l’activité, rôles Patron, Gérant et Agent, statistiques de fréquentation et export CSV. Il est gratuit pendant le lancement." },
   { question: "Combien coûte REKOLLECTE ?", answer: "REKOLLECTE est gratuit pendant le lancement. Ensuite : Gratuit à 0 FCFA, Essentiel à 3 000 FCFA par mois, REKOLLECTE+ à 7 000 FCFA par mois, Entreprise sur devis. L’enregistrement des visiteurs n’est jamais bloqué par un plan." },
-  { question: "Quelle différence entre REKOLLECTE et REKOLLECTE+ ?", answer: "REKOLLECTE est le registre visiteurs. REKOLLECTE+ y ajoute les fiches clients, les ressources (chambre, table, salle…), les réservations, les encaissements et les rappels de fin de créneau. Il s’active depuis les paramètres ; après le lancement, il faut le plan REKOLLECTE+." },
+  { question: "Quelle différence entre REKOLLECTE et REKOLLECTE+ ?", answer: "REKOLLECTE est le registre visiteurs. REKOLLECTE+ y ajoute les fiches clients, les ressources (chambre, table, salle…), les réservations, les encaissements et les rappels de fin de créneau. Il s’active depuis la page REKOLLECTE ; après le lancement, il faut le plan REKOLLECTE+." },
   { question: "Le visiteur doit-il créer un compte ?", answer: "Non. Il scanne le QR Code, remplit le formulaire sur son téléphone ou la tablette d’accueil, puis signe. Aucune application ni inscription n’est nécessaire." },
   { question: "Est-ce que REKOLLECTE fonctionne sans connexion ?", answer: "Oui. Le formulaire continue d’enregistrer les visites sur l’appareil, hors ligne. Les données se synchronisent automatiquement dès que la connexion revient." },
   { question: "Puis-je adapter le formulaire à mon activité ?", answer: "Oui. Vous choisissez les champs utiles à votre établissement (bureau, restaurant, hôtel, chantier…) et vous les modifiez à tout moment depuis les paramètres." },
@@ -86,7 +86,7 @@ export const JSON_LD = {
       applicationCategory: "BusinessApplication",
       operatingSystem: "Web (application installable PWA)",
       inLanguage: "fr",
-      description: "REKOLLECTE+ complète REKOLLECTE : fiches clients, ressources, réservations, encaissements et rappels, activable depuis les paramètres.",
+      description: "REKOLLECTE+ complète REKOLLECTE : fiches clients, ressources, réservations, encaissements et rappels, activable depuis la page REKOLLECTE.",
       featureList: FEATURES_PLUS,
       isAccessibleForFree: true,
       offers: FREE,
@@ -115,7 +115,7 @@ export const STEPS = [
 ];
 
 export const STEPS_PLUS = [
-  { n: "01", title: "Activer", body: "Dans les paramètres, activez REKOLLECTE+ : le registre continue de tourner sans interruption." },
+  { n: "01", title: "Activer", body: "Dans la page REKOLLECTE, activez la rubrique REKOLLECTE+ : le registre continue de tourner sans interruption." },
   { n: "02", title: "Créer une ressource", body: "Choisissez un type et un sous-type : la ressource est prête. Le prix s’ajuste ensuite en un clic." },
   { n: "03", title: "Réserver", body: "Le client réserve une ressource ; la réservation est numérotée, sans conflit de créneaux." },
   { n: "04", title: "Être alerté", body: "À la fin du créneau, une sonnerie prévient l’équipe. Un geste suffit pour valider ou annuler." },
@@ -161,7 +161,7 @@ export const FEATURE_ROWS = [
     id: "plus",
     image: { src: "/landing-images/offline+.webp", alt: "REKOLLECTE+ : réservations, clients et ressources pour toute l’équipe", w: 1254, h: 1254 },
     title: "REKOLLECTE+ : du visiteur au client",
-    body: "Quand un visiteur réserve, consomme et doit payer, le deuxième cahier disparaît aussi. Activez REKOLLECTE+ depuis vos paramètres.",
+    body: "Quand un visiteur réserve, consomme et doit payer, le deuxième cahier disparaît aussi. Activez REKOLLECTE+ depuis la page REKOLLECTE.",
     checks: ["Fiches clients avec tout l’historique", "Ressources : chambre, table ou salle", "Réservations numérotées, paiements et rappels"],
     cta: { label: "Activer REKOLLECTE+", href: "/connexion" },
   },
